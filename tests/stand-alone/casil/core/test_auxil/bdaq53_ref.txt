@@ -1,0 +1,199 @@
+ DATA: 
+transfer_layer DATA: 
+	#0 DATA: 
+		name DATA: intf
+		type DATA: SiTcp
+		init DATA: 
+			ip DATA: 192.168.10.12
+			udp_port DATA: 4660
+			tcp_port DATA: 24
+			tcp_connection DATA: True
+hw_drivers DATA: 
+	#0 DATA: 
+		name DATA: FIFO
+		type DATA: sitcp_fifo
+		interface DATA: intf
+		base_addr DATA: 0x200000000
+		base_data_addr DATA: 0x100000000
+	#1 DATA: 
+		name DATA: system
+		type DATA: bdaq53.system.board
+		interface DATA: intf
+		base_addr DATA: 0x0000
+	#2 DATA: 
+		name DATA: tlu
+		type DATA: tlu
+		interface DATA: intf
+		base_addr DATA: 0x0600
+	#3 DATA: 
+		name DATA: pulser_trig
+		type DATA: pulse_gen
+		interface DATA: intf
+		base_addr DATA: 0x0700
+	#4 DATA: 
+		name DATA: pulser_veto
+		type DATA: pulse_gen
+		interface DATA: intf
+		base_addr DATA: 0x0800
+	#5 DATA: 
+		name DATA: i2c
+		type DATA: i2c
+		interface DATA: intf
+		base_addr DATA: 0x1000
+	#6 DATA: 
+		name DATA: gpio_bdaq_control
+		type DATA: gpio
+		interface DATA: intf
+		base_addr DATA: 0x2100
+		size DATA: 24
+	#7 DATA: 
+		name DATA: gpio_dm
+		type DATA: gpio
+		interface DATA: intf
+		base_addr DATA: 0x1e00
+		size DATA: 80
+	#8 DATA: 
+		name DATA: gpio_xadc_vpvn
+		type DATA: gpio
+		interface DATA: intf
+		base_addr DATA: 0x1f00
+		size DATA: 16
+	#9 DATA: 
+		name DATA: gpio_xadc_fpga_temp
+		type DATA: gpio
+		interface DATA: intf
+		base_addr DATA: 0x2000
+		size DATA: 16
+	#10 DATA: 
+		name DATA: pulse_gen_az
+		type DATA: pulse_gen
+		interface DATA: intf
+		base_addr DATA: 0x2300
+	#11 DATA: 
+		name DATA: tdc_hitor0
+		type DATA: tdc_s3
+		interface DATA: intf
+		base_addr DATA: 0x2400
+	#12 DATA: 
+		name DATA: tdc_hitor1
+		type DATA: tdc_s3
+		interface DATA: intf
+		base_addr DATA: 0x2500
+	#13 DATA: 
+		name DATA: tdc_hitor2
+		type DATA: tdc_s3
+		interface DATA: intf
+		base_addr DATA: 0x2600
+	#14 DATA: 
+		name DATA: tdc_hitor3
+		type DATA: tdc_s3
+		interface DATA: intf
+		base_addr DATA: 0x2700
+	#15 DATA: 
+		name DATA: pulser_cmd_start_loop
+		type DATA: pulse_gen
+		interface DATA: intf
+		base_addr DATA: 0x2800
+	#16 DATA: 
+		name DATA: pulser_ext_trig
+		type DATA: pulse_gen
+		interface DATA: intf
+		base_addr DATA: 0x2900
+	#17 DATA: 
+		name DATA: cmd
+		type DATA: bdaq53.system.bdaq53_driver
+		interface DATA: intf
+		base_addr DATA: 0x9000
+registers DATA: 
+	#0 DATA: 
+		name DATA: BDAQ_CONTROL
+		type DATA: StdRegister
+		hw_driver DATA: gpio_bdaq_control
+		size DATA: 24
+		fields DATA: 
+			#0 DATA: 
+				name DATA: HITOR_COMBINE_EN
+				size DATA: 3
+				offset DATA: 23
+			#1 DATA: 
+				name DATA: SI570_IS_CONFIGURED
+				size DATA: 1
+				offset DATA: 20
+			#2 DATA: 
+				name DATA: MGT_REF_SEL
+				size DATA: 1
+				offset DATA: 19
+			#3 DATA: 
+				name DATA: LEMO_MUX_TX1
+				size DATA: 2
+				offset DATA: 18
+			#4 DATA: 
+				name DATA: LEMO_MUX_TX0
+				size DATA: 2
+				offset DATA: 16
+			#5 DATA: 
+				name DATA: LEMO_MUX_RX1
+				size DATA: 2
+				offset DATA: 14
+			#6 DATA: 
+				name DATA: LEMO_MUX_RX0
+				size DATA: 2
+				offset DATA: 12
+			#7 DATA: 
+				name DATA: NTC_MUX
+				size DATA: 3
+				offset DATA: 10
+			#8 DATA: 
+				name DATA: RESET
+				size DATA: 4
+				offset DATA: 7
+			#9 DATA: 
+				name DATA: SENSE
+				size DATA: 4
+				offset DATA: 3
+	#1 DATA: 
+		name DATA: DATA_MERGING
+		type DATA: StdRegister
+		hw_driver DATA: gpio_dm
+		size DATA: 80
+		fields DATA: 
+			#0 DATA: 
+				name DATA: DM_INC_SET
+				size DATA: 1
+				offset DATA: 79
+			#1 DATA: 
+				name DATA: DM_INC_ENABLE
+				size DATA: 1
+				offset DATA: 78
+			#2 DATA: 
+				name DATA: DM_DELAY
+				size DATA: 1
+				offset DATA: 77
+			#3 DATA: 
+				name DATA: DM_ENABLE
+				size DATA: 4
+				offset DATA: 75
+			#4 DATA: 
+				name DATA: DM_STATE
+				size DATA: 3
+				offset DATA: 71
+			#5 DATA: 
+				name DATA: DM_INVERT
+				size DATA: 1
+				offset DATA: 67
+			#6 DATA: 
+				name DATA: DM_RESET
+				size DATA: 1
+				offset DATA: 66
+			#7 DATA: 
+				name DATA: DM_TYPE
+				size DATA: 1
+				offset DATA: 65
+			#8 DATA: 
+				name DATA: DM_START
+				size DATA: 1
+				offset DATA: 64
+			#9 DATA: 
+				name DATA: DM_DATA
+				size DATA: 64
+				offset DATA: 63

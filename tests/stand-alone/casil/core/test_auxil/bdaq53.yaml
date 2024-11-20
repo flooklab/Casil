@@ -1,0 +1,209 @@
+# Copyright (C) 2011–2024 SiLab, Institute of Physics, University of Bonn
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#  *  Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+#  *  Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#
+#  *  Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from
+#     this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+transfer_layer:
+  - name  : intf
+    type  : SiTcp
+    init:
+        ip : "192.168.10.12"  # "192.168.100.12"
+        udp_port : 4660
+        tcp_port : 24
+        tcp_connection : True
+        #tcp_to_bus : True
+
+hw_drivers:
+  - name      : FIFO
+    type      : sitcp_fifo
+    interface : intf
+    base_addr : 0x200000000
+    base_data_addr : 0x100000000
+
+  - name      : system
+    type      : bdaq53.system.board
+    interface : intf
+    base_addr : 0x0000
+
+  - name      : tlu
+    type      : tlu
+    interface : intf
+    base_addr : 0x0600
+
+  - name      : pulser_trig
+    type      : pulse_gen
+    interface : intf
+    base_addr : 0x0700
+
+  - name      : pulser_veto
+    type      : pulse_gen
+    interface : intf
+    base_addr : 0x0800
+
+  - name      : i2c
+    type      : i2c
+    interface : intf
+    base_addr : 0x1000
+
+  - name      : gpio_bdaq_control
+    type      : gpio
+    interface : intf
+    base_addr : 0x2100
+    size      : 24
+
+  - name      : gpio_dm
+    type      : gpio
+    interface : intf
+    base_addr : 0x1e00
+    size      : 80
+
+  - name      : gpio_xadc_vpvn
+    type      : gpio
+    interface : intf
+    base_addr : 0x1f00
+    size      : 16
+
+  - name      : gpio_xadc_fpga_temp
+    type      : gpio
+    interface : intf
+    base_addr : 0x2000
+    size      : 16
+
+  - name      : pulse_gen_az
+    type      : pulse_gen
+    interface : intf
+    base_addr : 0x2300
+
+  - name      : tdc_hitor0
+    type      : tdc_s3
+    interface : intf
+    base_addr : 0x2400
+
+  - name      : tdc_hitor1
+    type      : tdc_s3
+    interface : intf
+    base_addr : 0x2500
+
+  - name      : tdc_hitor2
+    type      : tdc_s3
+    interface : intf
+    base_addr : 0x2600
+
+  - name      : tdc_hitor3
+    type      : tdc_s3
+    interface : intf
+    base_addr : 0x2700
+
+  - name      : pulser_cmd_start_loop
+    type      : pulse_gen
+    interface : intf
+    base_addr : 0x2800
+
+  - name      : pulser_ext_trig
+    type      : pulse_gen
+    interface : intf
+    base_addr : 0x2900
+
+  - name      : cmd
+    type      : bdaq53.system.bdaq53_driver
+    interface : intf
+    base_addr : 0x9000
+
+registers:
+  - name        : BDAQ_CONTROL
+    type        : StdRegister
+    hw_driver   : gpio_bdaq_control
+    size        : 24
+    fields:
+      - name    : HITOR_COMBINE_EN
+        size    : 3
+        offset  : 23
+      - name    : SI570_IS_CONFIGURED
+        size    : 1
+        offset  : 20
+      - name    : MGT_REF_SEL
+        size    : 1
+        offset  : 19
+      - name    : LEMO_MUX_TX1
+        size    : 2
+        offset  : 18
+      - name    : LEMO_MUX_TX0
+        size    : 2
+        offset  : 16
+      - name    : LEMO_MUX_RX1
+        size    : 2
+        offset  : 14
+      - name    : LEMO_MUX_RX0
+        size    : 2
+        offset  : 12
+      - name    : NTC_MUX
+        size    : 3
+        offset  : 10
+      - name    : RESET
+        size    : 4
+        offset  : 7
+      - name    : SENSE
+        size    : 4
+        offset  : 3
+
+  - name        : DATA_MERGING
+    type        : StdRegister
+    hw_driver   : gpio_dm
+    size        : 80
+    fields:
+      - name: DM_INC_SET
+        size: 1
+        offset: 79
+      - name: DM_INC_ENABLE
+        size: 1
+        offset: 78
+      - name    : DM_DELAY
+        size    : 1
+        offset  : 77
+      - name    : DM_ENABLE
+        size    : 4
+        offset  : 75
+      - name    : DM_STATE
+        size    : 3
+        offset  : 71
+      - name    : DM_INVERT
+        size    : 1
+        offset  : 67
+      - name    : DM_RESET
+        size    : 1
+        offset  : 66
+      - name    : DM_TYPE
+        size    : 1
+        offset  : 65
+      - name    : DM_START
+        size    : 1
+        offset  : 64
+      - name    : DM_DATA
+        size    : 64
+        offset  : 63

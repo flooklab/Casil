@@ -1,0 +1,8 @@
+#Qt Creator project configuration
+CMakeLists.txt.user
+
+#Doxygen output
+doc/casil/doc
+
+#Untracked development stuff
+_misc

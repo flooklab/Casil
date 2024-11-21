@@ -29,8 +29,8 @@
 
 #include <cstdlib>
 
-#define xstr(s) str(s)
-#define str(s) #s
+#define CASIL_XSTR(S) CASIL_STR(S)
+#define CASIL_STR(S) #S
 
 namespace
 {
@@ -67,7 +67,7 @@ std::map<std::string, std::set<std::string>, std::less<>> readEnv()
 
     std::string devDescsMacro;
 #ifdef CASIL_DEV_DESC_DIRS
-    devDescsMacro = xstr(CASIL_DEV_DESC_DIRS);
+    devDescsMacro = CASIL_XSTR(CASIL_DEV_DESC_DIRS);
 #endif
 
     const char *const getenvPtr = std::getenv("CASIL_DEV_DESC_DIRS");

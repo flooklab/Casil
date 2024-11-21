@@ -32,11 +32,9 @@ struct DataDirFixture
 {
     DataDirFixture() :
 #ifdef CASIL_TEST_DATA_DIR
-#define xstr(s) str(s)
-#define str(s) #s
-        dataPath(xstr(CASIL_TEST_DATA_DIR))
-#undef str
-#undef xstr
+#define CASIL_XSTR(S) CASIL_STR(S)
+#define CASIL_STR(S) #S
+        dataPath(CASIL_XSTR(CASIL_TEST_DATA_DIR))
 #else
         dataPath(extractDataPath())
 #endif

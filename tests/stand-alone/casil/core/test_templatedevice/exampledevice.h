@@ -30,27 +30,27 @@
 #include <casil/RL/dummyregister.h>
 #include <casil/TL/Direct/dummyinterface.h>
 
-struct TLDummyInterface1 : public casil::TmplDevInterface<casil::TL::DummyInterface>
+struct TLDummyInterface1 : public casil::TmplDev::InterfaceConf<casil::TL::DummyInterface>
 {
     static constexpr char name[] = "DummyInterface1";
     static constexpr char conf[] = "";
 };
 
-struct HLDummyDriver1 : public casil::TmplDevDriver<casil::HL::DummyDriver>
+struct HLDummyDriver1 : public casil::TmplDev::DriverConf<casil::HL::DummyDriver>
 {
     static constexpr char name[] = "DummyDriver1";
     static constexpr char interface[] = "DummyInterface1";
     static constexpr char conf[] = "";
 };
 
-struct HLDriver2 : public casil::TmplDevDriver<casil::HL::TestDriver>
+struct HLDriver2 : public casil::TmplDev::DriverConf<casil::HL::TestDriver>
 {
     static constexpr char name[] = "testdrv123";
     static constexpr char interface[] = "DummyInterface1";
     static constexpr char conf[] = "";
 };
 
-struct RLDummyRegister1 : public casil::TmplDevRegister<casil::RL::DummyRegister>
+struct RLDummyRegister1 : public casil::TmplDev::RegisterConf<casil::RL::DummyRegister>
 {
     static constexpr char name[] = "DummyRegister1";
     static constexpr char driver[] = "DummyDriver1";
@@ -58,10 +58,10 @@ struct RLDummyRegister1 : public casil::TmplDevRegister<casil::RL::DummyRegister
 };
 
 typedef casil::TemplateDevice<
-                casil::TmplDevInterfaces<TLDummyInterface1>,
-                casil::TmplDevDrivers<HLDummyDriver1,
-                                      HLDriver2>,
-                casil::TmplDevRegisters<RLDummyRegister1>
+                casil::TmplDev::InterfacesConf<TLDummyInterface1>,
+                casil::TmplDev::DriversConf<HLDummyDriver1,
+                                            HLDriver2>,
+                casil::TmplDev::RegistersConf<RLDummyRegister1>
             > ExampleDevice;
 
 #endif // CASILTESTS_EXAMPLEDEVICE_H

@@ -40,15 +40,23 @@ namespace casil
 {
 
 /*!
- * \brief Implementation details for \ref TemplateDeviceSpecialization "TemplateDevice".
+ * \brief Compile-time configuration of \ref TemplateDeviceSpecialization "TemplateDevice" layer components.
+ *
+ * \todo Detailed doc
+ */
+namespace TmplDev
+{
+
+/*!
+ * \brief Implementation details for TmplDev.
  */
 namespace TmplDevImpl
 {
-    struct TmplDevComponentBase { TmplDevComponentBase() = delete; };
+    struct ComponentConfBase { ComponentConfBase() = delete; };
 
-    struct TmplDevInterfaceBase : public TmplDevComponentBase {};
-    struct TmplDevDriverBase : public TmplDevComponentBase {};
-    struct TmplDevRegisterBase : public TmplDevComponentBase {};
+    struct InterfaceConfBase : public ComponentConfBase {};
+    struct DriverConfBase : public ComponentConfBase {};
+    struct RegisterConfBase : public ComponentConfBase {};
 
 } // namespace TmplDevImpl
 
@@ -62,7 +70,7 @@ namespace TmplDevImpl
  * \tparam T %Interface class implementing TL::Interface.
  */
 template<typename T>
-struct TmplDevInterface : public TmplDevImpl::TmplDevInterfaceBase
+struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
 {
     static_assert(Concepts::IsInterface<T>, "Type must be an interface.");
     static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
@@ -78,7 +86,7 @@ struct TmplDevInterface : public TmplDevImpl::TmplDevInterfaceBase
  * \tparam T %Driver class implementing HL::Driver.
  */
 template<typename T>
-struct TmplDevDriver : public TmplDevImpl::TmplDevDriverBase
+struct DriverConf : public TmplDevImpl::DriverConfBase
 {
     static_assert(Concepts::IsDriver<T>, "Type must be a driver.");
     static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
@@ -94,7 +102,7 @@ struct TmplDevDriver : public TmplDevImpl::TmplDevDriverBase
  * \tparam T %Register class implementing RL::Register.
  */
 template<typename T>
-struct TmplDevRegister : public TmplDevImpl::TmplDevRegisterBase
+struct RegisterConf : public TmplDevImpl::RegisterConfBase
 {
     static_assert(Concepts::IsRegister<T>, "Type must be a register.");
     static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
@@ -107,12 +115,12 @@ struct TmplDevRegister : public TmplDevImpl::TmplDevRegisterBase
 namespace TmplDevImpl
 {
     template<typename T, template<typename> typename U>
-    concept DerivedFromTmplDevStruct = requires { typename T::Type; } &&
-                                       std::is_base_of_v<U<typename T::Type>, T> &&
-                                       !std::is_same_v<U<typename T::Type>, T>;
+    concept DerivedFromConfStruct = requires { typename T::Type; } &&
+                                    std::is_base_of_v<U<typename T::Type>, T> &&
+                                    !std::is_same_v<U<typename T::Type>, T>;
 
     template<typename T, template<typename> typename U>
-    concept ImplementsTmplDevStruct = DerivedFromTmplDevStruct<T, U> && requires
+    concept ImplementsConfStruct = DerivedFromConfStruct<T, U> && requires
     {
         T::name;
         T::conf;
@@ -123,10 +131,10 @@ namespace TmplDevImpl
     };
 
     template<typename T>
-    concept ImplementsTmplDevInterface = ImplementsTmplDevStruct<T, TmplDevInterface>;
+    concept ImplementsInterfaceConf = ImplementsConfStruct<T, InterfaceConf>;
 
     template<typename T>
-    concept ImplementsTmplDevDriver = ImplementsTmplDevStruct<T, TmplDevDriver> && requires
+    concept ImplementsDriverConf = ImplementsConfStruct<T, DriverConf> && requires
     {
         T::interface;
         requires Concepts::IsConstCharArr<decltype(T::interface)>;
@@ -134,7 +142,7 @@ namespace TmplDevImpl
     };
 
     template<typename T>
-    concept ImplementsTmplDevRegister = ImplementsTmplDevStruct<T, TmplDevRegister> && requires
+    concept ImplementsRegisterConf = ImplementsConfStruct<T, RegisterConf> && requires
     {
         T::driver;
         requires Concepts::IsConstCharArr<decltype(T::driver)>;
@@ -150,13 +158,13 @@ namespace TmplDevImpl
  *
  * \todo Detailed doc
  *
- * \tparam Ts Set of interface configurations (each implementing TmplDevInterface).
+ * \tparam Ts Set of interface configurations (each implementing InterfaceConf).
  */
 template<typename... Ts>
-struct TmplDevInterfaces
+struct InterfacesConf
 {
-    static_assert((TmplDevImpl::ImplementsTmplDevInterface<Ts> && ...),
-                  "Each interface must be specified by deriving from TmplDevInterface and defining "
+    static_assert((TmplDevImpl::ImplementsInterfaceConf<Ts> && ...),
+                  "Each interface must be specified by deriving from InterfaceConf and defining "
                   "'static constexpr char name[] = \"name_of_interface\";' and "
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
 };
@@ -166,13 +174,13 @@ struct TmplDevInterfaces
  *
  * \todo Detailed doc
  *
- * \tparam Ts Set of driver configurations (each implementing TmplDevDriver).
+ * \tparam Ts Set of driver configurations (each implementing DriverConf).
  */
 template<typename... Ts>
-struct TmplDevDrivers
+struct DriversConf
 {
-    static_assert((TmplDevImpl::ImplementsTmplDevDriver<Ts> && ...),
-                  "Each driver must be specified by deriving from TmplDevDriver and defining "
+    static_assert((TmplDevImpl::ImplementsDriverConf<Ts> && ...),
+                  "Each driver must be specified by deriving from DriverConf and defining "
                   "'static constexpr char name[] = \"name_of_driver\";' and "
                   "'static constexpr char interface[] = \"name_of_used_interface\";' and "
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
@@ -183,33 +191,35 @@ struct TmplDevDrivers
  *
  * \todo Detailed doc
  *
- * \tparam Ts Set of register configurations (each implementing TmplDevRegister).
+ * \tparam Ts Set of register configurations (each implementing RegisterConf).
  */
 template<typename... Ts>
-struct TmplDevRegisters
+struct RegistersConf
 {
-    static_assert((TmplDevImpl::ImplementsTmplDevRegister<Ts> && ...),
-                  "Each register must be specified by deriving from TmplDevRegister and defining "
+    static_assert((TmplDevImpl::ImplementsRegisterConf<Ts> && ...),
+                  "Each register must be specified by deriving from RegisterConf and defining "
                   "'static constexpr char name[] = \"name_of_register\";' and "
                   "'static constexpr char driver[] = \"name_of_used_hw_driver\";' and "
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
 };
+
+} // namespace TmplDev
 
 //
 
 /*!
  * \brief Type-safe wrapper for the "plain" Device class.
  *
- * See \ref TemplateDeviceSpecialization "TemplateDevice<TmplDevInterfaces<TmplDevInterfaceTs...>, <!--
- *                                                    -->TmplDevDrivers<TmplDevDriverTs...>, TmplDevRegisters<TmplDevRegisterTs...>>"
+ * See \ref TemplateDeviceSpecialization "TemplateDevice<TmplDev::InterfacesConf<InterfaceConfTs...>, <!--
+ *                                                      -->TmplDev::DriversConf<DriverConfTs...>, TmplDev::RegistersConf<RegisterConfTs...>>"
  *
  * \todo Describe or remove tparams here.
  *
- * \tparam TmplDevInterfacesT
- * \tparam TmplDevDriversT
- * \tparam TmplDevRegistersT
+ * \tparam InterfacesConfT
+ * \tparam DriversConfT
+ * \tparam RegistersConfT
  */
-template<typename TmplDevInterfacesT, typename TmplDevDriversT, typename TmplDevRegistersT>
+template<typename InterfacesConfT, typename DriversConfT, typename RegistersConfT>
 class TemplateDevice;
 
 /*!
@@ -218,17 +228,17 @@ class TemplateDevice;
  *
  * \todo Detailed doc
  *
- * \tparam TmplDevInterfaces Wrapper for a set of interface configurations \p TmplDevInterfaceTs.
- * \tparam TmplDevInterfaceTs Set of interface configurations (each implementing TmplDevInterface).
- * \tparam TmplDevDrivers Wrapper for a set of driver configurations \p TmplDevDriverTs.
- * \tparam TmplDevDriverTs Set of driver configurations (each implementing TmplDevDriver).
- * \tparam TmplDevRegisters Wrapper for a set of register configurations.
- * \tparam TmplDevRegisterTs Set of register configurations (each implementing TmplDevRegister).
+ * \tparam TmplDev::InterfacesConf Wrapper for a set of interface configurations \p InterfaceConfTs.
+ * \tparam InterfaceConfTs Set of interface configurations (each implementing TmplDev::InterfaceConf).
+ * \tparam TmplDev::DriversConf Wrapper for a set of driver configurations \p DriverConfTs.
+ * \tparam DriverConfTs Set of driver configurations (each implementing TmplDev::DriverConf).
+ * \tparam TmplDev::RegistersConf Wrapper for a set of register configurations \p RegisterConfTs.
+ * \tparam RegisterConfTs Set of register configurations (each implementing TmplDev::RegisterConf).
  */
-template<typename... TmplDevInterfaceTs, typename... TmplDevDriverTs, typename... TmplDevRegisterTs>
-class TemplateDevice<TmplDevInterfaces<TmplDevInterfaceTs...>,
-                     TmplDevDrivers<TmplDevDriverTs...>,
-                     TmplDevRegisters<TmplDevRegisterTs...>> : public Device
+template<typename... InterfaceConfTs, typename... DriverConfTs, typename... RegisterConfTs>
+class TemplateDevice<TmplDev::InterfacesConf<InterfaceConfTs...>,
+                     TmplDev::DriversConf<DriverConfTs...>,
+                     TmplDev::RegistersConf<RegisterConfTs...>> : public Device
 {
 public:
     /*!
@@ -258,7 +268,7 @@ public:
     typename T::Type& interface()
     {
         static_assert(std::is_base_of_v<TL::Interface, typename T::Type>, "Requested type is not an interface.");
-        static_assert((std::is_same_v<T, TmplDevInterfaceTs> || ...), "Device does not have the requested interface.");
+        static_assert((std::is_same_v<T, InterfaceConfTs> || ...), "Device does not have the requested interface.");
 
         return dynamic_cast<typename T::Type&>(Device::interface(T::name));
     }
@@ -274,7 +284,7 @@ public:
     typename T::Type& driver()
     {
         static_assert(std::is_base_of_v<HL::Driver, typename T::Type>, "Requested type is not a driver.");
-        static_assert((std::is_same_v<T, TmplDevDriverTs> || ...), "Device does not have the requested driver.");
+        static_assert((std::is_same_v<T, DriverConfTs> || ...), "Device does not have the requested driver.");
 
         return dynamic_cast<typename T::Type&>(Device::driver(T::name));
     }
@@ -290,7 +300,7 @@ public:
     typename T::Type& reg()
     {
         static_assert(std::is_base_of_v<RL::Register, typename T::Type>, "Requested type is not a register.");
-        static_assert((std::is_same_v<T, TmplDevRegisterTs> || ...), "Device does not have the requested register.");
+        static_assert((std::is_same_v<T, RegisterConfTs> || ...), "Device does not have the requested register.");
 
         return dynamic_cast<typename T::Type&>(Device::reg(T::name));
     }
@@ -309,12 +319,12 @@ private:
         std::string yamlDrvSeq;
         std::string yamlRegSeq;
 
-        if constexpr (sizeof...(TmplDevInterfaceTs) > 0)
-            addLayerElementsToYAML<0, LayerBase::Layer::TransferLayer, TmplDevInterfaceTs...>(yamlIntfSeq);
-        if constexpr (sizeof...(TmplDevDriverTs) > 0)
-            addLayerElementsToYAML<0, LayerBase::Layer::HardwareLayer, TmplDevDriverTs...>(yamlDrvSeq);
-        if constexpr (sizeof...(TmplDevRegisterTs) > 0)
-            addLayerElementsToYAML<0, LayerBase::Layer::RegisterLayer, TmplDevRegisterTs...>(yamlRegSeq);
+        if constexpr (sizeof...(InterfaceConfTs) > 0)
+            addLayerElementsToYAML<0, LayerBase::Layer::TransferLayer, InterfaceConfTs...>(yamlIntfSeq);
+        if constexpr (sizeof...(DriverConfTs) > 0)
+            addLayerElementsToYAML<0, LayerBase::Layer::HardwareLayer, DriverConfTs...>(yamlDrvSeq);
+        if constexpr (sizeof...(RegisterConfTs) > 0)
+            addLayerElementsToYAML<0, LayerBase::Layer::RegisterLayer, RegisterConfTs...>(yamlRegSeq);
 
         const std::string yamlString = "{transfer_layer: " + yamlIntfSeq + ", " +
                                        "hw_drivers: " + yamlDrvSeq + ", " +
@@ -330,13 +340,13 @@ private:
      *
      * \tparam N
      * \tparam layer
-     * \tparam TmplDevComponentTs
+     * \tparam ComponentConfTs
      * \param pYAMLLayerSeq
      */
-    template<std::size_t N, LayerBase::Layer layer, typename... TmplDevComponentTs>
+    template<std::size_t N, LayerBase::Layer layer, typename... ComponentConfTs>
     static void addLayerElementsToYAML(std::string& pYAMLLayerSeq)
     {
-        using CurrentElementT = std::tuple_element_t<N, std::tuple<TmplDevComponentTs...>>;
+        using CurrentElementT = std::tuple_element_t<N, std::tuple<ComponentConfTs...>>;
 
         if constexpr (N == 0)
             pYAMLLayerSeq = "[";
@@ -354,8 +364,8 @@ private:
 
         pYAMLLayerSeq += tElementMap;
 
-        if constexpr (N < sizeof...(TmplDevComponentTs)-1)
-            addLayerElementsToYAML<N+1, layer, TmplDevComponentTs...>(pYAMLLayerSeq);
+        if constexpr (N < sizeof...(ComponentConfTs)-1)
+            addLayerElementsToYAML<N+1, layer, ComponentConfTs...>(pYAMLLayerSeq);
         else
             pYAMLLayerSeq += "]";
     }

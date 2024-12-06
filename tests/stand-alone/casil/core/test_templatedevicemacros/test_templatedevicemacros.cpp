@@ -49,9 +49,9 @@ CASIL_DEFINE_REGISTER(casil::RL::DummyRegister,
                       "")
 
 typedef casil::TemplateDevice<
-                casil::TmplDevInterfaces<TLDummyInterface1>,
-                casil::TmplDevDrivers<HLDummyDriver1>,
-                casil::TmplDevRegisters<RLDummyRegister1>
+                casil::TmplDev::InterfacesConf<TLDummyInterface1>,
+                casil::TmplDev::DriversConf<HLDummyDriver1>,
+                casil::TmplDev::RegistersConf<RLDummyRegister1>
             > ExampleDevice;
 
 //

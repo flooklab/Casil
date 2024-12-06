@@ -53,20 +53,20 @@
 /// #include <thread>
 /// #include <vector>
 ///
-/// struct Intf : public casil::TmplDevInterface<casil::TL::SiTCP>
+/// struct Intf : public casil::TmplDev::InterfaceConf<casil::TL::SiTCP>
 /// {
 ///     static constexpr char name[] = "intf";
 ///     static constexpr char conf[] = "init: {ip: localhost, udp_port: 12345}";
 /// };
 ///
-/// struct GPIO : public casil::TmplDevDriver<casil::HL::GPIO>
+/// struct GPIO : public casil::TmplDev::DriverConf<casil::HL::GPIO>
 /// {
 ///     static constexpr char name[] = "GPIO";
 ///     static constexpr char interface[] = "intf";
 ///     static constexpr char conf[] = "base_addr: 0x0, size: 128";
 /// };
 ///
-/// struct FIFO : public casil::TmplDevDriver<casil::HL::SiTCPFifo>
+/// struct FIFO : public casil::TmplDev::DriverConf<casil::HL::SiTCPFifo>
 /// {
 ///     static constexpr char name[] = "FIFO";
 ///     static constexpr char interface[] = "intf";
@@ -78,7 +78,7 @@
 ///
 /// //Above macro is equivalent to:
 /// //
-/// // struct SomeRegister : public casil::TmplDevRegister<casil::RL::DummyRegister>
+/// // struct SomeRegister : public casil::TmplDev::RegisterConf<casil::RL::DummyRegister>
 /// // {
 /// //     static constexpr char name[] = "some_register";
 /// //     static constexpr char driver[] = "GPIO";
@@ -86,10 +86,10 @@
 /// // };
 ///
 /// typedef casil::TemplateDevice<
-///                 casil::TmplDevInterfaces<Intf>,
-///                 casil::TmplDevDrivers<GPIO,
-///                                       FIFO>,
-///                 casil::TmplDevRegisters<SomeRegister>
+///                 casil::TmplDev::InterfacesConf<Intf>,
+///                 casil::TmplDev::DriversConf<GPIO,
+///                                             FIFO>,
+///                 casil::TmplDev::RegistersConf<SomeRegister>
 ///             > ExampleDevice;
 ///
 /// int main()

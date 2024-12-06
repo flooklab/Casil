@@ -28,14 +28,14 @@
 //
 
 #define CASIL_DEFINE_INTERFACE(INTF_CLASS, STRUCT_NAME, INTF_NAME, CONF) \
-struct STRUCT_NAME : public casil::TmplDevInterface<INTF_CLASS>\
+struct STRUCT_NAME : public casil::TmplDev::InterfaceConf<INTF_CLASS>\
 {\
     static constexpr char name[] = INTF_NAME;\
     static constexpr char conf[] = CONF;\
 };
 
 #define CASIL_DEFINE_DRIVER(DRV_CLASS, STRUCT_NAME, DRV_NAME, INTERFACE, CONF) \
-struct STRUCT_NAME : public casil::TmplDevDriver<DRV_CLASS>\
+struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
 {\
     static constexpr char name[] = DRV_NAME;\
     static constexpr char interface[] = INTERFACE;\
@@ -43,7 +43,7 @@ struct STRUCT_NAME : public casil::TmplDevDriver<DRV_CLASS>\
 };
 
 #define CASIL_DEFINE_REGISTER(REG_CLASS, STRUCT_NAME, REG_NAME, DRIVER, CONF) \
-struct STRUCT_NAME : public casil::TmplDevRegister<REG_CLASS>\
+struct STRUCT_NAME : public casil::TmplDev::RegisterConf<REG_CLASS>\
 {\
     static constexpr char name[] = REG_NAME;\
     static constexpr char driver[] = DRIVER;\

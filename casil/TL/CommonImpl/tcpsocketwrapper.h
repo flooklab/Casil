@@ -42,6 +42,11 @@ namespace TL
 namespace CommonImpl
 {
 
+/*!
+ * \brief Wrapper class around the %TCP network socket of the Boost %ASIO library.
+ *
+ * \todo Detailed doc
+ */
 class TCPSocketWrapper
 {
 public:

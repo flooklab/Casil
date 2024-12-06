@@ -203,6 +203,9 @@ constexpr std::vector<std::uint8_t> composeByteVec(const bool pBigEndian, Ts... 
     return retVal;
 }
 
+/*!
+ * \brief Implementation details for Bytes.
+ */
 namespace BytesImpl
 {
 

@@ -43,6 +43,11 @@ namespace TL
 namespace CommonImpl
 {
 
+/*!
+ * \brief Wrapper class around the serial port interface of the Boost %ASIO library.
+ *
+ * \todo Detailed doc
+ */
 class SerialPortWrapper
 {
 public:

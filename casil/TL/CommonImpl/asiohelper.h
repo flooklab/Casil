@@ -42,37 +42,66 @@ namespace casil
 namespace TL
 {
 
+/*!
+ * \brief Common implementations for the different Interface classes.
+ */
 namespace CommonImpl
 {
 
+/*!
+ * \brief Helper functions for using the asynchronous functionality of the Boost %ASIO library.
+ */
 namespace ASIOHelper
 {
 
+/*!
+ * \brief Check if type is either a Boost %ASIO %TCP socket or a Boost %ASIO %UDP socket.
+ */
 template<typename SocketT>
 concept IsSocket = (std::same_as<SocketT, boost::asio::ip::tcp::socket> || std::same_as<SocketT, boost::asio::ip::udp::socket>);
 
+/*!
+ * \brief Check if a Boost %ASIO %TCP or %UDP socket has a \c cancel() function with \c void return type.
+ */
 template<typename SocketT>
 concept IsCancellableSocket = IsSocket<SocketT> && requires(SocketT sock)
 {
-    { sock.cancel() } -> std::same_as<void>;
+    { sock.cancel() } -> std::same_as<void>;    //This check is kind of paranoid
 };
 
 template<typename ReturnT, typename SocketT>
     requires IsCancellableSocket<SocketT>
 ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, SocketT& pSocket, std::chrono::milliseconds pTimeout,
                                               const std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                            ///< \brief Wait for the future, get and return its value;
+                                                                            ///  cancel socket and throw an exception on timeout.
 
 template<typename SocketT>
     requires IsCancellableSocket<SocketT>
 std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPromiseN, SocketT& pSocket, std::chrono::milliseconds pTimeout,
                                                   const std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                            ///< \brief Wait for the promised future, get and return its value;
+                                                                            ///  cancel the socket on timeout but return future's value anyway.
 
 void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t pNumBytes, std::promise<std::size_t>& pNumBytesPromise);
+                                                                            ///< \brief Handler for socket transfer operations
+                                                                            ///  that does not fail when the socket gets cancelled.
 
 
 //Template function definitions
 
 
+/*!
+ * \brief Wait for the future, get and return its value; cancel socket and throw an exception on timeout.
+ *
+ * \todo Detailed doc
+ *
+ * \param pFuture
+ * \param pSocket
+ * \param pTimeout
+ * \param pTimedOut
+ * \return
+ */
 template<typename ReturnT, typename SocketT>
     requires IsCancellableSocket<SocketT>
 ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, SocketT& pSocket, std::chrono::milliseconds pTimeout,
@@ -117,6 +146,17 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
         throw std::runtime_error("Deferred future. THIS SHOULD NEVER HAPPEN!");
 }
 
+/*!
+ * \brief Wait for the promised future, get and return its value; cancel the socket on timeout but return future's value anyway.
+ *
+ * \todo Detailed doc
+ *
+ * \param pPromiseN
+ * \param pSocket
+ * \param pTimeout
+ * \param pTimedOut
+ * \return
+ */
 template<typename SocketT>
     requires IsCancellableSocket<SocketT>
 std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPromiseN, SocketT& pSocket, std::chrono::milliseconds pTimeout,

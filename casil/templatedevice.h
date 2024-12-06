@@ -39,6 +39,9 @@
 namespace casil
 {
 
+/*!
+ * \brief Implementation details for \ref TemplateDeviceSpecialization "TemplateDevice".
+ */
 namespace TmplDevImpl
 {
     struct TmplDevComponentBase { TmplDevComponentBase() = delete; };

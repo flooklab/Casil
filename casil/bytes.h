@@ -122,6 +122,7 @@ std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);            
 
 //Template and constexpr function definitions
 
+
 /*!
  * \brief Compose a byte sequence with a certain endianness from a number of unsigned integers.
  *

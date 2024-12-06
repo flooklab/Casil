@@ -39,6 +39,14 @@
 namespace casil::Auxil
 {
 
+/*!
+ * \brief Parse a YAML document into a Boost Property Tree.
+ *
+ * \todo Detailed doc
+ *
+ * \param pYAMLString
+ * \return
+ */
 boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
 {
     using boost::property_tree::ptree;
@@ -103,6 +111,14 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
     return tTree;
 }
 
+/*!
+ * \brief Parse a sequence of unsigned integers from YAML format.
+ *
+ * \todo Detailed doc
+ *
+ * \param pYAMLString
+ * \return
+ */
 std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString)
 {
     boost::property_tree::ptree valsTree = propertyTreeFromYAML(pYAMLString);

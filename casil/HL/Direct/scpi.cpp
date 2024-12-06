@@ -79,6 +79,15 @@ CASIL_REGISTER_DRIVER_ALIAS("scpi")
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ */
 SCPI::SCPI(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     DirectDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig::fromYAML(
                      "{init: {device: string}}")
@@ -92,6 +101,16 @@ SCPI::SCPI(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig
 
 //Public
 
+/*!
+ * \brief Execute a command (either write or query).
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \param pValue
+ * \return
+ */
 std::optional<std::string> SCPI::operator()(const std::string_view pCmd, const std::optional<int> pChannel, VariantValueType pValue) const
 {
     return command(pCmd, pChannel, std::move(pValue));
@@ -99,6 +118,15 @@ std::optional<std::string> SCPI::operator()(const std::string_view pCmd, const s
 
 //
 
+/*!
+ * \brief Execute a write command.
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \param pValue
+ */
 void SCPI::writeCommand(const std::string_view pCmd, const std::optional<int> pChannel, VariantValueType pValue) const
 {
     const int channel = (pChannel.has_value() ? *pChannel : -1);
@@ -136,6 +164,15 @@ void SCPI::writeCommand(const std::string_view pCmd, const std::optional<int> pC
     }
 }
 
+/*!
+ * \brief Execute a query command.
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \return
+ */
 std::string SCPI::queryCommand(const std::string_view pCmd, const std::optional<int> pChannel) const
 {
     const int channel = (pChannel.has_value() ? *pChannel : -1);
@@ -143,6 +180,16 @@ std::string SCPI::queryCommand(const std::string_view pCmd, const std::optional<
     return Bytes::strFromByteVec(interface.query(getQueryCommand(pCmd, channel)));
 }
 
+/*!
+ * \brief Execute a command (either write or query).
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \param pValue
+ * \return
+ */
 std::optional<std::string> SCPI::command(const std::string_view pCmd, const std::optional<int> pChannel, VariantValueType pValue) const
 {
     const int channel = (pChannel.has_value() ? *pChannel : -1);
@@ -166,6 +213,13 @@ std::optional<std::string> SCPI::command(const std::string_view pCmd, const std:
 
 //Private
 
+/*!
+ * \copybrief DirectDriver::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SCPI::initImpl()
 {
     std::string ident;
@@ -194,6 +248,13 @@ bool SCPI::initImpl()
     return true;
 }
 
+/*!
+ * \copybrief DirectDriver::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SCPI::closeImpl()
 {
     return true;
@@ -201,6 +262,15 @@ bool SCPI::closeImpl()
 
 //
 
+/*!
+ * \brief Check if command is query command.
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \return
+ */
 bool SCPI::isQueryCommand(const std::string_view pCmd, const int pChannel) const
 {
     const CommandMapType& queryCmds = getQueryCommandMap(pChannel);
@@ -208,6 +278,15 @@ bool SCPI::isQueryCommand(const std::string_view pCmd, const int pChannel) const
     return queryCmds.contains(pCmd);
 }
 
+/*!
+ * \brief Get a write command from its name.
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \return
+ */
 const std::vector<std::uint8_t>& SCPI::getWriteCommand(const std::string_view pCmd, const int pChannel) const
 {
     const CommandMapType& writeCmds = getWriteCommandMap(pChannel);
@@ -220,6 +299,15 @@ const std::vector<std::uint8_t>& SCPI::getWriteCommand(const std::string_view pC
     return it->second;
 }
 
+/*!
+ * \brief Get a query command from its name.
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \param pChannel
+ * \return
+ */
 const std::vector<std::uint8_t>& SCPI::getQueryCommand(const std::string_view pCmd, const int pChannel) const
 {
     const CommandMapType& queryCmds = getQueryCommandMap(pChannel);
@@ -234,6 +322,14 @@ const std::vector<std::uint8_t>& SCPI::getQueryCommand(const std::string_view pC
 
 //
 
+/*!
+ * \brief Get the write commands for a certain channel.
+ *
+ * \todo Detailed doc
+ *
+ * \param pChannel
+ * \return
+ */
 const SCPI::CommandMapType& SCPI::getWriteCommandMap(const int pChannel) const
 {
     const auto it = writeCommands.find(pChannel);
@@ -244,6 +340,14 @@ const SCPI::CommandMapType& SCPI::getWriteCommandMap(const int pChannel) const
     return it->second;
 }
 
+/*!
+ * \brief Get the query commands for a certain channel.
+ *
+ * \todo Detailed doc
+ *
+ * \param pChannel
+ * \return
+ */
 const SCPI::CommandMapType& SCPI::getQueryCommandMap(const int pChannel) const
 {
     const auto it = queryCommands.find(pChannel);
@@ -256,6 +360,14 @@ const SCPI::CommandMapType& SCPI::getQueryCommandMap(const int pChannel) const
 
 //
 
+/*!
+ * \brief Read the device description file for some device type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pDeviceType
+ * \return
+ */
 std::string SCPI::loadDeviceDescription(const std::string& pDeviceType)
 {
     std::string fileName = pDeviceType;
@@ -319,6 +431,14 @@ std::string SCPI::loadDeviceDescription(const std::string& pDeviceType)
     return devDescStr;
 }
 
+/*!
+ * \brief Generate a map of general and channel-specific write commands from a device description.
+ *
+ * \todo Detailed doc
+ *
+ * \param pDeviceDescription
+ * \return
+ */
 std::map<int, SCPI::CommandMapType> SCPI::parseWriteCommands(const boost::property_tree::ptree& pDeviceDescription)
 {
     //SCPI write commands mandatory by IEEE 488.2 standard
@@ -329,6 +449,14 @@ std::map<int, SCPI::CommandMapType> SCPI::parseWriteCommands(const boost::proper
     return parseCommands(pDeviceDescription, false, ieeeCmds);
 }
 
+/*!
+ * \brief Generate a map of general and channel-specific query commands from a device description.
+ *
+ * \todo Detailed doc
+ *
+ * \param pDeviceDescription
+ * \return
+ */
 std::map<int, SCPI::CommandMapType> SCPI::parseQueryCommands(const boost::property_tree::ptree& pDeviceDescription)
 {
     //SCPI query commands mandatory by IEEE 488.2 standard
@@ -337,6 +465,16 @@ std::map<int, SCPI::CommandMapType> SCPI::parseQueryCommands(const boost::proper
     return parseCommands(pDeviceDescription, true, ieeeCmds);
 }
 
+/*!
+ * \brief Generate a map of general and channel-specific commands from a device description (either query or write commands).
+ *
+ * \todo Detailed doc
+ *
+ * \param pDeviceDescription
+ * \param pQueryCommands
+ * \param pIEEECmds
+ * \return
+ */
 std::map<int, SCPI::CommandMapType> SCPI::parseCommands(const boost::property_tree::ptree& pDeviceDescription, bool pQueryCommands,
                                                         const std::vector<std::pair<std::string, std::string>>& pIEEECmds)
 {
@@ -432,6 +570,14 @@ std::map<int, SCPI::CommandMapType> SCPI::parseCommands(const boost::property_tr
     return tCommands;
 }
 
+/*!
+ * \brief Get the device identifier string.
+ *
+ * \todo Detailed doc
+ *
+ * \param pDeviceDescription
+ * \return
+ */
 std::string SCPI::parseDeviceIdentifier(const boost::property_tree::ptree& pDeviceDescription)
 {
     const auto it = pDeviceDescription.find("identifier");
@@ -444,6 +590,14 @@ std::string SCPI::parseDeviceIdentifier(const boost::property_tree::ptree& pDevi
 
 //
 
+/*!
+ * \brief Convert a value to string with fixed formatting.
+ *
+ * \todo Detailed doc
+ *
+ * \param pValue
+ * \return
+ */
 std::string SCPI::getValueStr(VariantValueType&& pValue)
 {
     if (std::holds_alternative<std::string>(pValue))
@@ -456,6 +610,14 @@ std::string SCPI::getValueStr(VariantValueType&& pValue)
         return "";  //Fallback for std::monostate
 }
 
+/*!
+ * \brief Check if a command name identifies it as setter.
+ *
+ * \todo Detailed doc
+ *
+ * \param pCmd
+ * \return
+ */
 bool SCPI::isSetter(const std::string_view pCmd)
 {
     return pCmd.starts_with("set_");

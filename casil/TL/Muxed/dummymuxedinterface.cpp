@@ -33,6 +33,14 @@ CASIL_REGISTER_INTERFACE_CPP(DummyMuxedInterface)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pConfig
+ */
 DummyMuxedInterface::DummyMuxedInterface(std::string pName, LayerConfig pConfig) :
     MuxedInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig())
 {
@@ -40,6 +48,15 @@ DummyMuxedInterface::DummyMuxedInterface(std::string pName, LayerConfig pConfig)
 
 //Public
 
+/*!
+ * \copybrief MuxedInterface::read()
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, const int pSize)
 {
     Logger::logDebug("Called read() for " + getSelfDescription() + " with arguments " +
@@ -48,6 +65,14 @@ std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, c
     return {};
 }
 
+/*!
+ * \copybrief MuxedInterface::write()
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pData
+ */
 void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData)
 {
     Logger::logDebug("Called write() for " + getSelfDescription() + " with arguments " +
@@ -55,6 +80,17 @@ void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std
                      "\"pData\" = " + Bytes::formatByteVec(pData) + ".");
 }
 
+/*!
+ * \copybrief MuxedInterface::query()
+ *
+ * \todo Detailed doc
+ *
+ * \param pWriteAddr
+ * \param pReadAddr
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteAddr, const std::uint64_t pReadAddr,
                                                      const std::vector<std::uint8_t>& pData, const int pSize)
 {
@@ -68,12 +104,24 @@ std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteA
 
 //
 
+/*!
+ * \copybrief MuxedInterface::readBufferEmpty()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyMuxedInterface::readBufferEmpty() const
 {
     Logger::logDebug("Called readBufferEmpty() for " + getSelfDescription() + ".");
     return true;
 }
 
+/*!
+ * \copybrief MuxedInterface::clearReadBuffer()
+ *
+ * \todo Detailed doc
+ */
 void DummyMuxedInterface::clearReadBuffer()
 {
     Logger::logDebug("Called clearReadBuffer() for " + getSelfDescription() + ".");
@@ -81,12 +129,26 @@ void DummyMuxedInterface::clearReadBuffer()
 
 //Private
 
+/*!
+ * \copybrief MuxedInterface::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyMuxedInterface::initImpl()
 {
     Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
     return true;
 }
 
+/*!
+ * \copybrief MuxedInterface::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyMuxedInterface::closeImpl()
 {
     Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");

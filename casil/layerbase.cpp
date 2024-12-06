@@ -29,6 +29,17 @@
 
 using casil::LayerBase;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pLayer
+ * \param pType
+ * \param pName
+ * \param pConfig
+ * \param pRequiredConfig
+ */
 LayerBase::LayerBase(const Layer pLayer, std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     layer(pLayer),
     type(std::move(pType)),
@@ -45,16 +56,37 @@ LayerBase::LayerBase(const Layer pLayer, std::string pType, std::string pName, L
 
 //Public
 
+/*!
+ * \brief Get the layer of this layer component.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 LayerBase::Layer LayerBase::getLayer() const
 {
     return layer;
 }
 
+/*!
+ * \brief Get the type name of this layer component.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 const std::string& LayerBase::getType() const
 {
     return type;
 }
 
+/*!
+ * \brief Get the instance name of this layer component.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 const std::string& LayerBase::getName() const
 {
     return name;
@@ -62,6 +94,14 @@ const std::string& LayerBase::getName() const
 
 //
 
+/*!
+ * \brief Initialize this layer component.
+ *
+ * \todo Detailed doc
+ *
+ * \param pForce
+ * \return
+ */
 bool LayerBase::init(const bool pForce)
 {
     if (initialized && !pForce)
@@ -79,6 +119,14 @@ bool LayerBase::init(const bool pForce)
     return true;
 }
 
+/*!
+ * \brief Close ("uninitialize") this layer component.
+ *
+ * \todo Detailed doc
+ *
+ * \param pForce
+ * \return
+ */
 bool LayerBase::close(const bool pForce)
 {
     if (!initialized && !pForce)
@@ -96,6 +144,13 @@ bool LayerBase::close(const bool pForce)
 
 //Protected
 
+/*!
+ * \brief Get a standard description of this layer component for logging purposes.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 const std::string& LayerBase::getSelfDescription() const
 {
     return selfDescription;

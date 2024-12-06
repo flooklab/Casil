@@ -26,6 +26,17 @@
 
 using casil::RL::Register;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pDriver
+ * \param pConfig
+ * \param pRequiredConfig
+ */
 Register::Register(std::string pType, std::string pName, HL::Driver& pDriver, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     LayerBase(Layer::RegisterLayer, std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig),
     driver(pDriver)

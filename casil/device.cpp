@@ -38,6 +38,11 @@ using casil::TL::Interface;
 using casil::HL::Driver;
 using casil::RL::Register;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ */
 Device::Device() :
     initialized(false)
 {
@@ -45,6 +50,13 @@ Device::Device() :
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pConfig
+ */
 Device::Device(const boost::property_tree::ptree& pConfig) :
     Device()
 {
@@ -133,11 +145,23 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
     }
 }
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pConfig
+ */
 Device::Device(const std::string& pConfig) :
     Device(Auxil::propertyTreeFromYAML(pConfig))
 {
 }
 
+/*!
+ * \brief Destructor.
+ *
+ * \todo Detailed doc
+ */
 Device::~Device()
 {
     //Make sure everything was closed before destruction
@@ -155,6 +179,14 @@ Device::~Device()
 
 //Public
 
+/*!
+ * \brief Access one of the components from any layer.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \return
+ */
 LayerBase& Device::operator[](const std::string_view pName) const
 {
     const auto intfIt = interfaces.find(pName);
@@ -174,6 +206,14 @@ LayerBase& Device::operator[](const std::string_view pName) const
 
 //
 
+/*!
+ * \brief Access one of the interface components from the transfer layer.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \return
+ */
 casil::TL::Interface& Device::interface(const std::string_view pName) const
 {
     const auto it = interfaces.find(pName);
@@ -183,6 +223,14 @@ casil::TL::Interface& Device::interface(const std::string_view pName) const
         throw std::invalid_argument("No interface with name \"" + std::string(pName) + "\".");
 }
 
+/*!
+ * \brief Access one of the driver components from the hardware layer.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \return
+ */
 casil::HL::Driver& Device::driver(const std::string_view pName) const
 {
     const auto it = drivers.find(pName);
@@ -192,6 +240,14 @@ casil::HL::Driver& Device::driver(const std::string_view pName) const
         throw std::invalid_argument("No driver with name \"" + std::string(pName) + "\".");
 }
 
+/*!
+ * \brief Access one of the register components from the register layer.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \return
+ */
 casil::RL::Register& Device::reg(const std::string_view pName) const
 {
     const auto it = registers.find(pName);
@@ -203,6 +259,14 @@ casil::RL::Register& Device::reg(const std::string_view pName) const
 
 //
 
+/*!
+ * \brief Initialize by initializing all components of all layers.
+ *
+ * \todo Detailed doc
+ *
+ * \param pForce
+ * \return
+ */
 bool Device::init(const bool pForce)
 {
     if (initialized && !pForce)
@@ -227,6 +291,14 @@ bool Device::init(const bool pForce)
     return true;
 }
 
+/*!
+ * \brief Close by closing all components of all layers.
+ *
+ * \todo Detailed doc
+ *
+ * \param pForce
+ * \return
+ */
 bool Device::close(const bool pForce)
 {
     if (!initialized && !pForce)

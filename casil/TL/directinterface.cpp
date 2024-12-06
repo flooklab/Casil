@@ -31,6 +31,16 @@
 
 using casil::TL::DirectInterface;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pConfig
+ * \param pRequiredConfig
+ */
 DirectInterface::DirectInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     Interface(std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig)
 {
@@ -38,6 +48,15 @@ DirectInterface::DirectInterface(std::string pType, std::string pName, LayerConf
 
 //Public
 
+/*!
+ * \brief Write a query to the interface and read the response.
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> DirectInterface::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
     try

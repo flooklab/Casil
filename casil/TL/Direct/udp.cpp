@@ -33,6 +33,14 @@ CASIL_REGISTER_INTERFACE_CPP(UDP)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pConfig
+ */
 UDP::UDP(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
                         "{init: {address: string, port: int}}")
@@ -49,6 +57,14 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
 
 //Public
 
+/*!
+ * \copybrief DirectInterface::read()
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> UDP::read(const int pSize)
 {
     (void)pSize;
@@ -63,6 +79,13 @@ std::vector<std::uint8_t> UDP::read(const int pSize)
     }
 }
 
+/*!
+ * \copybrief DirectInterface::write()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void UDP::write(const std::vector<std::uint8_t>& pData)
 {
     try
@@ -75,6 +98,15 @@ void UDP::write(const std::vector<std::uint8_t>& pData)
     }
 }
 
+/*!
+ * \copybrief DirectInterface::query()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> UDP::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
     return DirectInterface::query(pData, pSize);
@@ -82,6 +114,13 @@ std::vector<std::uint8_t> UDP::query(const std::vector<std::uint8_t>& pData, con
 
 //
 
+/*!
+ * \copybrief DirectInterface::readBufferEmpty()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool UDP::readBufferEmpty() const
 {
     try
@@ -94,6 +133,11 @@ bool UDP::readBufferEmpty() const
     }
 }
 
+/*!
+ * \copybrief DirectInterface::clearReadBuffer()
+ *
+ * \todo Detailed doc
+ */
 void UDP::clearReadBuffer()
 {
     try
@@ -108,6 +152,13 @@ void UDP::clearReadBuffer()
 
 //Private
 
+/*!
+ * \copybrief DirectInterface::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool UDP::initImpl()
 {
     try
@@ -123,6 +174,13 @@ bool UDP::initImpl()
     return true;
 }
 
+/*!
+ * \copybrief DirectInterface::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool UDP::closeImpl()
 {
     try

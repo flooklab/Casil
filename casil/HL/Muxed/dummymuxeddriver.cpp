@@ -33,6 +33,15 @@ CASIL_REGISTER_DRIVER_CPP(DummyMuxedDriver)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ */
 DummyMuxedDriver::DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     MuxedDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig())
 {
@@ -40,6 +49,15 @@ DummyMuxedDriver::DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterf
 
 //Public
 
+/*!
+ * \copybrief MuxedDriver::getData()
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \param pAddrOffs
+ * \return
+ */
 std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::uint32_t pAddrOffs)
 {
     Logger::logDebug("Called getData() for " + getSelfDescription() + " with arguments " +
@@ -48,6 +66,14 @@ std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::
     return {};
 }
 
+/*!
+ * \copybrief MuxedDriver::setData()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pAddrOffs
+ */
 void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std::uint32_t pAddrOffs)
 {
     Logger::logDebug("Called setData() for " + getSelfDescription() + " with arguments " +
@@ -55,11 +81,23 @@ void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std
                      "\"pAddrOffs\" = " + Bytes::formatHex(pAddrOffs) + ".");
 }
 
+/*!
+ * \copybrief MuxedDriver::exec()
+ *
+ * \todo Detailed doc
+ */
 void DummyMuxedDriver::exec()
 {
     Logger::logDebug("Called exec() for " + getSelfDescription() + ".");
 }
 
+/*!
+ * \copybrief MuxedDriver::isDone()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyMuxedDriver::isDone()
 {
     Logger::logDebug("Called isDone() for " + getSelfDescription() + ".");
@@ -68,12 +106,26 @@ bool DummyMuxedDriver::isDone()
 
 //Private
 
+/*!
+ * \copybrief MuxedDriver::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyMuxedDriver::initImpl()
 {
     Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
     return true;
 }
 
+/*!
+ * \copybrief MuxedDriver::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyMuxedDriver::closeImpl()
 {
     Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");

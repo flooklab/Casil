@@ -26,6 +26,17 @@
 
 using casil::HL::DirectDriver;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ * \param pRequiredConfig
+ */
 DirectDriver::DirectDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                            LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     Driver(std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig),
@@ -35,21 +46,45 @@ DirectDriver::DirectDriver(std::string pType, std::string pName, InterfaceBaseTy
 
 //Private
 
+/*!
+ * \brief Override not intended to be used (dummy implementation).
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::vector<std::uint8_t> DirectDriver::getData(int, std::uint32_t)
 {
     return {};  //(sic!)
 }
 
+/*!
+ * \brief Override not intended to be used (dummy implementation).
+ *
+ * \todo Detailed doc
+ */
 void DirectDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 {
     //(sic!)
 }
 
+/*!
+ * \brief Override not intended to be used (dummy implementation).
+ *
+ * \todo Detailed doc
+ */
 void DirectDriver::exec()
 {
     //(sic!)
 }
 
+/*!
+ * \brief Override not intended to be used (dummy implementation).
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DirectDriver::isDone()
 {
     return false;   //(sic!)

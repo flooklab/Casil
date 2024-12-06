@@ -28,6 +28,16 @@
 
 using casil::TL::Interface;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pConfig
+ * \param pRequiredConfig
+ */
 Interface::Interface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     LayerBase(Layer::TransferLayer, std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig),
     queryDelay(config.getDbl("init.query_delay", 0.0)),

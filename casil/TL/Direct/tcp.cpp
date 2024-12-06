@@ -34,6 +34,14 @@ CASIL_REGISTER_INTERFACE_ALIAS("Socket")
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pConfig
+ */
 TCP::TCP(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
                         "{init: {address: string, port: int, read_termination: string}}")
@@ -52,6 +60,14 @@ TCP::TCP(std::string pName, LayerConfig pConfig) :
 
 //Public
 
+/*!
+ * \copybrief DirectInterface::read()
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> TCP::read(const int pSize)
 {
     try
@@ -64,6 +80,13 @@ std::vector<std::uint8_t> TCP::read(const int pSize)
     }
 }
 
+/*!
+ * \copybrief DirectInterface::write()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void TCP::write(const std::vector<std::uint8_t>& pData)
 {
     try
@@ -76,6 +99,15 @@ void TCP::write(const std::vector<std::uint8_t>& pData)
     }
 }
 
+/*!
+ * \copybrief DirectInterface::query()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> TCP::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
     return DirectInterface::query(pData, pSize);
@@ -83,6 +115,13 @@ std::vector<std::uint8_t> TCP::query(const std::vector<std::uint8_t>& pData, con
 
 //
 
+/*!
+ * \copybrief DirectInterface::readBufferEmpty()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool TCP::readBufferEmpty() const
 {
     try
@@ -95,6 +134,11 @@ bool TCP::readBufferEmpty() const
     }
 }
 
+/*!
+ * \copybrief DirectInterface::clearReadBuffer()
+ *
+ * \todo Detailed doc
+ */
 void TCP::clearReadBuffer()
 {
     try
@@ -109,6 +153,13 @@ void TCP::clearReadBuffer()
 
 //Private
 
+/*!
+ * \copybrief DirectInterface::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool TCP::initImpl()
 {
     try
@@ -124,6 +175,13 @@ bool TCP::initImpl()
     return true;
 }
 
+/*!
+ * \copybrief DirectInterface::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool TCP::closeImpl()
 {
     try

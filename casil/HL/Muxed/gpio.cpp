@@ -73,6 +73,15 @@ CASIL_REGISTER_DRIVER_ALIAS("gpio")
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ */
 GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig::fromYAML("{size: uint}"), getRegisterDescrs(pConfig)),
     size(config.getUInt("size", 8)),
@@ -84,11 +93,25 @@ GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig
 
 //Public
 
+/*!
+ * \brief Get the \c INPUT register.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::vector<std::uint8_t> GPIO::getData(int, std::uint32_t)
 {
     return getBytes("INPUT");
 }
 
+/*!
+ * \brief Set the \c OUTPUT register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void GPIO::setData(const std::vector<std::uint8_t>& pData, std::uint32_t)
 {
     setBytes("OUTPUT", pData);
@@ -96,6 +119,13 @@ void GPIO::setData(const std::vector<std::uint8_t>& pData, std::uint32_t)
 
 //
 
+/*!
+ * \brief Get the number of IO bits.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::uint64_t GPIO::getSize() const
 {
     return size;
@@ -103,11 +133,25 @@ std::uint64_t GPIO::getSize() const
 
 //
 
+/*!
+ * \brief Get the \c OUTPUT_EN register.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::vector<std::uint8_t> GPIO::getOutputEn()
 {
     return getBytes("OUTPUT_EN");
 }
 
+/*!
+ * \brief Set the \c OUTPUT_EN register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pEnable
+ */
 void GPIO::setOutputEn(const std::vector<std::uint8_t>& pEnable)
 {
     setBytes("OUTPUT_EN", pEnable);
@@ -115,6 +159,14 @@ void GPIO::setOutputEn(const std::vector<std::uint8_t>& pEnable)
 
 //
 
+/*!
+ * \brief Convert IO register bytes to a bitset.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \return
+ */
 boost::dynamic_bitset<> GPIO::bitsetFromBytes(const std::vector<std::uint8_t>& pBytes) const
 {
     if (pBytes.size() != ioBytes)
@@ -123,6 +175,14 @@ boost::dynamic_bitset<> GPIO::bitsetFromBytes(const std::vector<std::uint8_t>& p
     return Bytes::bitsetFromBytes(pBytes, size);
 }
 
+/*!
+ * \brief Convert a bitset to IO register bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBits
+ * \return
+ */
 std::vector<std::uint8_t> GPIO::bytesFromBitset(const boost::dynamic_bitset<>& pBits) const
 {
     if (pBits.size() != size)
@@ -133,6 +193,13 @@ std::vector<std::uint8_t> GPIO::bytesFromBitset(const boost::dynamic_bitset<>& p
 
 //Private
 
+/*!
+ * \copybrief RegisterDriver::initModule()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool GPIO::initModule()
 {
     if (config.contains(LayerConfig::fromYAML("{init: {output_en: string}}"), true))
@@ -146,6 +213,11 @@ bool GPIO::initModule()
 
 //
 
+/*!
+ * \copybrief RegisterDriver::resetImpl()
+ *
+ * \todo Detailed doc
+ */
 void GPIO::resetImpl()
 {
     setValue("RESET", 0);
@@ -153,11 +225,25 @@ void GPIO::resetImpl()
 
 //
 
+/*!
+ * \copybrief RegisterDriver::getModuleSoftwareVersion()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::uint8_t GPIO::getModuleSoftwareVersion() const
 {
     return requireFirmwareVersion;
 }
 
+/*!
+ * \copybrief RegisterDriver::getModuleFirmwareVersion()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::uint8_t GPIO::getModuleFirmwareVersion()
 {
     return static_cast<std::uint8_t>(getValue("VERSION"));
@@ -165,6 +251,14 @@ std::uint8_t GPIO::getModuleFirmwareVersion()
 
 //
 
+/*!
+ * \brief Generate the map of registers depending on the configured bit count.
+ *
+ * \todo Detailed doc
+ *
+ * \param pConfig
+ * \return
+ */
 std::map<std::string, casil::HL::RegisterDescr, std::less<>> GPIO::getRegisterDescrs(const LayerConfig& pConfig)
 {
     const std::uint32_t numIOBytes = ((pConfig.getUInt("size", 8) - 1) / 8) + 1;

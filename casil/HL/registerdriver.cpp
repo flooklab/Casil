@@ -74,6 +74,18 @@
 
 using casil::HL::RegisterDriver;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ * \param pRequiredConfig
+ * \param pRegisters
+ */
 RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                                LayerConfig pConfig, const LayerConfig& pRequiredConfig,
                                std::map<std::string, RegisterDescr, std::less<>> pRegisters) :
@@ -163,6 +175,14 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
 
 //Public
 
+/*!
+ * \brief Access a register via the proxy class.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 const RegisterDriver::RegisterProxy& RegisterDriver::operator[](const std::string_view pRegName) const
 {
     const auto it = registerProxies.find(pRegName);
@@ -178,6 +198,11 @@ const RegisterDriver::RegisterProxy& RegisterDriver::operator[](const std::strin
 
 //
 
+/*!
+ * \brief Reset the firmware module.
+ *
+ * \todo Detailed doc
+ */
 void RegisterDriver::reset()
 {
     resetImpl();
@@ -191,6 +216,11 @@ void RegisterDriver::reset()
 
 //
 
+/*!
+ * \brief Write configured default values to all appropriate registers.
+ *
+ * \todo Detailed doc
+ */
 void RegisterDriver::applyDefaults()
 {
     for (const auto& [regName, regDescr] : registers)
@@ -217,6 +247,14 @@ void RegisterDriver::applyDefaults()
 
 //
 
+/*!
+ * \brief Read the data from a byte array register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegName)
 {
     const auto it = registers.find(pRegName);
@@ -268,6 +306,14 @@ std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegNa
     }
 }
 
+/*!
+ * \brief Write data to a byte array register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \param pData
+ */
 void RegisterDriver::setBytes(const std::string_view pRegName, const std::vector<std::uint8_t>& pData)
 {
     const auto it = registers.find(pRegName);
@@ -303,6 +349,14 @@ void RegisterDriver::setBytes(const std::string_view pRegName, const std::vector
 
 //
 
+/*!
+ * \brief Read the value from a value register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
 {
     const auto it = registers.find(pRegName);
@@ -354,6 +408,14 @@ std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
     }
 }
 
+/*!
+ * \brief Write a value to a value register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \param pValue
+ */
 void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64_t pValue)
 {
     const auto it = registers.find(pRegName);
@@ -392,6 +454,14 @@ void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64
 
 //
 
+/*!
+ * \brief Read an integer or byte sequence from a register, according to its data type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const std::string_view pRegName)
 {
     const auto it = registers.find(pRegName);
@@ -410,11 +480,27 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const
         return getBytes(pRegName);
 }
 
+/*!
+ * \brief Write a value to a value register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \param pValue
+ */
 void RegisterDriver::set(const std::string_view pRegName, const std::uint64_t pValue)
 {
     setValue(pRegName, pValue);
 }
 
+/*!
+ * \brief Write data to a byte array register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \param pBytes
+ */
 void RegisterDriver::set(const std::string_view pRegName, const std::vector<std::uint8_t>& pBytes)
 {
     setBytes(pRegName, pBytes);
@@ -422,6 +508,13 @@ void RegisterDriver::set(const std::string_view pRegName, const std::vector<std:
 
 //
 
+/*!
+ * \brief "Trigger" a write-only register by writing configured default or zero.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ */
 void RegisterDriver::trigger(const std::string_view pRegName)
 {
     const auto it = registers.find(pRegName);
@@ -467,6 +560,14 @@ void RegisterDriver::trigger(const std::string_view pRegName)
 
 //
 
+/*!
+ * \brief Check if a register exists or throw an exception else.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 bool RegisterDriver::testRegisterName(const std::string_view pRegName) const
 {
     if (registers.contains(pRegName))
@@ -477,6 +578,14 @@ bool RegisterDriver::testRegisterName(const std::string_view pRegName) const
 
 //
 
+/*!
+ * \brief Check if a string could be a valid register name.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 bool RegisterDriver::isValidRegisterName(const std::string_view pRegName)
 {
     auto isValidRegNameChar = [](const std::string::value_type pChar) -> bool
@@ -489,6 +598,13 @@ bool RegisterDriver::isValidRegisterName(const std::string_view pRegName)
 
 //Private
 
+/*!
+ * \copybrief MuxedDriver::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool RegisterDriver::initImpl()
 {
     try
@@ -541,6 +657,13 @@ bool RegisterDriver::initImpl()
     return true;
 }
 
+/*!
+ * \copybrief MuxedDriver::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool RegisterDriver::closeImpl()
 {
     if (!closeModule())
@@ -551,11 +674,25 @@ bool RegisterDriver::closeImpl()
 
 //
 
+/*!
+ * \brief Perform module-specific initialization steps.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool RegisterDriver::initModule()
 {
     return true;
 }
 
+/*!
+ * \brief Perform module-specific closing steps.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool RegisterDriver::closeModule()
 {
     return true;
@@ -563,11 +700,27 @@ bool RegisterDriver::closeModule()
 
 //
 
+/*!
+ * \brief Check if software version is compatible with firmware version.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSoftwareVersion
+ * \param pFirmwareVersion
+ * \return
+ */
 bool RegisterDriver::checkVersionRequirement(const std::uint8_t pSoftwareVersion, const std::uint8_t pFirmwareVersion)
 {
     return pFirmwareVersion == pSoftwareVersion;
 }
 
+/*!
+ * \copybrief checkVersionRequirement(std::uint8_t, std::uint8_t)
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool RegisterDriver::checkVersionRequirement()
 {
     return checkVersionRequirement(getModuleSoftwareVersion(), getModuleFirmwareVersion());
@@ -575,6 +728,15 @@ bool RegisterDriver::checkVersionRequirement()
 
 //
 
+/*!
+ * \brief Read a byte sequence from a register address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegAddr
+ * \param pRegSize
+ * \return
+ */
 std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAddr, const std::uint32_t pRegSize) const
 {
     const std::vector<std::uint8_t> readBytes = read(pRegAddr, pRegSize);
@@ -585,6 +747,14 @@ std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAd
     return readBytes;
 }
 
+/*!
+ * \brief Write a byte sequence to a register address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegAddr
+ * \param pData
+ */
 void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const std::vector<std::uint8_t>& pData) const
 {
     write(pRegAddr, pData);
@@ -592,6 +762,16 @@ void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const std::vector
 
 //
 
+/*!
+ * \brief Read an integer value from a register address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegAddr
+ * \param pRegSize
+ * \param pRegOffs
+ * \return
+ */
 std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize, const std::uint32_t pRegOffs) const
 {
     const std::uint32_t byteOffs = pRegOffs / 8;
@@ -667,6 +847,16 @@ std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const st
         throw std::runtime_error("Read size of register is zero. THIS SHOULD NEVER HAPPEN!");
 }
 
+/*!
+ * \brief Write an integer value to a register address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegAddr
+ * \param pRegSize
+ * \param pRegOffs
+ * \param pValue
+ */
 void RegisterDriver::setRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize,
                                  const std::uint32_t pRegOffs, const std::uint64_t pValue) const
 {
@@ -768,18 +958,42 @@ void RegisterDriver::setRegValue(const std::uint32_t pRegAddr, const std::uint32
 
 using RegisterProxy = RegisterDriver::RegisterProxy;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegDriver
+ * \param pRegName
+ */
 RegisterProxy::RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName) :
     regDriver(pRegDriver),
     regName(std::move(pRegName))
 {
 }
 
+/*!
+ * \brief Write an integer value to the register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pValue
+ * \return
+ */
 std::uint64_t RegisterProxy::operator=(const std::uint64_t pValue) const
 {
     regDriver.setValue(regName, pValue);
     return pValue;
 }
 
+/*!
+ * \brief Write a byte sequence to the register.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \return
+ */
 const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std::uint8_t>& pBytes) const
 {
     regDriver.setBytes(regName, pBytes);
@@ -788,11 +1002,21 @@ const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std:
 
 //
 
+/*!
+ * \brief Read an integer value from the register.
+ *
+ * \todo Detailed doc
+ */
 RegisterProxy::operator std::uint64_t() const
 {
     return regDriver.getValue(regName);
 }
 
+/*!
+ * \brief Read a byte sequence from the register.
+ *
+ * \todo Detailed doc
+ */
 RegisterProxy::operator std::vector<std::uint8_t>() const
 {
     return regDriver.getBytes(regName);
@@ -800,6 +1024,13 @@ RegisterProxy::operator std::vector<std::uint8_t>() const
 
 //
 
+/*!
+ * \brief Read an integer or byte sequence from the register, according to its data type.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() const
 {
     return regDriver.get(regName);
@@ -807,6 +1038,11 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() cons
 
 //
 
+/*!
+ * \brief "Trigger" the (write-only) register by writing configured default or zero.
+ *
+ * \todo Detailed doc
+ */
 void RegisterProxy::trigger() const
 {
     regDriver.trigger(regName);

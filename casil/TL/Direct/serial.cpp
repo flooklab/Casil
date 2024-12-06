@@ -36,6 +36,14 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pConfig
+ */
 Serial::Serial(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
                         "{init: {port: string, read_termination: string, baudrate: int}}")
@@ -54,11 +62,26 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
 
 //Public
 
+/*!
+ * \copybrief DirectInterface::read()
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> Serial::read(const int pSize)
 {
     return serialPortWrapper.read(pSize);
 }
 
+/*!
+ * \copybrief DirectInterface::write()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void Serial::write(const std::vector<std::uint8_t>& pData)
 {
     try
@@ -71,6 +94,15 @@ void Serial::write(const std::vector<std::uint8_t>& pData)
     }
 }
 
+/*!
+ * \copybrief DirectInterface::query()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> Serial::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
     return DirectInterface::query(pData, pSize);
@@ -78,11 +110,23 @@ std::vector<std::uint8_t> Serial::query(const std::vector<std::uint8_t>& pData, 
 
 //
 
+/*!
+ * \copybrief DirectInterface::readBufferEmpty()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool Serial::readBufferEmpty() const
 {
     return serialPortWrapper.readBufferEmpty();
 }
 
+/*!
+ * \copybrief DirectInterface::clearReadBuffer()
+ *
+ * \todo Detailed doc
+ */
 void Serial::clearReadBuffer()
 {
     serialPortWrapper.clearReadBuffer();
@@ -90,6 +134,13 @@ void Serial::clearReadBuffer()
 
 //Private
 
+/*!
+ * \copybrief DirectInterface::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool Serial::initImpl()
 {
     try
@@ -105,6 +156,13 @@ bool Serial::initImpl()
     return true;
 }
 
+/*!
+ * \copybrief DirectInterface::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool Serial::closeImpl()
 {
     try

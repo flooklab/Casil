@@ -38,6 +38,16 @@ using casil::RL::Register;
 
 //Public
 
+/*!
+ * \brief Construct a registered interface type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pConfig
+ * \return
+ */
 std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pType, std::string pName, LayerConfig pConfig)
 {
     const auto it = tlGenerators().find(pType);
@@ -59,8 +69,18 @@ std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pTyp
     return nullptr;
 }
 
-std::unique_ptr<Driver>
-LayerFactory::createDriver(const std::string& pType, std::string pName, Interface& pInterface, LayerConfig pConfig)
+/*!
+ * \brief Construct a registered driver type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ * \return
+ */
+std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std::string pName, Interface& pInterface, LayerConfig pConfig)
 {
     const auto it = hlGenerators().find(pType);
 
@@ -81,8 +101,18 @@ LayerFactory::createDriver(const std::string& pType, std::string pName, Interfac
     return nullptr;
 }
 
-std::unique_ptr<Register>
-LayerFactory::createRegister(const std::string& pType, std::string pName, Driver& pDriver, LayerConfig pConfig)
+/*!
+ * \brief Construct a registered register type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pDriver
+ * \param pConfig
+ * \return
+ */
+std::unique_ptr<Register> LayerFactory::createRegister(const std::string& pType, std::string pName, Driver& pDriver, LayerConfig pConfig)
 {
     const auto it = rlGenerators().find(pType);
 
@@ -105,16 +135,40 @@ LayerFactory::createRegister(const std::string& pType, std::string pName, Driver
 
 //
 
+/*!
+ * \brief Register a generator for an interface type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pGenerator
+ */
 void LayerFactory::registerInterfaceType(std::string pType, TLGeneratorFunction pGenerator)
 {
     tlGenerators().insert({std::move(pType), std::move(pGenerator)});
 }
 
+/*!
+ * \brief Register a generator for an driver type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pGenerator
+ */
 void LayerFactory::registerDriverType(std::string pType, HLGeneratorFunction pGenerator)
 {
     hlGenerators().insert({std::move(pType), std::move(pGenerator)});
 }
 
+/*!
+ * \brief Register a generator for an register type.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pGenerator
+ */
 void LayerFactory::registerRegisterType(std::string pType, RLGeneratorFunction pGenerator)
 {
     rlGenerators().insert({std::move(pType), std::move(pGenerator)});
@@ -122,6 +176,14 @@ void LayerFactory::registerRegisterType(std::string pType, RLGeneratorFunction p
 
 //
 
+/*!
+ * \brief Register an interface type name alias.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pAlias
+ */
 void LayerFactory::registerInterfaceAlias(const std::string& pType, std::string pAlias)
 {
     const auto it = tlGenerators().find(pType);
@@ -134,6 +196,14 @@ void LayerFactory::registerInterfaceAlias(const std::string& pType, std::string 
     tlGenerators().insert({std::move(pAlias), std::move(boundGenerator)});
 }
 
+/*!
+ * \brief Register a driver type name alias.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pAlias
+ */
 void LayerFactory::registerDriverAlias(const std::string& pType, std::string pAlias)
 {
     const auto it = hlGenerators().find(pType);
@@ -146,6 +216,14 @@ void LayerFactory::registerDriverAlias(const std::string& pType, std::string pAl
     hlGenerators().insert({std::move(pAlias), std::move(boundGenerator)});
 }
 
+/*!
+ * \brief Register a register type name alias.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pAlias
+ */
 void LayerFactory::registerRegisterAlias(const std::string& pType, std::string pAlias)
 {
     const auto it = rlGenerators().find(pType);
@@ -160,18 +238,39 @@ void LayerFactory::registerRegisterAlias(const std::string& pType, std::string p
 
 //Private
 
+/*!
+ * \brief Access the map of interface generators with interface types as keys.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::map<std::string, LayerFactory::TLGeneratorFunction>& LayerFactory::tlGenerators()
 {
     static std::map<std::string, TLGeneratorFunction> typeGtors = {};
     return typeGtors;
 }
 
+/*!
+ * \brief Access the map of driver generators with driver types as keys.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::map<std::string, LayerFactory::HLGeneratorFunction>& LayerFactory::hlGenerators()
 {
     static std::map<std::string, HLGeneratorFunction> typeGtors = {};
     return typeGtors;
 }
 
+/*!
+ * \brief Access the map of register generators with register types as keys.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::map<std::string, LayerFactory::RLGeneratorFunction>& LayerFactory::rlGenerators()
 {
     static std::map<std::string, RLGeneratorFunction> typeGtors = {};

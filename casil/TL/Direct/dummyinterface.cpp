@@ -33,6 +33,14 @@ CASIL_REGISTER_INTERFACE_CPP(DummyInterface)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pConfig
+ */
 DummyInterface::DummyInterface(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig())
 {
@@ -40,17 +48,41 @@ DummyInterface::DummyInterface(std::string pName, LayerConfig pConfig) :
 
 //Public
 
+/*!
+ * \copybrief DirectInterface::read()
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> DummyInterface::read(const int pSize)
 {
     Logger::logDebug("Called read() for " + getSelfDescription() + " with argument \"pSize\" = " + std::to_string(pSize) + ".");
     return {};
 }
 
+/*!
+ * \copybrief DirectInterface::write()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void DummyInterface::write(const std::vector<std::uint8_t>& pData)
 {
     Logger::logDebug("Called write() for " + getSelfDescription() + " with argument \"pData\" = " + Bytes::formatByteVec(pData) + ".");
 }
 
+/*!
+ * \copybrief DirectInterface::query()
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> DummyInterface::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
     Logger::logDebug("Called query() for " + getSelfDescription() + " with arguments " +
@@ -61,12 +93,24 @@ std::vector<std::uint8_t> DummyInterface::query(const std::vector<std::uint8_t>&
 
 //
 
+/*!
+ * \copybrief DirectInterface::readBufferEmpty()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyInterface::readBufferEmpty() const
 {
     Logger::logDebug("Called readBufferEmpty() for " + getSelfDescription() + ".");
     return true;
 }
 
+/*!
+ * \copybrief DirectInterface::clearReadBuffer()
+ *
+ * \todo Detailed doc
+ */
 void DummyInterface::clearReadBuffer()
 {
     Logger::logDebug("Called clearReadBuffer() for " + getSelfDescription() + ".");
@@ -74,12 +118,26 @@ void DummyInterface::clearReadBuffer()
 
 //Private
 
+/*!
+ * \copybrief DirectInterface::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyInterface::initImpl()
 {
     Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
     return true;
 }
 
+/*!
+ * \copybrief DirectInterface::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyInterface::closeImpl()
 {
     Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");

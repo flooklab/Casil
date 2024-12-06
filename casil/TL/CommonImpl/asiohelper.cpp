@@ -27,6 +27,15 @@
 namespace casil::TL::CommonImpl::ASIOHelper
 {
 
+/*!
+ * \brief Handler for socket transfer operations that does not fail when the socket gets cancelled.
+ *
+ * \todo Detailed doc
+ *
+ * \param pErrorCode
+ * \param pNumBytes
+ * \param pNumBytesPromise
+ */
 void readWriteHandler(const boost::system::error_code& pErrorCode, const std::size_t pNumBytes, std::promise<std::size_t>& pNumBytesPromise)
 {
     if (pErrorCode.value() != boost::system::errc::success && pErrorCode.value() != boost::system::errc::operation_canceled)

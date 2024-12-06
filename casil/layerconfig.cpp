@@ -84,6 +84,13 @@ std::vector<T> geTSeq(const ptree& pTree, const std::string& pKey, std::vector<T
 
 using casil::LayerConfig;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pTree
+ */
 LayerConfig::LayerConfig(const boost::property_tree::ptree& pTree) :
     tree(pTree)
 {
@@ -91,6 +98,14 @@ LayerConfig::LayerConfig(const boost::property_tree::ptree& pTree) :
 
 //Public
 
+/*!
+ * \brief Equality operator.
+ *
+ * \todo Detailed doc
+ *
+ * \param pOther
+ * \return
+ */
 bool LayerConfig::operator==(const LayerConfig& pOther) const
 {
     return (tree == pOther.tree);
@@ -98,6 +113,15 @@ bool LayerConfig::operator==(const LayerConfig& pOther) const
 
 //
 
+/*!
+ * \brief Check the configuration tree structure (and value types).
+ *
+ * \todo Detailed doc
+ *
+ * \param pOther
+ * \param pCheckTypes
+ * \return
+ */
 bool LayerConfig::contains(const LayerConfig& pOther, const bool pCheckTypes) const
 {
     using boost::property_tree::ptree;
@@ -181,6 +205,15 @@ bool LayerConfig::contains(const LayerConfig& pOther, const bool pCheckTypes) co
 
 //
 
+/*!
+ * \brief Get a boolean configuration value.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
 {
     try
@@ -195,6 +228,15 @@ bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
     }
 }
 
+/*!
+ * \brief Get a (signed) integer configuration value.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
 {
     try
@@ -209,6 +251,15 @@ int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
     }
 }
 
+/*!
+ * \brief Get an unsigned integer configuration value.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t pDefault) const
 {
     try
@@ -223,6 +274,15 @@ std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t 
     }
 }
 
+/*!
+ * \brief Get a floating point configuration value.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
 {
     try
@@ -237,6 +297,15 @@ double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
     }
 }
 
+/*!
+ * \brief Get a string-type configuration value.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 std::string LayerConfig::getStr(const std::string& pKey,
                                 const std::string pDefault) const   // cppcheck-suppress passedByValue symbolName=pDefault
 {
@@ -245,11 +314,29 @@ std::string LayerConfig::getStr(const std::string& pKey,
 
 //
 
+/*!
+ * \brief Get an 8 bit unsigned integer sequence from the configuration tree.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault) const
 {
     return ::geTSeq<std::uint8_t>(tree, pKey, std::move(pDefault));
 }
 
+/*!
+ * \brief Get a 64 bit unsigned integer sequence from the configuration tree.
+ *
+ * \todo Detailed doc
+ *
+ * \param pKey
+ * \param pDefault
+ * \return
+ */
 std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault) const
 {
     return ::geTSeq<std::uint64_t>(tree, pKey, std::move(pDefault));
@@ -257,6 +344,14 @@ std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std:
 
 //
 
+/*!
+ * \brief Create a configuration object from YAML format.
+ *
+ * \todo Detailed doc
+ *
+ * \param pYAMLString
+ * \return
+ */
 LayerConfig LayerConfig::fromYAML(const std::string& pYAMLString)
 {
     return LayerConfig(Auxil::propertyTreeFromYAML(pYAMLString));

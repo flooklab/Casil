@@ -25,6 +25,13 @@
 namespace casil::Version
 {
 
+/*!
+ * \brief Get the library version formatted as string.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::string toString()
 {
     std::string verStr = std::to_string(casilVersionMajor) + "." + std::to_string(casilVersionMinor) + "." +

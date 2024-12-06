@@ -77,6 +77,14 @@ CASIL_REGISTER_INTERFACE_ALIAS("SiTcp")
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pConfig
+ */
 SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
     MuxedInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
                        "{init: {ip: string, udp_port: int}}")
@@ -111,6 +119,11 @@ SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
         throw std::runtime_error("Negative connect timeout set for " + getSelfDescription() + ".");
 }
 
+/*!
+ * \brief Destructor.
+ *
+ * \todo Detailed doc
+ */
 SiTCP::~SiTCP()
 {
     if (initialized)    //Not closed yet; need to stop FIFO thread
@@ -119,6 +132,15 @@ SiTCP::~SiTCP()
 
 //Public
 
+/*!
+ * \copybrief MuxedInterface::read()
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize)
 {
     if (pAddr < baseAddrDataLimit)
@@ -178,6 +200,14 @@ std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize
     }
 }
 
+/*!
+ * \copybrief MuxedInterface::write()
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pData
+ */
 void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData)
 {
     if (pAddr < baseAddrDataLimit)
@@ -258,6 +288,13 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
     }
 }
 
+/*!
+ * \copybrief MuxedInterface::query()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::vector<std::uint8_t> SiTCP::query(std::uint64_t, std::uint64_t, const std::vector<std::uint8_t>&, int)
 {
     Logger::logWarning("The query() function is not implemented for the SiTcp interface (does nothing).");
@@ -266,6 +303,13 @@ std::vector<std::uint8_t> SiTCP::query(std::uint64_t, std::uint64_t, const std::
 
 //
 
+/*!
+ * \brief Check if the %UDP read buffer is empty.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SiTCP::readBufferEmpty() const
 {
     try
@@ -278,6 +322,11 @@ bool SiTCP::readBufferEmpty() const
     }
 }
 
+/*!
+ * \brief Clear the current contents of the %UDP read buffer.
+ *
+ * \todo Detailed doc
+ */
 void SiTCP::clearReadBuffer()
 {
     try
@@ -292,6 +341,11 @@ void SiTCP::clearReadBuffer()
 
 //
 
+/*!
+ * \brief Clear the FIFO and the remaining incoming %TCP buffer.
+ *
+ * \todo Detailed doc
+ */
 void SiTCP::resetFifo()
 {
     {
@@ -322,6 +376,11 @@ void SiTCP::resetFifo()
     }
 }
 
+/*!
+ * \brief TODO
+ *
+ * \todo Detailed doc
+ */
 void SiTCP::resetFifoMod32()
 {
     {
@@ -354,6 +413,13 @@ void SiTCP::resetFifoMod32()
     }
 }
 
+/*!
+ * \brief Get the FIFO size in number of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::size_t SiTCP::getFifoSize() const
 {
     const std::lock_guard<std::mutex> bufferLock(fifoMutex);
@@ -362,6 +428,14 @@ std::size_t SiTCP::getFifoSize() const
     return fifoBuffer.size();
 }
 
+/*!
+ * \brief Extract the current FIFO content as sequence of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> SiTCP::getFifoData(const int pSize)
 {
     if (pSize == 0)
@@ -388,6 +462,13 @@ std::vector<std::uint8_t> SiTCP::getFifoData(const int pSize)
 
 //Private
 
+/*!
+ * \copybrief MuxedInterface::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SiTCP::initImpl()
 {
     try
@@ -450,6 +531,13 @@ bool SiTCP::initImpl()
     return true;
 }
 
+/*!
+ * \copybrief MuxedInterface::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SiTCP::closeImpl()
 {
     try
@@ -485,6 +573,11 @@ bool SiTCP::closeImpl()
 
 //
 
+/*!
+ * \brief Enable using %TCP protocol for normal bus writes.
+ *
+ * \todo Detailed doc
+ */
 void SiTCP::enableTcpToBus()
 {
     if (!tcpSocketWrapperPtr)
@@ -510,6 +603,11 @@ void SiTCP::enableTcpToBus()
 
 //
 
+/*!
+ * \brief Continuously poll the %TCP socket for new FIFO data (use as thread).
+ *
+ * \todo Detailed doc
+ */
 void SiTCP::pollFifo()
 {
     if (!tcpSocketWrapperPtr)
@@ -572,11 +670,28 @@ void SiTCP::pollFifo()
 
 //
 
+/*!
+ * \brief Read from the bus with a single RBCP request/response.
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> SiTCP::readSingle(const std::uint32_t pAddr, const std::uint8_t pSize)
 {
     return doSingleRBCPOperation(pAddr, pSize).value();
 }
 
+/*!
+ * \brief Write to the bus with a single RBCP request/response.
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pData
+ */
 void SiTCP::writeSingle(const std::uint32_t pAddr, const std::vector<std::uint8_t>& pData)
 {
     doSingleRBCPOperation(pAddr, pData);
@@ -584,6 +699,15 @@ void SiTCP::writeSingle(const std::uint32_t pAddr, const std::vector<std::uint8_
 
 //
 
+/*!
+ * \brief Send a single RBCP read or write request to the bus and process the response message.
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pSizeOrData
+ * \return
+ */
 std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std::uint32_t pAddr, const std::variant<
                                                                  std::uint8_t,
                                                                  std::reference_wrapper<const std::vector<std::uint8_t>>> pSizeOrData)

@@ -42,6 +42,16 @@ using casil::TL::CommonImpl::SerialPortWrapper;
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pPort
+ * \param pReadTermination
+ * \param pWriteTermination
+ * \param pBaudRate
+ */
 SerialPortWrapper::SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination,
                                      const int pBaudRate) :
     port(std::move(pPort)),
@@ -62,6 +72,11 @@ SerialPortWrapper::SerialPortWrapper(std::string pPort, const std::string& pRead
 {
 }
 
+/*!
+ * \brief Destructor.
+ *
+ * \todo Detailed doc
+ */
 SerialPortWrapper::~SerialPortWrapper()
 {
     if (pollData.load())    //Not closed yet; need to stop polling here
@@ -78,6 +93,14 @@ SerialPortWrapper::~SerialPortWrapper()
 
 //Public
 
+/*!
+ * \brief Read an amount of bytes from the read buffer, or until read termination.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
 {
     std::unique_lock<std::mutex> bufferLock(readBufferMutex);
@@ -131,6 +154,14 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
         return {};
 }
 
+/*!
+ * \brief Read maximally some amount of bytes from the read buffer.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
 {
     if (pSize > 0)
@@ -170,6 +201,13 @@ std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
         return {};
 }
 
+/*!
+ * \brief Write data to the port (automatically terminated).
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData)
 {
     try
@@ -185,6 +223,13 @@ void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData)
 
 //
 
+/*!
+ * \brief Check if the read buffer is empty.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SerialPortWrapper::readBufferEmpty() const
 {
     const std::lock_guard<std::mutex> bufferLock(readBufferMutex);
@@ -193,6 +238,11 @@ bool SerialPortWrapper::readBufferEmpty() const
     return readBuffer.empty();
 }
 
+/*!
+ * \brief Clear the current contents of the read buffer.
+ *
+ * \todo Detailed doc
+ */
 void SerialPortWrapper::clearReadBuffer()
 {
     const std::lock_guard<std::mutex> bufferLock(readBufferMutex);
@@ -203,6 +253,11 @@ void SerialPortWrapper::clearReadBuffer()
 
 //
 
+/*!
+ * \brief Open the serial port and start a read buffer polling thread.
+ *
+ * \todo Detailed doc
+ */
 void SerialPortWrapper::init()
 {
     if (!ASIO::ioContextThreadsRunning())
@@ -233,6 +288,11 @@ void SerialPortWrapper::init()
     pollReadBuffer();
 }
 
+/*!
+ * \brief Stop the read buffer polling thread and close the serial port.
+ *
+ * \todo Detailed doc
+ */
 void SerialPortWrapper::close()
 {
     pollData.store(false);
@@ -254,12 +314,25 @@ void SerialPortWrapper::close()
 
 //Private
 
+/*!
+ * \brief Issue an async read to poll the serial port (handler is handleAsyncRead()).
+ *
+ * \todo Detailed doc
+ */
 void SerialPortWrapper::pollReadBuffer()
 {
     boost::asio::async_read(serialPort, boost::asio::dynamic_buffer(intermediateReadBuffer), boost::asio::transfer_at_least(1),
                             std::bind(&SerialPortWrapper::handleAsyncRead, this, std::placeholders::_1 ,std::placeholders::_2));
 }
 
+/*!
+ * \brief Fill read buffer from single poll by pollReadBuffer() and issue next poll.
+ *
+ * \todo Detailed doc
+ *
+ * \param pErrorCode
+ * \param pNumBytes
+ */
 void SerialPortWrapper::handleAsyncRead(const boost::system::error_code& pErrorCode, const std::size_t pNumBytes)
 {
     if (pErrorCode.value() != boost::system::errc::success && pErrorCode.value() != boost::system::errc::operation_canceled)

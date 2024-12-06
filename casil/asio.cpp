@@ -36,6 +36,13 @@ std::vector<std::thread> ASIO::ioContextThreads;
 
 //Public
 
+/*!
+ * \brief Get the IO context object.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 boost::asio::io_context& ASIO::getIOContext()
 {
     static boost::asio::io_context ioContext;
@@ -44,6 +51,14 @@ boost::asio::io_context& ASIO::getIOContext()
 
 //
 
+/*!
+ * \brief Start threads that continuously execute/run the IO context.
+ *
+ * \todo Detailed doc
+ *
+ * \param pNumThreads
+ * \return
+ */
 bool ASIO::startRunIOContext(const unsigned int pNumThreads)
 {
     if (ioContextRunning)
@@ -95,6 +110,11 @@ bool ASIO::startRunIOContext(const unsigned int pNumThreads)
     return true;
 }
 
+/*!
+ * \brief Stop all running IO context threads.
+ *
+ * \todo Detailed doc
+ */
 void ASIO::stopRunIOContext()
 {
     Logger::logInfo("Stopping all IO context threads...");
@@ -122,6 +142,13 @@ void ASIO::stopRunIOContext()
 
 //
 
+/*!
+ * \brief Check if any IO context threads are currently running.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool ASIO::ioContextThreadsRunning()
 {
     return ioContextRunning;
@@ -129,6 +156,13 @@ bool ASIO::ioContextThreadsRunning()
 
 //Private
 
+/*!
+ * \brief Get the "work guard" object for the IO context object.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 ASIO::WorkGuard& ASIO::getWorkGuard()
 {
     static std::unique_ptr<WorkGuard> work;

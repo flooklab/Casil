@@ -30,6 +30,15 @@ CASIL_REGISTER_DRIVER_CPP(VirtEcho)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ */
 VirtEcho::VirtEcho(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     DirectDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig())
 {
@@ -37,6 +46,13 @@ VirtEcho::VirtEcho(std::string pName, InterfaceBaseType& pInterface, LayerConfig
 
 //Public
 
+/*!
+ * \brief Read and immediately write back a number of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \param pN
+ */
 void VirtEcho::operator()(const int pN) const
 {
     interface.write(interface.read(pN));
@@ -44,11 +60,25 @@ void VirtEcho::operator()(const int pN) const
 
 //Private
 
+/*!
+ * \copybrief DirectDriver::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool VirtEcho::initImpl()
 {
     return true;
 }
 
+/*!
+ * \copybrief DirectDriver::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool VirtEcho::closeImpl()
 {
     return true;

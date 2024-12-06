@@ -38,6 +38,14 @@ using casil::TL::CommonImpl::UDPSocketWrapper;
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pHostName
+ * \param pPort
+ */
 UDPSocketWrapper::UDPSocketWrapper(std::string pHostName, const int pPort) :
     hostName(std::move(pHostName)),
     port(pPort),
@@ -48,6 +56,15 @@ UDPSocketWrapper::UDPSocketWrapper(std::string pHostName, const int pPort) :
 
 //Public
 
+/*!
+ * \brief Receive a single datagram from the socket.
+ *
+ * \todo Detailed doc
+ *
+ * \param pTimeout
+ * \param pTimedOut
+ * \return
+ */
 std::vector<std::uint8_t> UDPSocketWrapper::read(const std::chrono::milliseconds pTimeout,
                                                  const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -83,6 +100,16 @@ std::vector<std::uint8_t> UDPSocketWrapper::read(const std::chrono::milliseconds
     return std::vector<std::uint8_t>(readBuffer.begin(), readBuffer.begin() + n);
 }
 
+/*!
+ * \brief Receive maximally some amount of bytes of a single datagram from the socket.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \param pTimeout
+ * \param pTimedOut
+ * \return
+ */
 std::vector<std::uint8_t> UDPSocketWrapper::readMax(const int pSize, const std::chrono::milliseconds pTimeout,
                                                     const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -124,6 +151,15 @@ std::vector<std::uint8_t> UDPSocketWrapper::readMax(const int pSize, const std::
         return {};
 }
 
+/*!
+ * \brief Send a single datagram over the socket.
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pTimeout
+ * \param pTimedOut
+ */
 void UDPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::chrono::milliseconds pTimeout,
                              const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -150,6 +186,13 @@ void UDPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::
 
 //
 
+/*!
+ * \brief Check if no incoming datagrams are available on the socket.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool UDPSocketWrapper::readBufferEmpty() const
 {
     try
@@ -162,6 +205,11 @@ bool UDPSocketWrapper::readBufferEmpty() const
     }
 }
 
+/*!
+ * \brief Read remaining datagrams from the socket and discard them.
+ *
+ * \todo Detailed doc
+ */
 void UDPSocketWrapper::clearReadBuffer()
 {
     try
@@ -181,6 +229,14 @@ void UDPSocketWrapper::clearReadBuffer()
 
 //
 
+/*!
+ * \brief Connect the %UDP socket.
+ *
+ * \todo Detailed doc
+ *
+ * \param pConnectTimeout
+ * \param pTimedOut
+ */
 void UDPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (!ASIO::ioContextThreadsRunning())
@@ -212,6 +268,11 @@ void UDPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
     }
 }
 
+/*!
+ * \brief Disconnect the %UDP socket.
+ *
+ * \todo Detailed doc
+ */
 void UDPSocketWrapper::close()
 {
     try

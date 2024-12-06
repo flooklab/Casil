@@ -43,6 +43,16 @@ using casil::TL::CommonImpl::TCPSocketWrapper;
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pHostName
+ * \param pPort
+ * \param pReadTermination
+ * \param pWriteTermination
+ */
 TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
                                    std::string pReadTermination, const std::string& pWriteTermination) :
     hostName(std::move(pHostName)),
@@ -58,6 +68,16 @@ TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
 
 //Public
 
+/*!
+ * \brief Read an amount of bytes from the socket, or until read termination.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \param pTimeout
+ * \param pTimedOut
+ * \return
+ */
 std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chrono::milliseconds pTimeout,
                                                  const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -196,6 +216,16 @@ std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chr
         return {};
 }
 
+/*!
+ * \brief Read maximally some amount of bytes from the socket.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSize
+ * \param pTimeout
+ * \param pTimedOut
+ * \return
+ */
 std::vector<std::uint8_t> TCPSocketWrapper::readMax(const int pSize, const std::chrono::milliseconds pTimeout,
                                                     const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -285,6 +315,15 @@ std::vector<std::uint8_t> TCPSocketWrapper::readMax(const int pSize, const std::
         return {};
 }
 
+/*!
+ * \brief Write data to the socket (automatically terminated).
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ * \param pTimeout
+ * \param pTimedOut
+ */
 void TCPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::chrono::milliseconds pTimeout,
                              const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -331,6 +370,13 @@ void TCPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::
 
 //
 
+/*!
+ * \brief Check if the read buffer is empty (and no remaining data to be read).
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool TCPSocketWrapper::readBufferEmpty() const
 {
     if (readBuffer.size() > 0)
@@ -348,6 +394,11 @@ bool TCPSocketWrapper::readBufferEmpty() const
     return false;
 }
 
+/*!
+ * \brief Read remaining data from the socket and then clear the read buffer contents.
+ *
+ * \todo Detailed doc
+ */
 void TCPSocketWrapper::clearReadBuffer()
 {
     std::size_t dataAvail = 0;
@@ -380,6 +431,14 @@ void TCPSocketWrapper::clearReadBuffer()
 
 //
 
+/*!
+ * \brief Connect the %TCP socket.
+ *
+ * \todo Detailed doc
+ *
+ * \param pConnectTimeout
+ * \param pTimedOut
+ */
 void TCPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (!ASIO::ioContextThreadsRunning())
@@ -411,6 +470,11 @@ void TCPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
     }
 }
 
+/*!
+ * \brief Disconnect the %TCP socket.
+ *
+ * \todo Detailed doc
+ */
 void TCPSocketWrapper::close()
 {
     try

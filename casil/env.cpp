@@ -83,6 +83,13 @@ std::map<std::string, std::set<std::string>, std::less<>> readEnv()
 namespace casil::Env
 {
 
+/*!
+ * \brief Get a map of all Casil environment variables.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 const std::map<std::string, std::set<std::string>, std::less<>>& getEnv()
 {
     const static std::map<std::string, std::set<std::string>, std::less<>> env = ::readEnv();
@@ -90,6 +97,14 @@ const std::map<std::string, std::set<std::string>, std::less<>>& getEnv()
     return env;
 }
 
+/*!
+ * \brief Get a specific Casil environment variable.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVarName
+ * \return
+ */
 const std::set<std::string>& getEnv(const std::string_view pVarName)
 {
     const std::map<std::string, std::set<std::string>, std::less<>>& env = getEnv();

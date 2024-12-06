@@ -70,6 +70,15 @@ std::string formatUIntVec(const std::vector<T>& pVec)
 namespace casil::Bytes
 {
 
+/*!
+ * \brief Convert a sequence of bytes to a dynamic bitset.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBitSize
+ * \return
+ */
 boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes, const std::size_t pBitSize)
 {
     const std::size_t byteSize = pBytes.size();
@@ -95,6 +104,15 @@ boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes,
     return bits;
 }
 
+/*!
+ * \brief Convert a dynamic bitset to a sequence of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBits
+ * \param pByteSize
+ * \return
+ */
 std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits, const std::size_t pByteSize)
 {
     const std::size_t bitSize = pBits.size();
@@ -125,16 +143,40 @@ std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits, 
 
 //
 
+/*!
+ * \brief Interpret a character string as a sequence of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \param pStr
+ * \return
+ */
 std::vector<std::uint8_t> byteVecFromStr(const std::string& pStr)
 {
     return std::vector<std::uint8_t>(pStr.begin(), pStr.end());
 }
 
+/*!
+ * \brief Interpret a sequence of bytes as a character string.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVec
+ * \return
+ */
 std::string strFromByteVec(const std::vector<std::uint8_t>& pVec)
 {
     return std::string(pVec.begin(), pVec.end());
 }
 
+/*!
+ * \brief Concatenate two sequences of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVec
+ * \param pAppend
+ */
 void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uint8_t>& pAppend)
 {
     pVec.insert(pVec.end(), pAppend.begin(), pAppend.end());
@@ -142,41 +184,109 @@ void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uin
 
 //
 
+/*!
+ * \brief Output a vector of 8 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pOstream
+ * \param pByteVec
+ * \return
+ */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint8_t>& pByteVec)
 {
     return ::ostreamOperator<std::uint8_t>(pOstream, pByteVec);
 }
 
+/*!
+ * \brief Output a vector of 16 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pOstream
+ * \param pVec
+ * \return
+ */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint16_t>& pVec)
 {
     return ::ostreamOperator<std::uint16_t>(pOstream, pVec);
 }
 
+/*!
+ * \brief Output a vector of 32 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pOstream
+ * \param pVec
+ * \return
+ */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint32_t>& pVec)
 {
     return ::ostreamOperator<std::uint32_t>(pOstream, pVec);
 }
 
+/*!
+ * \brief Output a vector of 64 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pOstream
+ * \param pVec
+ * \return
+ */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint64_t>& pVec)
 {
     return ::ostreamOperator<std::uint64_t>(pOstream, pVec);
 }
 
+/*!
+ * \brief Format a vector of 8 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVec
+ * \return
+ */
 std::string formatByteVec(const std::vector<std::uint8_t>& pVec)
 {
     return ::formatUIntVec<std::uint8_t>(pVec);
 }
 
+/*!
+ * \brief Format a vector of 16 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVec
+ * \return
+ */
 std::string formatUInt16Vec(const std::vector<std::uint16_t>& pVec)
 {
     return ::formatUIntVec<std::uint16_t>(pVec);
 }
 
+/*!
+ * \brief Format a vector of 32 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVec
+ * \return
+ */
 std::string formatUInt32Vec(const std::vector<std::uint32_t>& pVec)
 {
     return ::formatUIntVec<std::uint32_t>(pVec);
 }
 
+/*!
+ * \brief Format a vector of 64 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \todo Detailed doc
+ *
+ * \param pVec
+ * \return
+ */
 std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec)
 {
     return ::formatUIntVec<std::uint64_t>(pVec);

@@ -72,6 +72,15 @@ CASIL_REGISTER_DRIVER_ALIAS("sitcp_fifo")
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ */
 SiTCPFifo::SiTCPFifo(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     MuxedDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig()),
     siTcpIntf(dynamic_cast<SiTCP&>(interface))  //Possible exception will be caught by macro-registered factory generator
@@ -80,6 +89,14 @@ SiTCPFifo::SiTCPFifo(std::string pName, InterfaceBaseType& pInterface, LayerConf
 
 //Public
 
+/*!
+ * \brief Register-like access to some functions.
+ *
+ * \todo Detailed doc
+ *
+ * \param pRegName
+ * \return
+ */
 std::size_t SiTCPFifo::operator[](std::string_view pRegName)
 {
     if (pRegName == "RESET")
@@ -97,6 +114,11 @@ std::size_t SiTCPFifo::operator[](std::string_view pRegName)
 
 //
 
+/*!
+ * \brief Reset the FIFO.
+ *
+ * \todo Detailed doc
+ */
 void SiTCPFifo::reset()
 {
     try
@@ -111,6 +133,13 @@ void SiTCPFifo::reset()
 
 //
 
+/*!
+ * \brief Get the pseudo FIFO module version.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::uint8_t SiTCPFifo::getVersion() const
 {
     return pseudoVersion;
@@ -118,11 +147,25 @@ std::uint8_t SiTCPFifo::getVersion() const
 
 //
 
+/*!
+ * \brief Get the FIFO size in number of bytes.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::size_t SiTCPFifo::getFifoSize() const
 {
     return siTcpIntf.getFifoSize();
 }
 
+/*!
+ * \brief Read the FIFO content as sequence of 32 bit unsigned integers.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::vector<std::uint32_t> SiTCPFifo::getFifoData() const
 {
     std::size_t retSize;
@@ -149,6 +192,13 @@ std::vector<std::uint32_t> SiTCPFifo::getFifoData() const
     return retVal;
 }
 
+/*!
+ * \brief Write a sequence of 32 bit unsigned integers to the FIFO.
+ *
+ * \todo Detailed doc
+ *
+ * \param pData
+ */
 void SiTCPFifo::setFifoData(const std::vector<std::uint32_t>& pData) const
 {
     const std::size_t retSize = pData.size() * 4;
@@ -172,11 +222,25 @@ void SiTCPFifo::setFifoData(const std::vector<std::uint32_t>& pData) const
 
 //Private
 
+/*!
+ * \brief Initialize the driver by doing nothing.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SiTCPFifo::initImpl()
 {
     return true;
 }
 
+/*!
+ * \brief Close the driver by doing nothing.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool SiTCPFifo::closeImpl()
 {
     return true;

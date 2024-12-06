@@ -29,6 +29,17 @@
 
 using casil::HL::MuxedDriver;
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pType
+ * \param pName
+ * \param pInterface
+ * \param pConfig
+ * \param pRequiredConfig
+ */
 MuxedDriver::MuxedDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                          LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     Driver(std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig),
@@ -41,21 +52,45 @@ MuxedDriver::MuxedDriver(std::string pType, std::string pName, InterfaceBaseType
 
 //Public
 
+/*!
+ * \brief Get driver-specific special data.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 std::vector<std::uint8_t> MuxedDriver::getData(int, std::uint32_t)
 {
     return {};  //(sic!)
 }
 
+/*!
+ * \brief Set driver-specific special data.
+ *
+ * \todo Detailed doc
+ */
 void MuxedDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 {
     //(sic!)
 }
 
+/*!
+ * \brief Perform a driver-specific action.
+ *
+ * \todo Detailed doc
+ */
 void MuxedDriver::exec()
 {
     //(sic!)
 }
 
+/*!
+ * \brief Check if a driver-specific action has finished.
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool MuxedDriver::isDone()
 {
     return false;   //(sic!)
@@ -63,6 +98,15 @@ bool MuxedDriver::isDone()
 
 //Protected
 
+/*!
+ * \brief Read from the interface relative to the base address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> MuxedDriver::read(const std::uint64_t pAddr, const int pSize) const
 {
     try
@@ -76,6 +120,14 @@ std::vector<std::uint8_t> MuxedDriver::read(const std::uint64_t pAddr, const int
     }
 }
 
+/*!
+ * \brief Write to the interface relative to the base address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pAddr
+ * \param pData
+ */
 void MuxedDriver::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) const
 {
     try
@@ -89,6 +141,17 @@ void MuxedDriver::write(const std::uint64_t pAddr, const std::vector<std::uint8_
     }
 }
 
+/*!
+ * \brief Write a query to the interface and read the response, both relative to the base address.
+ *
+ * \todo Detailed doc
+ *
+ * \param pWriteAddr
+ * \param pReadAddr
+ * \param pData
+ * \param pSize
+ * \return
+ */
 std::vector<std::uint8_t> MuxedDriver::query(const std::uint64_t pWriteAddr, const std::uint64_t pReadAddr,
                                              const std::vector<std::uint8_t>& pData, const int pSize) const
 {

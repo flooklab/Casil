@@ -30,6 +30,15 @@ CASIL_REGISTER_REGISTER_CPP(DummyRegister)
 
 //
 
+/*!
+ * \brief Constructor.
+ *
+ * \todo Detailed doc
+ *
+ * \param pName
+ * \param pDriver
+ * \param pConfig
+ */
 DummyRegister::DummyRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig) :
     Register(typeName, std::move(pName), pDriver, std::move(pConfig), LayerConfig())
 {
@@ -37,11 +46,25 @@ DummyRegister::DummyRegister(std::string pName, HL::Driver& pDriver, LayerConfig
 
 //Private
 
+/*!
+ * \copybrief Register::initImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyRegister::initImpl()
 {
     return true;
 }
 
+/*!
+ * \copybrief Register::closeImpl()
+ *
+ * \todo Detailed doc
+ *
+ * \return
+ */
 bool DummyRegister::closeImpl()
 {
     return true;

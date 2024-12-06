@@ -34,8 +34,8 @@ using casil::HL::SCPI;
 
 void bindHL_SCPI(py::module& pM)
 {
-    py::class_<SCPI, casil::HL::DirectDriver>(pM, "SCPI", "")
-            .def(py::init<std::string, SCPI::InterfaceBaseType&, casil::LayerConfig>(), "",
+    py::class_<SCPI, casil::HL::DirectDriver>(pM, "SCPI", "Driver for Standard Commands for Programmable Instruments (SCPI) devices.")
+            .def(py::init<std::string, SCPI::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"))
             .def("__getattr__", [](const SCPI& pThis, const std::string_view pAttr) -> py::cpp_function
                                 {
@@ -45,10 +45,14 @@ void bindHL_SCPI(py::module& pM)
                                             -> std::optional<std::string>
                                         { return tThis->operator()(pAttr, pChannel, std::move(pValue)); },
                                         py::arg("channel") = std::optional<int>{}, py::arg("value") = std::monostate{});
-                                }, "", py::arg("attr"), py::is_operator())
-            .def("__call__", &SCPI::operator(), "", py::arg("cmd"), py::arg("channel") = std::nullopt, py::arg("value") = std::monostate{},
-                 py::is_operator())
-            .def("writeCommand", &SCPI::writeCommand, "", py::arg("cmd"), py::arg("channel") = std::nullopt, py::arg("value") = std::monostate{})
-            .def("queryCommand", &SCPI::queryCommand, "", py::arg("cmd"), py::arg("channel") = std::nullopt)
-            .def("command", &SCPI::command, "", py::arg("cmd"), py::arg("channel") = std::nullopt, py::arg("value") = std::monostate{});
+                                },
+                 "Get a function to execute a command (either write or query; according return type).", py::arg("attr"), py::is_operator())
+            .def("__call__", &SCPI::operator(), "Execute a command (either write or query).",
+                 py::arg("cmd"), py::arg("channel") = std::nullopt, py::arg("value") = std::monostate{}, py::is_operator())
+            .def("writeCommand", &SCPI::writeCommand, "Execute a write command.",
+                 py::arg("cmd"), py::arg("channel") = std::nullopt, py::arg("value") = std::monostate{})
+            .def("queryCommand", &SCPI::queryCommand, "Execute a query command.",
+                 py::arg("cmd"), py::arg("channel") = std::nullopt)
+            .def("command", &SCPI::command, "Execute a command (either write or query).",
+                 py::arg("cmd"), py::arg("channel") = std::nullopt, py::arg("value") = std::monostate{});
 }

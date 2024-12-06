@@ -35,11 +35,17 @@ namespace Bytes = casil::Bytes;
 void bindBytes(py::module& pM)
 {
     pM.def("composeUInt16", [](const std::vector<std::uint8_t>& pBytes, const bool pBigEndian) -> std::uint16_t
-                            { return Bytes::composeUInt16(pBytes, pBigEndian); }, "", py::arg("bytes"), py::arg("bigEndian") = true);
+                            { return Bytes::composeUInt16(pBytes, pBigEndian); },
+           "Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.",
+           py::arg("bytes"), py::arg("bigEndian") = true);
     pM.def("composeUInt32", [](const std::vector<std::uint8_t>& pBytes, const bool pBigEndian) -> std::uint32_t
-                            { return Bytes::composeUInt32(pBytes, pBigEndian); }, "", py::arg("bytes"), py::arg("bigEndian") = true);
+                            { return Bytes::composeUInt32(pBytes, pBigEndian); },
+           "Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.",
+           py::arg("bytes"), py::arg("bigEndian") = true);
     pM.def("composeUInt64", [](const std::vector<std::uint8_t>& pBytes, const bool pBigEndian) -> std::uint64_t
-                            { return Bytes::composeUInt64(pBytes, pBigEndian); }, "", py::arg("bytes"), py::arg("bigEndian") = true);
+                            { return Bytes::composeUInt64(pBytes, pBigEndian); },
+           "Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.",
+           py::arg("bytes"), py::arg("bigEndian") = true);
 
     pM.def("bitsetFromBytes", [](const std::vector<std::uint8_t>& pBytes, const std::size_t pBitSize) -> std::vector<bool>
                               {
@@ -48,20 +54,22 @@ void bindBytes(py::module& pM)
                                   for (std::size_t i = 0; i < bitset.size(); ++i)
                                       retVal[i] = bitset.test(bitset.size() - 1 - i);
                                   return retVal;
-                              }, "", py::arg("bytes"), py::arg("bitSize"));
+                              }, "Convert a sequence of bytes to a dynamic bitset.", py::arg("bytes"), py::arg("bitSize"));
     pM.def("bytesFromBitset", [](const std::vector<bool>& pBits, const std::size_t pByteSize) -> std::vector<std::uint8_t>
                               {
                                   boost::dynamic_bitset bitset(pBits.size());
                                   for (std::size_t i = 0; i < pBits.size(); ++i)
                                       bitset[i] = pBits[pBits.size() - 1 - i];
                                   return Bytes::bytesFromBitset(bitset, pByteSize);
-                              }, "", py::arg("bits"), py::arg("byteSize"));
+                              }, "Convert a dynamic bitset to a sequence of bytes.", py::arg("bits"), py::arg("byteSize"));
 
-    pM.def("byteVecFromStr", &Bytes::byteVecFromStr, "", py::arg("str"));
-    pM.def("strFromByteVec", &Bytes::strFromByteVec, "", py::arg("vec"));
+    pM.def("byteVecFromStr", &Bytes::byteVecFromStr, "Interpret a character string as a sequence of bytes.", py::arg("str"));
+    pM.def("strFromByteVec", &Bytes::strFromByteVec, "Interpret a sequence of bytes as a character string.", py::arg("vec"));
 
-    pM.def("formatHex", [](const std::uint64_t pNumber) -> std::string { return Bytes::formatHex<std::uint64_t>(pNumber, false); }, "",
-           py::arg("number"));
-    pM.def("formatByteVec", &Bytes::formatByteVec, "", py::arg("vec"));
-    pM.def("formatUIntVec", &Bytes::formatUInt64Vec, "", py::arg("vec"));
+    pM.def("formatHex", [](const std::uint64_t pNumber) -> std::string { return Bytes::formatHex<std::uint64_t>(pNumber, false); },
+           "Format an unsigned integer as hexadecimal literal.", py::arg("number"));
+    pM.def("formatByteVec", &Bytes::formatByteVec,
+           "Format a vector of 8 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.", py::arg("vec"));
+    pM.def("formatUIntVec", &Bytes::formatUInt64Vec,
+           "Format a vector of unsigned integers as brace-enclosed sequence of hexadecimal literals.", py::arg("vec"));
 }

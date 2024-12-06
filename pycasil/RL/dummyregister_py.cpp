@@ -28,6 +28,7 @@ using casil::RL::DummyRegister;
 
 void bindRL_DummyRegister(py::module& pM)
 {
-    py::class_<DummyRegister, casil::RL::Register>(pM, "DummyRegister", "")
-            .def(py::init<std::string, casil::HL::Driver&, casil::LayerConfig>(), "", py::arg("name"), py::arg("driver"), py::arg("config"));
+    py::class_<DummyRegister, casil::RL::Register>(pM, "DummyRegister", "Dummy implementation of Register without actual functionality.")
+            .def(py::init<std::string, casil::HL::Driver&, casil::LayerConfig>(), "Constructor.",
+                 py::arg("name"), py::arg("driver"), py::arg("config"));
 }

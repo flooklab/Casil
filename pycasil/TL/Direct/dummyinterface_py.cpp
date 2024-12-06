@@ -28,6 +28,7 @@ using casil::TL::DummyInterface;
 
 void bindTL_DummyInterface(py::module& pM)
 {
-    py::class_<DummyInterface, casil::TL::DirectInterface>(pM, "DummyInterface", "")
-            .def(py::init<std::string, casil::LayerConfig>(), "", py::arg("name"), py::arg("config"));
+    py::class_<DummyInterface, casil::TL::DirectInterface>(pM, "DummyInterface",
+                                                           "Dummy implementation of DirectInterface without actual functionality.")
+            .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"));
 }

@@ -28,5 +28,6 @@ using casil::HL::DirectDriver;
 
 void bindHL_DirectDriver(py::module& pM)
 {
-    py::class_<DirectDriver, casil::HL::Driver>(pM, "DirectDriver", "");
+    py::class_<DirectDriver, casil::HL::Driver>(pM, "DirectDriver", "Base class to derive from for driver components that control "
+                                                                    "independent hardware devices connected via a DirectInterface.");
 }

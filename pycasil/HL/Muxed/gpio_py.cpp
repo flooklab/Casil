@@ -34,12 +34,12 @@ using casil::HL::GPIO;
 
 void bindHL_GPIO(py::module& pM)
 {
-    py::class_<GPIO, casil::HL::RegisterDriver>(pM, "GPIO", "")
-            .def(py::init<std::string, GPIO::InterfaceBaseType&, casil::LayerConfig>(), "",
+    py::class_<GPIO, casil::HL::RegisterDriver>(pM, "GPIO", "Driver for the gpio firmware module.")
+            .def(py::init<std::string, GPIO::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"))
-            .def("getSize", &GPIO::getSize, "")
-            .def("getOutputEn", &GPIO::getOutputEn, "")
-            .def("setOutputEn", &GPIO::setOutputEn, "", py::arg("enable"))
+            .def("getSize", &GPIO::getSize, "Get the number of IO bits.")
+            .def("getOutputEn", &GPIO::getOutputEn, "Get the OUTPUT_EN register.")
+            .def("setOutputEn", &GPIO::setOutputEn, "Set the OUTPUT_EN register.", py::arg("enable"))
             .def("bitsetFromBytes", [](const GPIO& pThis, const std::vector<std::uint8_t>& pBytes) -> std::vector<bool>
                                     {
                                         const boost::dynamic_bitset bitset = pThis.bitsetFromBytes(pBytes);
@@ -47,13 +47,12 @@ void bindHL_GPIO(py::module& pM)
                                         for (std::size_t i = 0; i < bitset.size(); ++i)
                                             retVal[i] = bitset.test(bitset.size() - 1 - i);
                                         return retVal;
-                                    }, "", py::arg("bytes"))
-
+                                    }, "Convert IO register bytes to a bitset.", py::arg("bytes"))
             .def("bytesFromBitset", [](const GPIO& pThis, const std::vector<bool>& pBits) -> std::vector<std::uint8_t>
                                     {
                                         boost::dynamic_bitset bitset(pBits.size());
                                         for (std::size_t i = 0; i < pBits.size(); ++i)
                                             bitset[i] = pBits[pBits.size() - 1 - i];
                                         return pThis.bytesFromBitset(bitset);
-                                    }, "", py::arg("bits"));
+                                    }, "Convert a bitset to IO register bytes.", py::arg("bits"));
 }

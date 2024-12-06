@@ -28,6 +28,6 @@ using casil::TL::TCP;
 
 void bindTL_TCP(py::module& pM)
 {
-    py::class_<TCP, casil::TL::DirectInterface>(pM, "TCP", "")
-            .def(py::init<std::string, casil::LayerConfig>(), "", py::arg("name"), py::arg("config"));
+    py::class_<TCP, casil::TL::DirectInterface>(pM, "TCP", "Interface for network communication using the Transmission Control Protocol (TCP).")
+            .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"));
 }

@@ -28,8 +28,9 @@ using casil::ASIO;
 
 void bind_ASIO(py::module& pM)
 {
-    py::class_<ASIO>(pM, "ASIO", "")
-            .def_static("startRunIOContext", &ASIO::startRunIOContext, "", py::arg("numThreads") = 1)
-            .def_static("stopRunIOContext", &ASIO::stopRunIOContext, "")
-            .def_static("ioContextThreadsRunning", &ASIO::ioContextThreadsRunning, "");
+    py::class_<ASIO>(pM, "ASIO", "Limited interface to the used async IO back end from the Boost library.")
+            .def_static("startRunIOContext", &ASIO::startRunIOContext, "Start threads that continuously execute/run the IO context.",
+                        py::arg("numThreads") = 1)
+            .def_static("stopRunIOContext", &ASIO::stopRunIOContext, "Stop all running IO context threads.")
+            .def_static("ioContextThreadsRunning", &ASIO::ioContextThreadsRunning, "Check if any IO context threads are currently running.");
 }

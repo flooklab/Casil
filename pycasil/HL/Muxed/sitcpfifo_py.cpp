@@ -34,8 +34,8 @@ using casil::HL::SiTCPFifo;
 
 void bindHL_SiTCPFifo(py::module& pM)
 {
-    py::class_<SiTCPFifo, casil::HL::MuxedDriver>(pM, "SiTCPFifo", "")
-            .def(py::init<std::string, SiTCPFifo::InterfaceBaseType&, casil::LayerConfig>(), "",
+    py::class_<SiTCPFifo, casil::HL::MuxedDriver>(pM, "SiTCPFifo", "Special driver to access the FIFO of the SiTCP interface.")
+            .def(py::init<std::string, SiTCPFifo::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"))
             .def("__getitem__", [](SiTCPFifo& pThis, const std::string_view pItem) -> std::size_t
                                 {
@@ -50,21 +50,21 @@ void bindHL_SiTCPFifo(py::module& pM)
                                         return pThis.getFifoSize();
                                     else
                                         throw py::key_error("Invalid item \"" + std::string(pItem) + "\".");
-                                }, "", py::arg("item"), py::is_operator())
+                                }, "Register-like access to some functions (RESET, VERSION, FIFO_SIZE).", py::arg("item"), py::is_operator())
             .def("__setitem__", [](SiTCPFifo& pThis, const std::string_view pItem, std::uint8_t) -> void
                                 {
                                     if (pItem == "RESET")
                                         pThis.reset();
                                     else
                                         throw py::key_error("Invalid item \"" + std::string(pItem) + "\".");
-                                }, "", py::arg("item"), py::arg("arg"), py::is_operator())
+                                }, "Reset the FIFO via \"RESET\" (will fail otherwise).", py::arg("item"), py::arg("arg"), py::is_operator())
             .def("__setitem__", [](const SiTCPFifo&, const std::string_view pItem, py::object) -> void
                                 {
                                     if (pItem == "RESET")
                                         throw py::type_error("Invalid assignment.");
                                     else
                                         throw py::key_error("Invalid item \"" + std::string(pItem) + "\".");
-                                }, "", py::arg("item"), py::arg("arg"), py::is_operator())
+                                }, "This one will fail.", py::arg("item"), py::arg("arg"), py::is_operator())
             .def("__getattr__", [](SiTCPFifo& pThis, const std::string_view pAttr) -> std::variant<std::size_t, py::cpp_function>
                                 {
                                     if (pAttr.starts_with("get_") && pAttr.length() >= 5 && (pAttr.substr(4) == "RESET" ||
@@ -105,7 +105,9 @@ void bindHL_SiTCPFifo(py::module& pM)
                                     else
                                         throw py::attribute_error("Invalid attribute \"" + std::string(pAttr) + "\".");
 
-                                }, "", py::arg("attr"), py::is_operator())
+                                },
+                 "Get a getter function for RESET/VERSION/FIFO_SIZE, a setter function for RESET or access these register-like attributes "
+                 "as with __getitem__.", py::arg("attr"), py::is_operator())
             .def("__setattr__", [](SiTCPFifo& pThis, const std::string_view pAttr, const std::uint8_t pValue) -> void
                                 {
                                     if (pAttr == "RESET")
@@ -117,7 +119,8 @@ void bindHL_SiTCPFifo(py::module& pM)
 
                                         py::module::import("builtins").attr("super")(selfType, selfObj).attr("__setattr__")(pAttr, pValue);
                                     }
-                                }, "", py::arg("attr"), py::arg("value"), py::is_operator())
+                                },
+                 "Reset the FIFO via \"RESET\" or set a non-register attribute.", py::arg("attr"), py::arg("value"), py::is_operator())
             .def("__setattr__", [](SiTCPFifo& pThis, const std::string_view pAttr, const py::object pArg)   //Catchall forward to super
                                     -> void
                                 {
@@ -130,9 +133,9 @@ void bindHL_SiTCPFifo(py::module& pM)
 
                                         py::module::import("builtins").attr("super")(selfType, selfObj).attr("__setattr__")(pAttr, pArg);
                                     }
-                                }, "", py::arg("attr"), py::arg("arg"), py::is_operator())
-            .def("getVersion", &SiTCPFifo::getVersion, "")
-            .def("getFifoSize", &SiTCPFifo::getFifoSize, "")
-            .def("getFifoData", &SiTCPFifo::getFifoData, "")
-            .def("setFifoData", &SiTCPFifo::setFifoData, "", py::arg("data"));
+                                }, "Set a non-register attribute.", py::arg("attr"), py::arg("arg"), py::is_operator())
+            .def("getVersion", &SiTCPFifo::getVersion, "Get the pseudo FIFO module version.")
+            .def("getFifoSize", &SiTCPFifo::getFifoSize, "Get the FIFO size in number of bytes.")
+            .def("getFifoData", &SiTCPFifo::getFifoData, "Read the FIFO content as sequence of 32 bit unsigned integers.")
+            .def("setFifoData", &SiTCPFifo::setFifoData, "Write a sequence of 32 bit unsigned integers to the FIFO.", py::arg("data"));
 }

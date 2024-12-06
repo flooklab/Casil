@@ -34,8 +34,8 @@ namespace Env = casil::Env;
 
 void bindEnv(py::module& pM)
 {
-    pM.def("getEnv", static_cast<const std::map<std::string, std::set<std::string>, std::less<>>& (*)(void)>(&Env::getEnv), "",
-           py::return_value_policy::reference);
-    pM.def("getEnv", static_cast<const std::set<std::string>& (*)(std::string_view)>(&Env::getEnv), "", py::arg("varName"),
-           py::return_value_policy::reference);
+    pM.def("getEnv", static_cast<const std::map<std::string, std::set<std::string>, std::less<>>& (*)(void)>(&Env::getEnv),
+           "Get a map of all Casil environment variables.", py::return_value_policy::reference);
+    pM.def("getEnv", static_cast<const std::set<std::string>& (*)(std::string_view)>(&Env::getEnv),
+           "Get a specific Casil environment variable.", py::arg("varName"), py::return_value_policy::reference);
 }

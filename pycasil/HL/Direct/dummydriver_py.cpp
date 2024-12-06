@@ -28,7 +28,7 @@ using casil::HL::DummyDriver;
 
 void bindHL_DummyDriver(py::module& pM)
 {
-    py::class_<DummyDriver, casil::HL::DirectDriver>(pM, "DummyDriver", "")
-            .def(py::init<std::string, DummyDriver::InterfaceBaseType&, casil::LayerConfig>(), "",
+    py::class_<DummyDriver, casil::HL::DirectDriver>(pM, "DummyDriver", "Dummy implementation of DirectDriver without actual functionality.")
+            .def(py::init<std::string, DummyDriver::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"));
 }

@@ -28,5 +28,6 @@ using casil::HL::MuxedDriver;
 
 void bindHL_MuxedDriver(py::module& pM)
 {
-    py::class_<MuxedDriver, casil::HL::Driver>(pM, "MuxedDriver", "");
+    py::class_<MuxedDriver, casil::HL::Driver>(pM, "MuxedDriver", "Base class to derive from for driver components that control "
+                                                                  "firmware modules on a basil bus connected via a MuxedInterface.");
 }

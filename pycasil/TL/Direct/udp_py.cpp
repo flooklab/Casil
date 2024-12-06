@@ -28,6 +28,6 @@ using casil::TL::UDP;
 
 void bindTL_UDP(py::module& pM)
 {
-    py::class_<UDP, casil::TL::DirectInterface>(pM, "UDP", "")
-            .def(py::init<std::string, casil::LayerConfig>(), "", py::arg("name"), py::arg("config"));
+    py::class_<UDP, casil::TL::DirectInterface>(pM, "UDP", "Interface for network communication using the User Datagram Protocol (UDP).")
+            .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"));
 }

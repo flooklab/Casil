@@ -28,7 +28,7 @@ using casil::TL::Interface;
 
 void bindTL_Interface(py::module& pM)
 {
-    py::class_<Interface, casil::LayerBase>(pM, "Interface", "")
-            .def("readBufferEmpty", &Interface::readBufferEmpty, "")
-            .def("clearReadBuffer", &Interface::clearReadBuffer, "");
+    py::class_<Interface, casil::LayerBase>(pM, "Interface", "Common base class for all interface components in the transfer layer (TL).")
+            .def("readBufferEmpty", &Interface::readBufferEmpty, "Check if the read buffer is empty.")
+            .def("clearReadBuffer", &Interface::clearReadBuffer, "Clear the current contents of the read buffer.");
 }

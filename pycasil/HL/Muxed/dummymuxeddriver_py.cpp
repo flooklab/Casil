@@ -28,7 +28,8 @@ using casil::HL::DummyMuxedDriver;
 
 void bindHL_DummyMuxedDriver(py::module& pM)
 {
-    py::class_<DummyMuxedDriver, casil::HL::MuxedDriver>(pM, "DummyMuxedDriver", "")
-            .def(py::init<std::string, DummyMuxedDriver::InterfaceBaseType&, casil::LayerConfig>(), "",
+    py::class_<DummyMuxedDriver, casil::HL::MuxedDriver>(pM, "DummyMuxedDriver",
+                                                         "Dummy implementation of MuxedDriver without actual functionality.")
+            .def(py::init<std::string, DummyMuxedDriver::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"));
 }

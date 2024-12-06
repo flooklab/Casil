@@ -28,10 +28,10 @@ using casil::HL::Driver;
 
 void bindHL_Driver(py::module& pM)
 {
-    py::class_<Driver, casil::LayerBase>(pM, "Driver", "")
-            .def("reset", &Driver::reset, "")
-            .def("getData", &Driver::getData, "", py::arg("size") = -1, py::arg("addrOffs") = 0u)
-            .def("setData", &Driver::setData, "", py::arg("data"), py::arg("addrOffs") = 0u)
-            .def("exec", &Driver::exec, "")
-            .def("isDone", &Driver::isDone, "");
+    py::class_<Driver, casil::LayerBase>(pM, "Driver", "Common base class for all driver components in the hardware layer (HL).")
+            .def("reset", &Driver::reset, "Reset the controlled device/module.")
+            .def("getData", &Driver::getData, "Get driver-specific special data.", py::arg("size") = -1, py::arg("addrOffs") = 0u)
+            .def("setData", &Driver::setData, "Set driver-specific special data.", py::arg("data"), py::arg("addrOffs") = 0u)
+            .def("exec", &Driver::exec, "Perform a driver-specific action.")
+            .def("isDone", &Driver::isDone, "Check if a driver-specific action has finished.");
 }

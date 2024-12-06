@@ -28,6 +28,7 @@ using casil::TL::DummyMuxedInterface;
 
 void bindTL_DummyMuxedInterface(py::module& pM)
 {
-    py::class_<DummyMuxedInterface, casil::TL::MuxedInterface>(pM, "DummyMuxedInterface", "")
-            .def(py::init<std::string, casil::LayerConfig>(), "", py::arg("name"), py::arg("config"));
+    py::class_<DummyMuxedInterface, casil::TL::MuxedInterface>(pM, "DummyMuxedInterface",
+                                                               "Dummy implementation of MuxedInterface without actual functionality.")
+            .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"));
 }

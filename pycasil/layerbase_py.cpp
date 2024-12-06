@@ -28,16 +28,17 @@ using casil::LayerBase;
 
 void bind_LayerBase(py::module& pM)
 {
-    py::class_<LayerBase> layerBase(pM, "LayerBase", "");
+    py::class_<LayerBase> layerBase(pM, "LayerBase", "Common top-level base class that connects the different layers "
+                                                     "and layer components of the basil layer structure.");
 
-    py::enum_<LayerBase::Layer>(layerBase, "Layer", "")
-            .value("TransferLayer", LayerBase::Layer::TransferLayer, "")
-            .value("HardwareLayer", LayerBase::Layer::HardwareLayer, "")
-            .value("RegisterLayer", LayerBase::Layer::RegisterLayer, "");
+    py::enum_<LayerBase::Layer>(layerBase, "Layer", "Enumeration of identifiers for the distinguished component layers TL, HL and RL.")
+            .value("TransferLayer", LayerBase::Layer::TransferLayer, "Transfer layer (TL): Interfaces")
+            .value("HardwareLayer", LayerBase::Layer::HardwareLayer, "Hardware layer (HL): Drivers")
+            .value("RegisterLayer", LayerBase::Layer::RegisterLayer, "Register layer (RL): Registers");
 
-    layerBase.def("getLayer", &LayerBase::getLayer, "")
-            .def("getType", &LayerBase::getType, "", py::return_value_policy::reference)
-            .def("getName", &LayerBase::getName, "", py::return_value_policy::reference)
-            .def("init", &LayerBase::init, "", py::arg("force") = false)
-            .def("close", &LayerBase::close, "", py::arg("force") = false);
+    layerBase.def("getLayer", &LayerBase::getLayer, "Get the layer of this layer component.")
+            .def("getType", &LayerBase::getType, "Get the type name of this layer component.", py::return_value_policy::reference)
+            .def("getName", &LayerBase::getName, "Get the instance name of this layer component.", py::return_value_policy::reference)
+            .def("init", &LayerBase::init, "Initialize this layer component.", py::arg("force") = false)
+            .def("close", &LayerBase::close, "Close (\"uninitialize\") this layer component.", py::arg("force") = false);
 }

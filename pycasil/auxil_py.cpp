@@ -43,12 +43,12 @@ private:
 
 void bindAuxil(py::module& pM)
 {
-    pM.def("uintSeqFromYAML", &Auxil::uintSeqFromYAML, "", py::arg("yamlString"));
+    pM.def("uintSeqFromYAML", &Auxil::uintSeqFromYAML, "Parse a sequence of unsigned integers from YAML format.", py::arg("yamlString"));
 
-    py::class_<PyAsyncIORunner>(pM, "AsyncIORunner", "")
-            .def(py::init<unsigned int>(), "", py::arg("numThreads") = 1)
-            .def("__enter__", &PyAsyncIORunner::enter, "", py::is_operator())
-            .def("__exit__", &PyAsyncIORunner::exit, "", py::is_operator());
+    py::class_<PyAsyncIORunner>(pM, "AsyncIORunner", "Context manager to run IO context threads for ASIO functionality.")
+            .def(py::init<unsigned int>(), "Constructor.", py::arg("numThreads") = 1)
+            .def("__enter__", &PyAsyncIORunner::enter, "Start the numThreads IO context threads.", py::is_operator())
+            .def("__exit__", &PyAsyncIORunner::exit, "Stop the IO context threads.", py::is_operator());
 }
 
 //Function definitions for AsyncIORunner wrapper class

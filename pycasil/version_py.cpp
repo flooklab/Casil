@@ -32,17 +32,17 @@ void bindVersion(py::module& pM)
 {
     using Version::ReleaseType;
 
-    py::enum_<ReleaseType>(pM, "ReleaseType", "")
-            .value("Alpha", ReleaseType::Alpha, "")
-            .value("Beta", ReleaseType::Beta, "")
-            .value("ReleaseCandidate", ReleaseType::ReleaseCandidate, "")
-            .value("Normal", ReleaseType::Normal, "");
+    py::enum_<ReleaseType>(pM, "ReleaseType", "Release type of the released library version.")
+            .value("Alpha", ReleaseType::Alpha, "Pre-release alpha status.")
+            .value("Beta", ReleaseType::Beta, "Pre-release beta status.")
+            .value("ReleaseCandidate", ReleaseType::ReleaseCandidate, "Pre-release release candidate status.")
+            .value("Normal", ReleaseType::Normal, "Normal/final release.");
 
-    py::class_<PyCasilVersion>(pM, "CasilVersion", "")
-            .def_readonly_static("casilVersionMajor", &Version::casilVersionMajor, "")
-            .def_readonly_static("casilVersionMinor", &Version::casilVersionMinor, "")
-            .def_readonly_static("casilVersionPatch", &Version::casilVersionPatch, "")
-            .def_readonly_static("casilVersionType", &Version::casilVersionType, "");
+    py::class_<PyCasilVersion>(pM, "CasilVersion", "Current library version.")
+            .def_readonly_static("casilVersionMajor", &Version::casilVersionMajor, "Library version major number.")
+            .def_readonly_static("casilVersionMinor", &Version::casilVersionMinor, "Library version minor number.")
+            .def_readonly_static("casilVersionPatch", &Version::casilVersionPatch, "Library version patch number.")
+            .def_readonly_static("casilVersionType", &Version::casilVersionType, "Library version release type.");
 
-    pM.def("toString", &Version::toString, "");
+    pM.def("toString", &Version::toString, "Get the library version formatted as string.");
 }

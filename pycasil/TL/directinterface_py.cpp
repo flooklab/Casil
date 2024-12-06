@@ -28,8 +28,10 @@ using casil::TL::DirectInterface;
 
 void bindTL_DirectInterface(py::module& pM)
 {
-    py::class_<DirectInterface, casil::TL::Interface>(pM, "DirectInterface", "")
-            .def("read", &DirectInterface::read, "", py::arg("size") = -1)
-            .def("write", &DirectInterface::write, "", py::arg("data"))
-            .def("query", &DirectInterface::query, "", py::arg("data"), py::arg("size") = -1);
+    py::class_<DirectInterface, casil::TL::Interface>(pM, "DirectInterface", "Base class to derive from for interface components "
+                                                                             "that directly connect to an independent hardware device.")
+            .def("read", &DirectInterface::read, "Read from the interface.", py::arg("size") = -1)
+            .def("write", &DirectInterface::write, "Write to the interface.", py::arg("data"))
+            .def("query", &DirectInterface::query, "Write a query to the interface and read the response.",
+                 py::arg("data"), py::arg("size") = -1);
 }

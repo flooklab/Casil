@@ -28,12 +28,17 @@ using casil::Device;
 
 void bind_Device(py::module& pM)
 {
-    py::class_<Device>(pM, "Device", "")
-            .def(py::init<const std::string&>(), "", py::arg("config"))
-            .def("__getitem__", &Device::operator[], "", py::arg("name"), py::return_value_policy::reference, py::is_operator())
-            .def("interface", &Device::interface, "", py::arg("name"), py::return_value_policy::reference)
-            .def("driver", &Device::driver, "", py::arg("name"), py::return_value_policy::reference)
-            .def("reg", &Device::reg, "", py::arg("name"), py::return_value_policy::reference)
-            .def("init", &Device::init, "", py::arg("force") = false)
-            .def("close", &Device::close, "", py::arg("force") = false);
+    py::class_<Device>(pM, "Device",
+                       "Configurable container class for interdependent layer components to interact with an arbitrary DAQ setup.")
+            .def(py::init<const std::string&>(), "Constructor.", py::arg("config"))
+            .def("__getitem__", &Device::operator[], "Access one of the components from any layer.",
+                 py::arg("name"), py::return_value_policy::reference, py::is_operator())
+            .def("interface", &Device::interface, "Access one of the interface components from the transfer layer.",
+                 py::arg("name"), py::return_value_policy::reference)
+            .def("driver", &Device::driver, "Access one of the driver components from the hardware layer.",
+                 py::arg("name"), py::return_value_policy::reference)
+            .def("reg", &Device::reg, "Access one of the register components from the register layer.",
+                 py::arg("name"), py::return_value_policy::reference)
+            .def("init", &Device::init, "Initialize by initializing all components of all layers.", py::arg("force") = false)
+            .def("close", &Device::close, "Close by closing all components of all layers.", py::arg("force") = false);
 }

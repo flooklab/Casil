@@ -28,8 +28,8 @@ using casil::HL::VirtEcho;
 
 void bindHL_VirtEcho(py::module& pM)
 {
-    py::class_<VirtEcho, casil::HL::DirectDriver>(pM, "VirtEcho", "")
-            .def(py::init<std::string, VirtEcho::InterfaceBaseType&, casil::LayerConfig>(), "",
+    py::class_<VirtEcho, casil::HL::DirectDriver>(pM, "VirtEcho", "Pseudo driver to write back to its interface what can be read from it.")
+            .def(py::init<std::string, VirtEcho::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"))
-            .def("__call__", &VirtEcho::operator(), "", py::arg("n"), py::is_operator());
+            .def("__call__", &VirtEcho::operator(), "Read and immediately write back a number of bytes.", py::arg("n"), py::is_operator());
 }

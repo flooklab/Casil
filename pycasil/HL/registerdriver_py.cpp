@@ -35,12 +35,16 @@ using casil::HL::RegisterDriver;
 
 void bindHL_RegisterDriver(py::module& pM)
 {
-    py::class_<RegisterDriver, casil::HL::MuxedDriver>(pM, "RegisterDriver", "")
-            .def("__getitem__", &RegisterDriver::get, "", py::arg("regName"), py::is_operator())
+    py::class_<RegisterDriver, casil::HL::MuxedDriver>(pM, "RegisterDriver", "Specialization for principally MuxedDriver components that will "
+                                                                             "mainly control their firmware module via register operations.")
+            .def("__getitem__", &RegisterDriver::get, "Read an integer or byte sequence from a register, according to its data type.",
+                 py::arg("regName"), py::is_operator())
             .def("__setitem__", [](RegisterDriver& pThis, const std::string_view pRegName, const std::uint64_t pValue) -> void
-                                { pThis.setValue(pRegName, pValue); }, "", py::arg("regName"), py::arg("value"), py::is_operator())
+                                { pThis.setValue(pRegName, pValue); }, "Write a value to a value register.",
+                 py::arg("regName"), py::arg("value"), py::is_operator())
             .def("__setitem__", [](RegisterDriver& pThis, const std::string_view pRegName, const std::vector<std::uint8_t>& pBytes) -> void
-                                { pThis.setBytes(pRegName, pBytes); }, "", py::arg("regName"), py::arg("bytes"), py::is_operator())
+                                { pThis.setBytes(pRegName, pBytes); }, "Write data to a byte array register.",
+                 py::arg("regName"), py::arg("bytes"), py::is_operator())
             .def("__setitem__", [](const RegisterDriver& pThis, const std::string_view pRegName, py::object) -> void
                                 {
                                     try
@@ -52,7 +56,7 @@ void bindHL_RegisterDriver(py::module& pM)
                                     {
                                         throw;
                                     }
-                                }, "", py::arg("regName"), py::arg("arg"), py::is_operator())
+                                }, "Write something else to a register (will fail).", py::arg("regName"), py::arg("arg"), py::is_operator())
             .def("__getattr__", [](RegisterDriver& pThis, const std::string_view pAttr) -> std::variant<std::uint64_t,
                                                                                                         std::vector<std::uint8_t>,
                                                                                                         py::cpp_function>
@@ -100,7 +104,9 @@ void bindHL_RegisterDriver(py::module& pM)
                                     else
                                         throw py::attribute_error("Invalid attribute \"" + std::string(pAttr) + "\".");
 
-                                }, "", py::arg("attr"), py::is_operator())
+                                },
+                 "Read from a register (return type according to its data type) or get a register getter/setter function.",
+                 py::arg("attr"), py::is_operator())
             .def("__setattr__", [](RegisterDriver& pThis, const std::string_view pAttr, const std::uint64_t pValue) -> void
                                 {
                                     if (RegisterDriver::isValidRegisterName(pAttr))
@@ -122,7 +128,8 @@ void bindHL_RegisterDriver(py::module& pM)
 
                                         py::module::import("builtins").attr("super")(selfType, selfObj).attr("__setattr__")(pAttr, pValue);
                                     }
-                                }, "", py::arg("attr"), py::arg("value"), py::is_operator())
+                                },
+                 "Write a value to a value register or set a non-register attribute.", py::arg("attr"), py::arg("value"), py::is_operator())
             .def("__setattr__", [](RegisterDriver& pThis, const std::string_view pAttr, const std::vector<std::uint8_t>& pBytes) -> void
                                 {
                                     if (RegisterDriver::isValidRegisterName(pAttr))
@@ -144,7 +151,8 @@ void bindHL_RegisterDriver(py::module& pM)
 
                                         py::module::import("builtins").attr("super")(selfType, selfObj).attr("__setattr__")(pAttr, pBytes);
                                     }
-                                }, "", py::arg("attr"), py::arg("bytes"), py::is_operator())
+                                },
+                 "Write data to a byte array register or set a non-register attribute.", py::arg("attr"), py::arg("bytes"), py::is_operator())
             .def("__setattr__", [](RegisterDriver& pThis, const std::string_view pAttr, const py::object pArg)      //Catchall forward to super
                                     -> void
                                 {
@@ -167,18 +175,24 @@ void bindHL_RegisterDriver(py::module& pM)
 
                                         py::module::import("builtins").attr("super")(selfType, selfObj).attr("__setattr__")(pAttr, pArg);
                                     }
-                                }, "", py::arg("attr"), py::arg("arg"), py::is_operator())
-            .def("applyDefaults", &RegisterDriver::applyDefaults, "")
-            .def("getBytes", &RegisterDriver::getBytes, "", py::arg("regName"))
-            .def("setBytes", &RegisterDriver::setBytes, "", py::arg("regName"), py::arg("data"))
-            .def("getValue", &RegisterDriver::getValue, "", py::arg("regName"))
-            .def("setValue", &RegisterDriver::setValue, "", py::arg("regName"), py::arg("value"))
-            .def("get", &RegisterDriver::get, "", py::arg("regName"))
+                                },
+                 "Write something else to a register (will fail) or set a non-register attribute.",
+                 py::arg("attr"), py::arg("arg"), py::is_operator())
+            .def("applyDefaults", &RegisterDriver::applyDefaults, "Write configured default values to all appropriate registers.")
+            .def("getBytes", &RegisterDriver::getBytes, "Read the data from a byte array register.", py::arg("regName"))
+            .def("setBytes", &RegisterDriver::setBytes, "Write data to a byte array register.", py::arg("regName"), py::arg("data"))
+            .def("getValue", &RegisterDriver::getValue, "Read the value from a value register.", py::arg("regName"))
+            .def("setValue", &RegisterDriver::setValue, "Write a value to a value register.", py::arg("regName"), py::arg("value"))
+            .def("get", &RegisterDriver::get, "Read an integer or byte sequence from a register, according to its data type.",
+                 py::arg("regName"))
             .def("set", [](RegisterDriver& pThis, const std::string_view pRegName, const std::uint64_t pValue) -> void
-                        { pThis.setValue(pRegName, pValue); }, "", py::arg("regName"), py::arg("value"))
+                        { pThis.setValue(pRegName, pValue); }, "Write a value to a value register.", py::arg("regName"), py::arg("value"))
             .def("set", [](RegisterDriver& pThis, const std::string_view pRegName, const std::vector<std::uint8_t>& pBytes) -> void
-                        { pThis.setBytes(pRegName, pBytes); }, "", py::arg("regName"), py::arg("bytes"))
-            .def("trigger", &RegisterDriver::trigger, "", py::arg("regName"))
-            .def("testRegisterName", &RegisterDriver::testRegisterName, "", py::arg("regName"))
-            .def_static("isValidRegisterName", &RegisterDriver::isValidRegisterName, "", py::arg("regName"));
+                        { pThis.setBytes(pRegName, pBytes); }, "Write data to a byte array register.", py::arg("regName"), py::arg("bytes"))
+            .def("trigger", &RegisterDriver::trigger, "\"Trigger\" a write-only register by writing configured default or zero.",
+                 py::arg("regName"))
+            .def("testRegisterName", &RegisterDriver::testRegisterName, "Check if a register exists or raise an exception else.",
+                 py::arg("regName"))
+            .def_static("isValidRegisterName", &RegisterDriver::isValidRegisterName, "Check if a string could be a valid register name.",
+                        py::arg("regName"));
 }

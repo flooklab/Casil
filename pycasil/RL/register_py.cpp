@@ -28,5 +28,5 @@ using casil::RL::Register;
 
 void bindRL_Register(py::module& pM)
 {
-    py::class_<Register, casil::LayerBase>(pM, "Register", "");
+    py::class_<Register, casil::LayerBase>(pM, "Register", "Common base class for all register components in the register layer (RL).");
 }

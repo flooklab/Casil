@@ -28,8 +28,10 @@ using casil::TL::MuxedInterface;
 
 void bindTL_MuxedInterface(py::module& pM)
 {
-    py::class_<MuxedInterface, casil::TL::Interface>(pM, "MuxedInterface", "")
-            .def("read", &MuxedInterface::read, "", py::arg("addr"), py::arg("size") = -1)
-            .def("write", &MuxedInterface::write, "", py::arg("addr"), py::arg("data"))
-            .def("query", &MuxedInterface::query, "", py::arg("writeAddr"), py::arg("readAddr"), py::arg("data"), py::arg("size") = -1);
+    py::class_<MuxedInterface, casil::TL::Interface>(pM, "MuxedInterface", "Base class to derive from for interface components that connect "
+                                                                           "to an FPGA endpoint running the basil bus and firmware modules.")
+            .def("read", &MuxedInterface::read, "Read from the interface.", py::arg("addr"), py::arg("size") = -1)
+            .def("write", &MuxedInterface::write, "Write to the interface.", py::arg("addr"), py::arg("data"))
+            .def("query", &MuxedInterface::query, "Write a query to the interface and read the response.",
+                 py::arg("writeAddr"), py::arg("readAddr"), py::arg("data"), py::arg("size") = -1);
 }

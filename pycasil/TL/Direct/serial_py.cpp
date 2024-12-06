@@ -28,6 +28,6 @@ using casil::TL::Serial;
 
 void bindTL_Serial(py::module& pM)
 {
-    py::class_<Serial, casil::TL::DirectInterface>(pM, "Serial", "")
-            .def(py::init<std::string, casil::LayerConfig>(), "", py::arg("name"), py::arg("config"));
+    py::class_<Serial, casil::TL::DirectInterface>(pM, "Serial", "Interface for communication via a serial port.")
+            .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"));
 }

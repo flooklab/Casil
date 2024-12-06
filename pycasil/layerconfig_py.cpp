@@ -28,17 +28,20 @@ using casil::LayerConfig;
 
 void bind_LayerConfig(py::module& pM)
 {
-    py::class_<LayerConfig>(pM, "LayerConfig", "")
-            .def(py::init<>(), "")
-            .def(py::init<const LayerConfig&>(), "", py::arg("other"))
-            .def("__eq__", (&LayerConfig::operator==), "", py::arg("other"), py::is_operator())
-            .def("contains", &LayerConfig::contains, "", py::arg("other"), py::arg("checkTypes") = false)
-            .def("getBool", &LayerConfig::getBool, "", py::arg("key"), py::arg("default") = false)
-            .def("getInt", &LayerConfig::getInt, "", py::arg("key"), py::arg("default") = 0)
-            .def("getUInt", &LayerConfig::getUInt, "", py::arg("key"), py::arg("default") = 0u)
-            .def("getDbl", &LayerConfig::getDbl, "", py::arg("key"), py::arg("default") = 0.0)
-            .def("getStr", &LayerConfig::getStr, "", py::arg("key"), py::arg("default") = "")
-            .def("getByteSeq", &LayerConfig::getByteSeq, "", py::arg("key"), py::arg("default") = std::vector<std::uint8_t>{})
-            .def("getUIntSeq", &LayerConfig::getUIntSeq, "", py::arg("key"), py::arg("default") = std::vector<std::uint64_t>{})
-            .def_static("fromYAML", &LayerConfig::fromYAML, "", py::arg("yamlString"));
+    py::class_<LayerConfig>(pM, "LayerConfig", "Configuration object for layer components derived from LayerBase.")
+            .def(py::init<>(), "Default constructor.")
+            .def(py::init<const LayerConfig&>(), "Default copy constructor.", py::arg("other"))
+            .def("__eq__", (&LayerConfig::operator==), "Equality operator.", py::arg("other"), py::is_operator())
+            .def("contains", &LayerConfig::contains, "Check the configuration tree structure (and value types).",
+                 py::arg("other"), py::arg("checkTypes") = false)
+            .def("getBool", &LayerConfig::getBool, "Get a boolean configuration value.", py::arg("key"), py::arg("default") = false)
+            .def("getInt", &LayerConfig::getInt, "Get a (signed) integer configuration value.", py::arg("key"), py::arg("default") = 0)
+            .def("getUInt", &LayerConfig::getUInt, "Get an unsigned integer configuration value.", py::arg("key"), py::arg("default") = 0u)
+            .def("getDbl", &LayerConfig::getDbl, "Get a floating point configuration value.", py::arg("key"), py::arg("default") = 0.0)
+            .def("getStr", &LayerConfig::getStr, "Get a string-type configuration value.", py::arg("key"), py::arg("default") = "")
+            .def("getByteSeq", &LayerConfig::getByteSeq, "Get an 8 bit unsigned integer sequence from the configuration tree.",
+                 py::arg("key"), py::arg("default") = std::vector<std::uint8_t>{})
+            .def("getUIntSeq", &LayerConfig::getUIntSeq, "Get a 64 bit unsigned integer sequence from the configuration tree.",
+                 py::arg("key"), py::arg("default") = std::vector<std::uint64_t>{})
+            .def_static("fromYAML", &LayerConfig::fromYAML, "Create a configuration object from YAML format.", py::arg("yamlString"));
 }

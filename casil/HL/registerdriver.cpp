@@ -980,7 +980,11 @@ RegisterProxy::RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName) :
  * \param pValue
  * \return
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+std::uint64_t RegisterProxy::operator=(/*const */std::uint64_t pValue) const
+#else
 std::uint64_t RegisterProxy::operator=(const std::uint64_t pValue) const
+#endif
 {
     regDriver.setValue(regName, pValue);
     return pValue;

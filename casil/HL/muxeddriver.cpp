@@ -53,7 +53,7 @@ MuxedDriver::MuxedDriver(std::string pType, std::string pName, InterfaceBaseType
 //Public
 
 /*!
- * \brief Get driver-specific special data.
+ * \copybrief Driver::getData()
  *
  * \todo Detailed doc
  *
@@ -67,7 +67,7 @@ std::vector<std::uint8_t> MuxedDriver::getData(int, std::uint32_t)
 }
 
 /*!
- * \brief Set driver-specific special data.
+ * \copybrief Driver::setData()
  *
  * \todo Detailed doc
  *
@@ -80,7 +80,7 @@ void MuxedDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 }
 
 /*!
- * \brief Perform a driver-specific action.
+ * \copybrief Driver::exec()
  *
  * \todo Detailed doc
  */
@@ -90,7 +90,7 @@ void MuxedDriver::exec()
 }
 
 /*!
- * \brief Check if a driver-specific action has finished.
+ * \copybrief Driver::isDone()
  *
  * \todo Detailed doc
  *

@@ -46,24 +46,26 @@ namespace HL
 class DirectDriver : public Driver
 {
 public:
-    typedef TL::DirectInterface InterfaceBaseType;
+    typedef TL::DirectInterface InterfaceBaseType;  ///< Alias for proper \ref TL::Interface "Interface" sub-type (analog to MuxedDriver).
 
 public:
-    DirectDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
-                 LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    ~DirectDriver() override = default;
+    DirectDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
+                                            ///< Constructor.
+    ~DirectDriver() override = default;     ///< Default destructor.
 
 private:
-    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override final;
-    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override final;
-    void exec() override final;
-    bool isDone() override final;
+    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override final;      ///< \brief Override not intended to
+                                                                                                        ///  be used (dummy implementation).
+    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override final;   ///< \brief Override not intended to
+                                                                                                        ///  be used (dummy implementation).
+    void exec() override final;                                                 ///< Override not intended to be used (dummy implementation).
+    bool isDone() override final;                                               ///< Override not intended to be used (dummy implementation).
     //
     bool initImpl() override = 0;
     bool closeImpl() override = 0;
 
 protected:
-    InterfaceBaseType& interface;
+    InterfaceBaseType& interface;           ///< The interface instance to be used for required access to the transfer layer.
 };
 
 } // namespace HL

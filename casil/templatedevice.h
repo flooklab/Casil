@@ -222,13 +222,29 @@ class TemplateDevice<TmplDevInterfaces<TmplDevInterfaceTs...>,
                      TmplDevRegisters<TmplDevRegisterTs...>> : public Device
 {
 public:
+    /*!
+     * \brief Constructor.
+     *
+     * \todo Detailed doc
+     */
     TemplateDevice() :
         Device(generateConfig())
     {
     }
+    /*!
+     * \brief Default destructor.
+     */
     ~TemplateDevice() override = default;
 
 public:
+    /*!
+     * \brief Access one of the interface components from the transfer layer.
+     *
+     * \todo Detailed doc
+     *
+     * \tparam T
+     * \return
+     */
     template<typename T>
     typename T::Type& interface()
     {
@@ -237,6 +253,14 @@ public:
 
         return dynamic_cast<typename T::Type&>(Device::interface(T::name));
     }
+    /*!
+     * \brief Access one of the driver components from the hardware layer.
+     *
+     * \todo Detailed doc
+     *
+     * \tparam T
+     * \return
+     */
     template<typename T>
     typename T::Type& driver()
     {
@@ -245,6 +269,14 @@ public:
 
         return dynamic_cast<typename T::Type&>(Device::driver(T::name));
     }
+    /*!
+     * \brief Access one of the register components from the register layer.
+     *
+     * \todo Detailed doc
+     *
+     * \tparam T
+     * \return
+     */
     template<typename T>
     typename T::Type& reg()
     {
@@ -255,6 +287,13 @@ public:
     }
 
 private:
+    /*!
+     * \brief Generate the device configuration tree from the template arguments.
+     *
+     * \todo Detailed doc
+     *
+     * \return
+     */
     static boost::property_tree::ptree generateConfig()
     {
         std::string yamlIntfSeq;
@@ -275,6 +314,13 @@ private:
         return Auxil::propertyTreeFromYAML(yamlString);
     }
     //
+    /*!
+     * \brief Recursively generate the YAML sequence for the components of a certain layer.
+     *
+     * \todo Detailed doc
+     *
+     * \param pYAMLLayerSeq
+     */
     template<std::size_t N, LayerBase::Layer layer, typename... TmplDevComponentTs>
     static void addLayerElementsToYAML(std::string& pYAMLLayerSeq)
     {

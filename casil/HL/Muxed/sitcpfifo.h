@@ -86,29 +86,29 @@ namespace HL
 class SiTCPFifo final : public MuxedDriver
 {
 public:
-    SiTCPFifo(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);
-    ~SiTCPFifo() override = default;
+    SiTCPFifo(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);   ///< Constructor.
+    ~SiTCPFifo() override = default;                                                    ///< Default destructor.
     //
-    std::size_t operator[](std::string_view pRegName);
+    std::size_t operator[](std::string_view pRegName);                  ///< Register-like access to some functions.
     //
-    void reset() override;
+    void reset() override;                                              ///< Reset the FIFO.
     //
-    std::uint8_t getVersion() const;
+    std::uint8_t getVersion() const;                                    ///< Get the pseudo FIFO module version.
     //
-    std::size_t getFifoSize() const;
-    std::vector<std::uint32_t> getFifoData() const;
-    void setFifoData(const std::vector<std::uint32_t>& pData) const;
+    std::size_t getFifoSize() const;                                    ///< Get the FIFO size in number of bytes.
+    std::vector<std::uint32_t> getFifoData() const;                     ///< Read the FIFO content as sequence of 32 bit unsigned integers.
+    void setFifoData(const std::vector<std::uint32_t>& pData) const;    ///< Write a sequence of 32 bit unsigned integers to the FIFO.
 
 private:
     bool initImpl() override;
     bool closeImpl() override;
 
 private:
-    using SiTCP = TL::SiTCP;
-    SiTCP& siTcpIntf;
+    using SiTCP = TL::SiTCP;                            ///< \copybrief TL::SiTCP
+    SiTCP& siTcpIntf;                                   ///< The \ref MuxedDriver::interface "interface" instance casted to needed SiTCP type.
 
 private:
-    static constexpr std::uint8_t pseudoVersion = 0;
+    static constexpr std::uint8_t pseudoVersion = 0;    ///< Need to provide a fake version of the non-existent firmware module.
 
     CASIL_REGISTER_DRIVER_H("SiTCPFifo")
 };

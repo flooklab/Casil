@@ -47,48 +47,51 @@ class SerialPortWrapper
 {
 public:
     SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination, int pBaudRate);
-    SerialPortWrapper(const SerialPortWrapper&) = delete;
-    SerialPortWrapper(SerialPortWrapper&&) = delete;
-    ~SerialPortWrapper();
+                                                                ///< Constructor.
+    SerialPortWrapper(const SerialPortWrapper&) = delete;       ///< Deleted copy constructor.
+    SerialPortWrapper(SerialPortWrapper&&) = delete;            ///< Deleted move constructor.
+    ~SerialPortWrapper();                                       ///< Destructor.
     //
-    SerialPortWrapper& operator=(SerialPortWrapper) = delete;
-    SerialPortWrapper& operator=(SerialPortWrapper&&) = delete;
+    SerialPortWrapper& operator=(SerialPortWrapper) = delete;   ///< Deleted copy assignment operator.
+    SerialPortWrapper& operator=(SerialPortWrapper&&) = delete; ///< Deleted move assignment operator.
     //
-    std::vector<std::uint8_t> read(int pSize);
-    std::vector<std::uint8_t> readMax(int pSize);
-    void write(const std::vector<std::uint8_t>& pData);
+    std::vector<std::uint8_t> read(int pSize);                  ///< Read an amount of bytes from the read buffer, or until read termination.
+    std::vector<std::uint8_t> readMax(int pSize);               ///< Read maximally some amount of bytes from the read buffer.
+    void write(const std::vector<std::uint8_t>& pData);         ///< Write data to the port (automatically terminated).
     //
-    bool readBufferEmpty() const;
-    void clearReadBuffer();
+    bool readBufferEmpty() const;                               ///< Check if the read buffer is empty.
+    void clearReadBuffer();                                     ///< Clear the current contents of the read buffer.
     //
-    void init();
-    void close();
+    void init();                                                ///< Open the serial port and start a read buffer polling thread.
+    void close();                                               ///< Stop the read buffer polling thread and close the serial port.
 
 private:
-    void pollReadBuffer();
-    void handleAsyncRead(const boost::system::error_code& pErrorCode, std::size_t pNumBytes);
+    void pollReadBuffer();                                                                      ///< \brief Issue an async read to poll the
+                                                                                                ///  serial port (handler is handleAsyncRead()).
+    void handleAsyncRead(const boost::system::error_code& pErrorCode, std::size_t pNumBytes);   ///< \brief Fill read buffer from single poll
+                                                                                                ///  by pollReadBuffer() and issue next poll.
 
 private:
-    const std::string port;
-    const std::vector<std::uint8_t> readTermination;
-    const std::size_t readTerminationLength;
-    const std::vector<std::uint8_t> writeTermination;
-    const std::size_t writeTerminationLength;
-    const int baudRate;
+    const std::string port;                                 ///< Serial port identifier (e.g. device file).
+    const std::vector<std::uint8_t> readTermination;        ///< Read termination to detect end of read data stream.
+    const std::size_t readTerminationLength;                ///< Number of read termination bytes.
+    const std::vector<std::uint8_t> writeTermination;       ///< Write termination to append to written data.
+    const std::size_t writeTerminationLength;               ///< Number of write termination bytes.
+    const int baudRate;                                     ///< Baud rate setting.
     //
-    boost::asio::serial_port serialPort;
+    boost::asio::serial_port serialPort;                    ///< %Serial port.
     //
-    std::vector<std::uint8_t> readBuffer;
-    std::vector<std::uint8_t> intermediateReadBuffer;
-    mutable std::mutex readBufferMutex;
-    std::atomic_bool pollData;
-    std::atomic_bool pollDataStopped;
-    bool newData;
-    std::condition_variable newDataCondVar;
-    std::atomic_size_t bufferErrorCount;
+    std::vector<std::uint8_t> readBuffer;                   ///< Buffer for incoming data.
+    std::vector<std::uint8_t> intermediateReadBuffer;       ///< Intermediate read buffer to facilitate the asynchronous polling.
+    mutable std::mutex readBufferMutex;                     ///< Mutex for the read buffer (\ref readBuffer).
+    std::atomic_bool pollData;                              ///< Flag to control/stop the read buffer polling.
+    std::atomic_bool pollDataStopped;                       ///< Flag to signal stopped read buffer polling (last handler finished).
+    bool newData;                                           ///< New read buffer data available from polling handler.
+    std::condition_variable newDataCondVar;                 ///< Condition variable for \ref newData.
+    std::atomic_size_t bufferErrorCount;                    ///< Current error count of the read buffer polling handler.
 
 private:
-    static constexpr std::size_t maxBufferErrorCount = 10;
+    static constexpr std::size_t maxBufferErrorCount = 10;  ///< Maximum error count for the read buffer polling before it stops itself.
 };
 
 } // namespace CommonImpl

@@ -44,8 +44,8 @@ namespace HL
 class DummyDriver final : public DirectDriver
 {
 public:
-    DummyDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);
-    ~DummyDriver() override = default;
+    DummyDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);     ///< Constructor.
+    ~DummyDriver() override = default;                                                      ///< Default destructor.
 
 private:
     bool initImpl() override;

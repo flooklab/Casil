@@ -47,8 +47,8 @@ namespace TL
 class TCP final : public DirectInterface
 {
 public:
-    TCP(std::string pName, LayerConfig pConfig);
-    ~TCP() override = default;
+    TCP(std::string pName, LayerConfig pConfig);    ///< Constructor.
+    ~TCP() override = default;                      ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;
@@ -62,12 +62,12 @@ private:
     bool closeImpl() override;
 
 private:
-    const std::string hostName;
-    const int port;
-    const std::string readTermination;
-    const std::string writeTermination;
+    const std::string hostName;                     ///< Host name of the remote endpoint.
+    const int port;                                 ///< Used network port.
+    const std::string readTermination;              ///< Read termination to detect end of read data stream.
+    const std::string writeTermination;             ///< Write termination to append to written data.
     //
-    CommonImpl::TCPSocketWrapper socketWrapper;
+    CommonImpl::TCPSocketWrapper socketWrapper;     ///< Detailed TCP socket logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("TCP")
 };

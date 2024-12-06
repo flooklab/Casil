@@ -46,8 +46,8 @@ namespace TL
 class DummyInterface final : public DirectInterface
 {
 public:
-    DummyInterface(std::string pName, LayerConfig pConfig);
-    ~DummyInterface() override = default;
+    DummyInterface(std::string pName, LayerConfig pConfig);     ///< Constructor.
+    ~DummyInterface() override = default;                       ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;

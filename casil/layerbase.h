@@ -32,7 +32,7 @@ namespace casil
 {
 
 /*!
- * \brief Common top-level base class that connects the different layers and components of the basil layer structure.
+ * \brief Common top-level base class that connects the different layers and layer components of the basil layer structure.
  *
  * \todo Detailed doc
  */
@@ -43,38 +43,39 @@ public:
 
 public:
     LayerBase(Layer pLayer, std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    LayerBase(const LayerBase&) = delete;
-    LayerBase(LayerBase&&) = default;
-    virtual ~LayerBase() = default;
+                                                    ///< Constructor.
+    LayerBase(const LayerBase&) = delete;           ///< Deleted copy constructor.
+    LayerBase(LayerBase&&) = default;               ///< Default move constructor.
+    virtual ~LayerBase() = default;                 ///< Default destructor.
     //
-    LayerBase& operator=(LayerBase) = delete;
-    LayerBase& operator=(LayerBase&&) = delete;
+    LayerBase& operator=(LayerBase) = delete;       ///< Deleted copy assignment operator.
+    LayerBase& operator=(LayerBase&&) = delete;     ///< Deleted move assignment operator.
     //
-    Layer getLayer() const;
-    const std::string& getType() const;
-    const std::string& getName() const;
+    Layer getLayer() const;                         ///< Get the layer of this layer component.
+    const std::string& getType() const;             ///< Get the type name of this layer component.
+    const std::string& getName() const;             ///< Get the instance name of this layer component.
     //
-    bool init(bool pForce = false);
-    bool close(bool pForce = false);
+    bool init(bool pForce = false);                 ///< Initialize this layer component.
+    bool close(bool pForce = false);                ///< Close ("uninitialize") this layer component.
 
 protected:
-    const std::string& getSelfDescription() const;
+    const std::string& getSelfDescription() const;  ///< Get a standard description of this layer component for logging purposes.
 
 private:
-    virtual bool initImpl() = 0;
-    virtual bool closeImpl() = 0;
+    virtual bool initImpl() = 0;                    ///< Perform component-specific initialization logic for init().
+    virtual bool closeImpl() = 0;                   ///< Perform component-specific closing logic for close().
 
 protected:
-    const Layer layer;
-    const std::string type;
-    const std::string name;
+    const Layer layer;                              ///< %Layer that this layer component belongs to.
+    const std::string type;                         ///< Name given to this type (i.e. specific derived class) of layer component.
+    const std::string name;                         ///< Name given to the current component instance.
     //
-    const LayerConfig config;
+    const LayerConfig config;                       ///< Component-specific configuration tree (typically from loaded YAML file).
     //
-    bool initialized;
+    bool initialized;                               ///< Initialized and not closed.
 
 private:
-    const std::string selfDescription;
+    const std::string selfDescription;              ///< Standard description of the layer component for logging purposes.
 
 public:
     /*!

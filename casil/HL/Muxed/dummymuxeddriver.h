@@ -46,8 +46,8 @@ namespace HL
 class DummyMuxedDriver final : public MuxedDriver
 {
 public:
-    DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);
-    ~DummyMuxedDriver() override = default;
+    DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);        ///< Constructor.
+    ~DummyMuxedDriver() override = default;                                                         ///< Default destructor.
     //
     std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;
     void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;

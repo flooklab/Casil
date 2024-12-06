@@ -203,8 +203,8 @@ namespace TL
 class SiTCP final : public MuxedInterface
 {
 public:
-    SiTCP(std::string pName, LayerConfig pConfig);
-    ~SiTCP() override;
+    SiTCP(std::string pName, LayerConfig pConfig);          ///< Constructor.
+    ~SiTCP() override;                                      ///< Destructor.
     //
     std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) override;
     void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) override;
@@ -214,65 +214,68 @@ public:
     bool readBufferEmpty() const override;
     void clearReadBuffer() override;
     //
-    void resetFifo();
-    void resetFifoMod32();
-    std::size_t getFifoSize() const;
-    std::vector<std::uint8_t> getFifoData(int pSize = -1);
+    void resetFifo();                                       ///< Clear the FIFO and the remaining incoming %TCP buffer.
+    void resetFifoMod32();                                  ///< TODO
+    std::size_t getFifoSize() const;                        ///< Get the FIFO size in number of bytes.
+    std::vector<std::uint8_t> getFifoData(int pSize = -1);  ///< Extract the current FIFO content as sequence of bytes.
 
 private:
     bool initImpl() override;
     bool closeImpl() override;
     //
-    void enableTcpToBus();
+    void enableTcpToBus();          ///< Enable using %TCP protocol for normal bus writes.
     //
-    void pollFifo();
+    void pollFifo();                ///< Continuously poll the %TCP socket for new FIFO data (use as thread).
     //
-    std::vector<std::uint8_t> readSingle(std::uint32_t pAddr, std::uint8_t pSize);
-    void writeSingle(std::uint32_t pAddr, const std::vector<std::uint8_t>& pData);
+    std::vector<std::uint8_t> readSingle(std::uint32_t pAddr, std::uint8_t pSize);  ///< Read from the bus with a single RBCP request/response.
+    void writeSingle(std::uint32_t pAddr, const std::vector<std::uint8_t>& pData);  ///< Write to the bus with a single RBCP request/response.
     //
     std::optional<std::vector<std::uint8_t>> doSingleRBCPOperation(std::uint32_t pAddr, const std::variant<
                                                                    std::uint8_t,
                                                                    std::reference_wrapper<const std::vector<std::uint8_t>>> pSizeOrData);
+                                                                                    ///< \brief Send a single RBCP read or write request
+                                                                                    ///  to the bus and process the response message.
 
 private:
-    const std::string hostName;
-    const int udpPort;
-    const int tcpPort;
+    const std::string hostName;     ///< Host name of the remote endpoint.
+    const int udpPort;              ///< Used network port for %UDP communication.
+    const int tcpPort;              ///< Used network port for %TCP communication.
     //
-    const bool useTcp;
-    const bool useTcpToBus;
+    const bool useTcp;              ///< Connect the %TCP socket and start a FIFO polling thread.
+    const bool useTcpToBus;         ///< Use the %TCP protocol for normal bus writes (instead of %UDP).
     //
-    const double connectTimeoutSecs;
-    const std::chrono::milliseconds connectTimeout;
+    const double connectTimeoutSecs;                    ///< Configured %TCP/(%UDP) connect timeout value in seconds (for init()).
+    const std::chrono::milliseconds connectTimeout;     ///< Rounded chrono version of connectTimeoutSecs.
     //
-    CommonImpl::UDPSocketWrapper udpSocketWrapper;
-    const std::unique_ptr<CommonImpl::TCPSocketWrapper> tcpSocketWrapperPtr;
+    CommonImpl::UDPSocketWrapper udpSocketWrapper;                              ///< Detailed %UDP socket logic wrapper.
+    const std::unique_ptr<CommonImpl::TCPSocketWrapper> tcpSocketWrapperPtr;    ///< Detailed %TCP socket logic wrapper.
     //
-    std::thread fifoThread;
-    std::deque<std::uint8_t> fifoBuffer;
-    mutable std::mutex fifoMutex;
-    std::mutex tcpSocketMutex;
-    std::atomic_flag wantLockTCPSocket;     //Need this to trigger FIFO thread to yield() to enable quicker/"fairer" access to tcpSocketMutex
-    std::atomic_bool pollFIFO;
-    std::atomic_size_t fifoErrorCount;
+    std::thread fifoThread;                 ///< FIFO polling thread.
+    std::deque<std::uint8_t> fifoBuffer;    ///< FIFO buffer.
+    mutable std::mutex fifoMutex;           ///< Mutex for the FIFO buffer.
+    std::mutex tcpSocketMutex;              ///< Mutex for the %TCP socket (for concurrently used \e reading parts only).
+    std::atomic_flag wantLockTCPSocket;     ///< Used for triggering FIFO thread to 'yield()' to enable "fairer" access to tcpSocketMutex.
+    std::atomic_bool pollFIFO;              ///< Flag to control/stop the FIFO polling thread.
+    std::atomic_size_t fifoErrorCount;      ///< Current error count of the FIFO polling thread.
     //
-    std::uint8_t rbcpId;
+    std::uint8_t rbcpId;                    ///< Last used/sent RBCP message ID.
 
 public:
-    static constexpr std::uint64_t baseAddrDataLimit = 0x100000000;
-    static constexpr std::uint64_t baseAddrFIFOLimit = 0x200000000;
+    static constexpr std::uint64_t baseAddrDataLimit = 0x100000000; ///< Address limit below which read() / write() do normal bus access.
+    static constexpr std::uint64_t baseAddrFIFOLimit = 0x200000000; ///< Address limit for special FIFO access of read() / write() (see there).
 
 private:
-    static constexpr std::uint8_t rbcpVerType = 0xFF;   //Version/type byte of RBCP header
-    static constexpr std::uint8_t rbcpCmdWr = 0x80;     //Write request value of CMD/FLAG byte of RBCP header
-    static constexpr std::uint8_t rbcpCmdRd = 0xC0;     //Read request value of CMD/FLAG byte of RBCP header
-    static constexpr std::uint8_t rbcpMaxSize = 255;    //Maximum number of data bytes
+    static constexpr std::uint8_t rbcpVerType = 0xFF;               ///< \c Version / \c Type byte of RBCP header.
+    static constexpr std::uint8_t rbcpCmdWr = 0x80;                 ///< Write request value of \c CMD / \c FLAG byte of RBCP header.
+    static constexpr std::uint8_t rbcpCmdRd = 0xC0;                 ///< Read request value of \c CMD / \c FLAG byte of RBCP header.
+    static constexpr std::uint8_t rbcpMaxSize = 255;                ///< Maximum number of data bytes.
     //
-    static constexpr std::chrono::milliseconds udpTimeout {1000};
-    static constexpr int udpRetransmitCnt = 3;
+    static constexpr std::chrono::milliseconds udpTimeout {1000};   ///< Timeout for sending and receiving RBCP messages over %UDP.
+    static constexpr int udpRetransmitCnt = 3;                      ///< Retry attempts for sending and receiving RBCP messages over %UDP.
     static constexpr std::chrono::milliseconds tcpReadoutInterval = Auxil::getChronoMilliSecs(0.05);
+                                                                    ///< FIFO polling target interval between successive %TCP socket reads.
     //
-    static constexpr std::size_t maxFIFOErrorCount = 10;
+    static constexpr std::size_t maxFIFOErrorCount = 10;            ///< Maximum error count of the FIFO polling thread before it stops itself.
 
     CASIL_REGISTER_INTERFACE_H("SiTCP")
 };

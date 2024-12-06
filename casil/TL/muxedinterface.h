@@ -48,10 +48,11 @@ public:
     MuxedInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
     ~MuxedInterface() override = default;
     //
-    virtual std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) = 0;
-    virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;
+    virtual std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) = 0;                        ///< Read from the interface.
+    virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;                    ///< Write to the interface.
     virtual std::vector<std::uint8_t> query(std::uint64_t pWriteAddr, std::uint64_t pReadAddr,
-                                            const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;
+                                            const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;    ///< \brief Write a query to the
+                                                                                                            ///  interface and read the response.
     //
     bool readBufferEmpty() const override = 0;
     void clearReadBuffer() override = 0;

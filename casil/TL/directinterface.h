@@ -45,12 +45,13 @@ namespace TL
 class DirectInterface : public Interface
 {
 public:
-    DirectInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    ~DirectInterface() override = default;
+    DirectInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig); ///< Constructor.
+    ~DirectInterface() override = default;                                                                          ///< Default destructor.
     //
-    virtual std::vector<std::uint8_t> read(int pSize = -1) = 0;
-    virtual void write(const std::vector<std::uint8_t>& pData) = 0;
-    virtual std::vector<std::uint8_t> query(const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;
+    virtual std::vector<std::uint8_t> read(int pSize = -1) = 0;                                             ///< Read from the interface.
+    virtual void write(const std::vector<std::uint8_t>& pData) = 0;                                         ///< Write to the interface.
+    virtual std::vector<std::uint8_t> query(const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;    ///< \brief Write a query to the
+                                                                                                            ///  interface and read the response.
     //
     bool readBufferEmpty() const override = 0;
     void clearReadBuffer() override = 0;

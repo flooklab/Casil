@@ -47,33 +47,33 @@ namespace casil
 class Device
 {
 private:
-    Device();
+    Device();                                                       ///< Constructor.
 
 public:
-    explicit Device(const boost::property_tree::ptree& pConfig);
-    explicit Device(const std::string& pConfig);
-    Device(const Device&) = delete;
-    Device(Device&&) = default;
-    virtual ~Device();
+    explicit Device(const boost::property_tree::ptree& pConfig);    ///< Constructor.
+    explicit Device(const std::string& pConfig);                    ///< Constructor.
+    Device(const Device&) = delete;                                 ///< Deleted copy constructor.
+    Device(Device&&) = default;                                     ///< Default move constructor.
+    virtual ~Device();                                              ///< Destructor.
     //
-    Device& operator=(Device) = delete;
-    Device& operator=(Device&&) = delete;
+    Device& operator=(Device) = delete;                             ///< Deleted copy assignment operator.
+    Device& operator=(Device&&) = delete;                           ///< Deleted move assignment operator.
     //
-    LayerBase& operator[](std::string_view pName) const;
+    LayerBase& operator[](std::string_view pName) const;            ///< Access one of the components from any layer.
     //
-    TL::Interface& interface(std::string_view pName) const;
-    HL::Driver& driver(std::string_view pName) const;
-    RL::Register& reg(std::string_view pName) const;
+    TL::Interface& interface(std::string_view pName) const;         ///< Access one of the interface components from the transfer layer.
+    HL::Driver& driver(std::string_view pName) const;               ///< Access one of the driver components from the hardware layer.
+    RL::Register& reg(std::string_view pName) const;                ///< Access one of the register components from the register layer.
     //
-    bool init(bool pForce = false);
-    bool close(bool pForce = false);
+    bool init(bool pForce = false);                                 ///< Initialize by initializing all components of all layers.
+    bool close(bool pForce = false);                                ///< Close by closing all components of all layers.
 
 private:
-    std::map<std::string, const std::unique_ptr<TL::Interface>, std::less<>> interfaces;
-    std::map<std::string, const std::unique_ptr<HL::Driver>, std::less<>> drivers;
-    std::map<std::string, const std::unique_ptr<RL::Register>, std::less<>> registers;
+    std::map<std::string, const std::unique_ptr<TL::Interface>, std::less<>> interfaces;    ///< Map of all interfaces with their names as keys.
+    std::map<std::string, const std::unique_ptr<HL::Driver>, std::less<>> drivers;          ///< Map of all drivers with their names as keys.
+    std::map<std::string, const std::unique_ptr<RL::Register>, std::less<>> registers;      ///< Map of all registers with their names as keys.
     //
-    bool initialized;
+    bool initialized;                                                                       ///< Initialized and not closed.
 };
 
 } // namespace casil

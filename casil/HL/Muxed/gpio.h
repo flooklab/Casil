@@ -86,19 +86,19 @@ namespace HL
 class GPIO final : public RegisterDriver
 {
 public:
-    GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);
-    ~GPIO() override = default;
+    GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);                    ///< Constructor.
+    ~GPIO() override = default;                                                                     ///< Default destructor.
     //
-    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;
-    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;
+    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;        ///< Get the \c INPUT register.
+    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;     ///< Set the \c OUTPUT register.
     //
-    std::uint64_t getSize() const;
+    std::uint64_t getSize() const;                                                                  ///< Get the number of IO bits.
     //
-    std::vector<std::uint8_t> getOutputEn();
-    void setOutputEn(const std::vector<std::uint8_t>& pEnable);
+    std::vector<std::uint8_t> getOutputEn();                                                        ///< Get the \c OUTPUT_EN register.
+    void setOutputEn(const std::vector<std::uint8_t>& pEnable);                                     ///< Set the \c OUTPUT_EN register.
     //
-    boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes) const;
-    std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits) const;
+    boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes) const;         ///< Convert IO register bytes to a bitset.
+    std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits) const;          ///< Convert a bitset to IO register bytes.
 
 private:
     bool initModule() override;
@@ -109,13 +109,15 @@ private:
     std::uint8_t getModuleFirmwareVersion() override;
     //
     static std::map<std::string, RegisterDescr, std::less<>> getRegisterDescrs(const LayerConfig& pConfig);
+                                                                                                    ///< \brief Generate the map of registers
+                                                                                                    ///  depending on the configured bit count.
 
 private:
-    const std::uint64_t size;
-    const std::uint32_t ioBytes;
+    const std::uint64_t size;                                   ///< Number of IO bits.
+    const std::uint32_t ioBytes;                                ///< Number of register bytes occupied by \ref size bits.
 
 private:
-    static constexpr std::uint8_t requireFirmwareVersion = 0;
+    static constexpr std::uint8_t requireFirmwareVersion = 0;   ///< Compatible version of the controlled firmware module.
 
     CASIL_REGISTER_DRIVER_H("GPIO")
 };

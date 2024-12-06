@@ -47,8 +47,8 @@ namespace TL
 class Serial final : public DirectInterface
 {
 public:
-    Serial(std::string pName, LayerConfig pConfig);
-    ~Serial() override = default;
+    Serial(std::string pName, LayerConfig pConfig);     ///< Constructor.
+    ~Serial() override = default;                       ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;
@@ -62,12 +62,12 @@ private:
     bool closeImpl() override;
 
 private:
-    const std::string port;
-    const std::string readTermination;
-    const std::string writeTermination;
-    const int baudRate;
+    const std::string port;                 ///< Serial port identifier (e.g. device file).
+    const std::string readTermination;      ///< Read termination to detect end of read data stream.
+    const std::string writeTermination;     ///< Write termination to append to written data.
+    const int baudRate;                     ///< Baud rate setting for the serial communication.
     //
-    CommonImpl::SerialPortWrapper serialPortWrapper;
+    CommonImpl::SerialPortWrapper serialPortWrapper;    ///< Detailed serial port logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("Serial")
 };

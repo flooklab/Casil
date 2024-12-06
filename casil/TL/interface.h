@@ -49,19 +49,19 @@ namespace TL
 class Interface : public LayerBase
 {
 public:
-    Interface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    ~Interface() override = default;
+    Interface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);   ///< Constructor.
+    ~Interface() override = default;                                                                            ///< Default destructor.
     //
-    virtual bool readBufferEmpty() const = 0;
-    virtual void clearReadBuffer() = 0;
+    virtual bool readBufferEmpty() const = 0;   ///< Check if the read buffer is empty.
+    virtual void clearReadBuffer() = 0;         ///< Clear the current contents of the read buffer.
 
 private:
-    bool initImpl() override = 0;
-    bool closeImpl() override = 0;
+    bool initImpl() override = 0;               ///< Perform interface-specific initialization logic for init().
+    bool closeImpl() override = 0;              ///< Perform interface-specific closing logic for init().
 
 protected:
-    const double queryDelay;    //In milliseconds
-    const std::chrono::microseconds queryDelayMicroSecs;
+    const double queryDelay;                    ///< Configured delay value for query operations (between write and read) in milliseconds.
+    const std::chrono::microseconds queryDelayMicroSecs;    ///< Rounded chrono version of queryDelay.
 };
 
 } // namespace TL

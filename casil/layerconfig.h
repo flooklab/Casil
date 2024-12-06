@@ -40,32 +40,36 @@ namespace casil
 class LayerConfig
 {
 public:
-    LayerConfig() = default;
-    explicit LayerConfig(const boost::property_tree::ptree& pTree);
-    LayerConfig(const LayerConfig&) = default;
-    LayerConfig(LayerConfig&&) = default;
-    ~LayerConfig() = default;
+    LayerConfig() = default;                                            ///< Default constructor.
+    explicit LayerConfig(const boost::property_tree::ptree& pTree);     ///< Constructor.
+    LayerConfig(const LayerConfig&) = default;                          ///< Default copy constructor.
+    LayerConfig(LayerConfig&&) = default;                               ///< Default move constructor.
+    ~LayerConfig() = default;                                           ///< Default destructor.
     //
-    LayerConfig& operator=(LayerConfig) = delete;
-    LayerConfig& operator=(LayerConfig&&) = delete;
+    LayerConfig& operator=(LayerConfig) = delete;                       ///< Deleted copy assignment operator.
+    LayerConfig& operator=(LayerConfig&&) = delete;                     ///< Deleted move assignment operator.
     //
-    bool operator==(const LayerConfig& pOther) const;
+    bool operator==(const LayerConfig& pOther) const;                   ///< Equality operator.
     //
-    bool contains(const LayerConfig& pOther, bool pCheckTypes = false) const;
+    bool contains(const LayerConfig& pOther, bool pCheckTypes = false) const;   ///< Check the configuration tree structure (and value types).
     //
-    bool getBool(const std::string& pKey, bool pDefault = false) const;
-    int getInt(const std::string& pKey, int pDefault = 0) const;
-    std::uint64_t getUInt(const std::string& pKey, std::uint64_t pDefault = 0x0u) const;
-    double getDbl(const std::string& pKey, double pDefault = 0.0) const;
-    std::string getStr(const std::string& pKey, std::string pDefault = "") const;
+    bool getBool(const std::string& pKey, bool pDefault = false) const;                     ///< Get a boolean configuration value.
+    int getInt(const std::string& pKey, int pDefault = 0) const;                            ///< Get a (signed) integer configuration value.
+    std::uint64_t getUInt(const std::string& pKey, std::uint64_t pDefault = 0x0u) const;    ///< Get an unsigned integer configuration value.
+    double getDbl(const std::string& pKey, double pDefault = 0.0) const;                    ///< Get a floating point configuration value.
+    std::string getStr(const std::string& pKey, std::string pDefault = "") const;           ///< Get a string-type configuration value.
     //
     std::vector<std::uint8_t> getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault = {}) const;
+                                                                                            ///< \brief Get an 8 bit unsigned integer sequence
+                                                                                            ///  from the configuration tree.
     std::vector<std::uint64_t> getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault = {}) const;
+                                                                                            ///< \brief Get a 64 bit unsigned integer sequence
+                                                                                            ///  from the configuration tree.
     //
-    static LayerConfig fromYAML(const std::string& pYAMLString);
+    static LayerConfig fromYAML(const std::string& pYAMLString);        ///< Create a configuration object from YAML format.
 
 private:
-    const boost::property_tree::ptree tree;
+    const boost::property_tree::ptree tree;                             ///< The configuration tree.
 };
 
 } // namespace casil

@@ -50,14 +50,15 @@ class Register : public LayerBase
 {
 public:
     Register(std::string pType, std::string pName, HL::Driver& pDriver, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    ~Register() override = default;
+                                        ///< Constructor.
+    ~Register() override = default;     ///< Default destructor.
 
 private:
-    bool initImpl() override = 0;
-    bool closeImpl() override = 0;
+    bool initImpl() override = 0;       ///< Perform register-specific initialization logic for init().
+    bool closeImpl() override = 0;      ///< Perform register-specific closing logic for init().
 
 protected:
-    HL::Driver& driver;
+    HL::Driver& driver;                 ///< The driver instance to be used for required access to the hardware layer.
 };
 
 } // namespace RL

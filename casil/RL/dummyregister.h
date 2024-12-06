@@ -45,8 +45,8 @@ namespace RL
 class DummyRegister final : public Register
 {
 public:
-    DummyRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig);
-    ~DummyRegister() override = default;
+    DummyRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig);     ///< Constructor.
+    ~DummyRegister() override = default;                                            ///< Default destructor.
 
 private:
     bool initImpl() override;

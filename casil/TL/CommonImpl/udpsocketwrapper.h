@@ -46,35 +46,38 @@ namespace CommonImpl
 class UDPSocketWrapper
 {
 public:
-    UDPSocketWrapper(std::string pHostName, int pPort);
-    UDPSocketWrapper(const UDPSocketWrapper&) = delete;
-    UDPSocketWrapper(UDPSocketWrapper&&) = default;
+    UDPSocketWrapper(std::string pHostName, int pPort);         ///< Constructor.
+    UDPSocketWrapper(const UDPSocketWrapper&) = delete;         ///< Deleted copy constructor.
+    UDPSocketWrapper(UDPSocketWrapper&&) = default;             ///< Default move constructor.
     //
-    UDPSocketWrapper& operator=(UDPSocketWrapper) = delete;
-    UDPSocketWrapper& operator=(UDPSocketWrapper&&) = delete;
+    UDPSocketWrapper& operator=(UDPSocketWrapper) = delete;     ///< Deleted copy assignment operator.
+    UDPSocketWrapper& operator=(UDPSocketWrapper&&) = delete;   ///< Deleted move assignment operator.
     //
     std::vector<std::uint8_t> read(std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                    std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                                                ///< Receive a single datagram from the socket.
     std::vector<std::uint8_t> readMax(int pSize, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                       std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                                                ///< \brief Receive maximally some amount of
+                                                                                                ///  bytes of a single datagram from the socket.
     void write(const std::vector<std::uint8_t>& pData, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
-               std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+               std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);           ///< Send a single datagram over the socket.
     //
-    bool readBufferEmpty() const;
-    void clearReadBuffer();
+    bool readBufferEmpty() const;                               ///< Check if no incoming datagrams are available on the socket.
+    void clearReadBuffer();                                     ///< Read remaining datagrams from the socket and discard them.
     //
     void init(std::chrono::milliseconds pConnectTimeout = std::chrono::milliseconds::zero(),
-              std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
-    void close();
+              std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);            ///< Connect the %UDP socket.
+    void close();                                                                               ///< Disconnect the %UDP socket.
 
 private:
-    const std::string hostName;
-    const int port;
+    const std::string hostName;                             ///< Host name of the remote endpoint.
+    const int port;                                         ///< Used network port.
     //
-    boost::asio::ip::udp::socket socket;
+    boost::asio::ip::udp::socket socket;                    ///< %UDP socket.
     //
-    static constexpr std::size_t readBufferSize = 65527;
-    std::array<std::uint8_t, readBufferSize> readBuffer;
+    static constexpr std::size_t readBufferSize = 65527;    ///< Maximum UDP datagram payload size.
+    std::array<std::uint8_t, readBufferSize> readBuffer;    ///< Buffer for incoming datagrams.
 };
 
 } // namespace CommonImpl

@@ -47,8 +47,8 @@ namespace TL
 class UDP final : public DirectInterface
 {
 public:
-    UDP(std::string pName, LayerConfig pConfig);
-    ~UDP() override = default;
+    UDP(std::string pName, LayerConfig pConfig);    ///< Constructor.
+    ~UDP() override = default;                      ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;
@@ -62,10 +62,10 @@ private:
     bool closeImpl() override;
 
 private:
-    const std::string hostName;
-    const int port;
+    const std::string hostName;                     ///< Host name of the remote endpoint.
+    const int port;                                 ///< Used network port.
     //
-    CommonImpl::UDPSocketWrapper socketWrapper;
+    CommonImpl::UDPSocketWrapper socketWrapper;     ///< Detailed UDP socket logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("UDP")
 };

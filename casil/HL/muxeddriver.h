@@ -46,32 +46,34 @@ namespace HL
 class MuxedDriver : public Driver
 {
 public:
-    typedef TL::MuxedInterface InterfaceBaseType;
+    typedef TL::MuxedInterface InterfaceBaseType;   ///< Alias for proper \ref TL::Interface "Interface" sub-type (analog to DirectDriver).
 
 public:
-    MuxedDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
-                LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    ~MuxedDriver() override = default;
+    MuxedDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
+                                            ///< Constructor.
+    ~MuxedDriver() override = default;      ///< Default destructor.
     //
-    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;
-    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;
-    void exec() override;
-    bool isDone() override;
+    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;        ///< Set driver-specific special data.
+    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;     ///< Get driver-specific special data.
+    void exec() override;                                                                           ///< Perform a driver-specific action.
+    bool isDone() override;                                                                 ///< Check if a driver-specific action has finished.
 
 protected:
-    std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) const;
-    void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) const;
+    std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) const;      ///< Read from the interface relative to the base address.
+    void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) const;  ///< Write to the interface relative to the base address.
     std::vector<std::uint8_t> query(std::uint64_t pWriteAddr, std::uint64_t pReadAddr,
-                                    const std::vector<std::uint8_t>& pData, int pSize = -1) const;
+                                    const std::vector<std::uint8_t>& pData, int pSize = -1) const;  ///< \brief Write a query to the interface
+                                                                                                    ///  and read the response, both relative
+                                                                                                    ///  to the base address.
 
 private:
     bool initImpl() override = 0;
     bool closeImpl() override = 0;
 
 protected:
-    InterfaceBaseType& interface;
+    InterfaceBaseType& interface;           ///< The interface instance to be used for required access to the transfer layer.
     //
-    const std::uint64_t baseAddr;
+    const std::uint64_t baseAddr;           ///< The root bus address for the controlled firmware module instance.
 };
 
 } // namespace HL

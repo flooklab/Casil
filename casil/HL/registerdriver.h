@@ -107,13 +107,14 @@ struct RegisterDescr
     };
     //
     typedef std::variant<std::monostate, std::uint64_t, std::vector<std::uint8_t>> VariantValueType;
+                                                            ///< Variant to optionally store the two possible types of register content.
     //
-    const DataType type = DataType::Value;
-    const AccessMode mode = AccessMode::ReadWrite;
-    const std::uint32_t addr = 0;
-    const std::uint32_t size = 0;
-    const std::uint32_t offs = 0;
-    const VariantValueType defaultValue = std::monostate{};
+    const DataType type = DataType::Value;                  ///< \copybrief DataType
+    const AccessMode mode = AccessMode::ReadWrite;          ///< \copybrief AccessMode
+    const std::uint32_t addr = 0;                           ///< %Register address in bytes.
+    const std::uint32_t size = 0;                           ///< %Register size (in bits for DataType::Value, in bytes for DataType::ByteArray).
+    const std::uint32_t offs = 0;                           ///< %Register bit offset from its \ref addr "address" (only for DataType::Value).
+    const VariantValueType defaultValue = std::monostate{}; ///< Designated default register content.
 };
 
 /*!
@@ -127,8 +128,9 @@ public:
     using MuxedDriver::InterfaceBaseType;
 
 protected:
-    using DataType = RegisterDescr::DataType;
-    using AccessMode = RegisterDescr::AccessMode;
+    //Declaring these aliases to make definition of registers in implementations more compact
+    using DataType = RegisterDescr::DataType;       ///< \copybrief RegisterDescr::DataType
+    using AccessMode = RegisterDescr::AccessMode;   ///< \copybrief RegisterDescr::AccessMode
 
 public:
     class RegisterProxy;
@@ -136,57 +138,63 @@ public:
 public:
     RegisterDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                    LayerConfig pConfig, const LayerConfig& pRequiredConfig, std::map<std::string, RegisterDescr, std::less<>> pRegisters);
-    ~RegisterDriver() override = default;
+                                            ///< Constructor.
+    ~RegisterDriver() override = default;   ///< Default destructor.
     //
-    const RegisterProxy& operator[](std::string_view pRegName) const;
+    const RegisterProxy& operator[](std::string_view pRegName) const;   ///< Access a register via the proxy class.
     //
-    void reset() override final;
+    void reset() override final;                                        ///< Reset the firmware module.
     //
-    void applyDefaults();
+    void applyDefaults();                                               ///< Write configured default values to all appropriate registers.
     //
-    std::vector<std::uint8_t> getBytes(std::string_view pRegName);
-    void setBytes(std::string_view pRegName, const std::vector<std::uint8_t>& pData);
+    std::vector<std::uint8_t> getBytes(std::string_view pRegName);                          ///< Read the data from a byte array register.
+    void setBytes(std::string_view pRegName, const std::vector<std::uint8_t>& pData);       ///< Write data to a byte array register.
     //
-    std::uint64_t getValue(std::string_view pRegName);
-    void setValue(std::string_view pRegName, std::uint64_t pValue);
+    std::uint64_t getValue(std::string_view pRegName);                                      ///< Read the value from a value register.
+    void setValue(std::string_view pRegName, std::uint64_t pValue);                         ///< Write a value to a value register.
     //
-    std::variant<std::uint64_t, std::vector<std::uint8_t>> get(std::string_view pRegName);
-    void set(std::string_view pRegName, std::uint64_t pValue);
-    void set(std::string_view pRegName, const std::vector<std::uint8_t>& pBytes);
+    std::variant<std::uint64_t, std::vector<std::uint8_t>> get(std::string_view pRegName);  ///< \brief Read an integer or byte sequence from
+                                                                                            ///  a register, according to its data type.
+    void set(std::string_view pRegName, std::uint64_t pValue);                              ///< Write a value to a value register.
+    void set(std::string_view pRegName, const std::vector<std::uint8_t>& pBytes);           ///< Write data to a byte array register.
     //
-    void trigger(std::string_view pRegName);
+    void trigger(std::string_view pRegName);                        ///< "Trigger" a write-only register by writing configured default or zero.
     //
-    bool testRegisterName(std::string_view pRegName) const;
+    bool testRegisterName(std::string_view pRegName) const;         ///< Check if a register exists or throw an exception else.
     //
-    static bool isValidRegisterName(std::string_view pRegName);
+    static bool isValidRegisterName(std::string_view pRegName);     ///< Check if a string could be a valid register name.
 
 private:
-    bool initImpl() override final;
-    bool closeImpl() override final;
+    bool initImpl() override final;     ///< Initialize the firmware module.
+    bool closeImpl() override final;    ///< Close the firmware module.
     //
-    virtual bool initModule();
-    virtual bool closeModule();
+    virtual bool initModule();          ///< Perform module-specific initialization steps.
+    virtual bool closeModule();         ///< Perform module-specific closing steps.
     //
-    virtual void resetImpl() = 0;
+    virtual void resetImpl() = 0;       ///< Perform the module-specific reset sequence for reset().
     //
-    virtual std::uint8_t getModuleSoftwareVersion() const = 0;
-    virtual std::uint8_t getModuleFirmwareVersion() = 0;
+    virtual std::uint8_t getModuleSoftwareVersion() const = 0;                                          ///< Get the driver software version.
+    virtual std::uint8_t getModuleFirmwareVersion() = 0;                                                ///< Read the module firmware version.
     virtual bool checkVersionRequirement(std::uint8_t pSoftwareVersion, std::uint8_t pFirmwareVersion);
-    bool checkVersionRequirement();
+                                                                            ///< Check if software version is compatible with firmware version.
+    bool checkVersionRequirement();                                         ///< \copybrief checkVersionRequirement(std::uint8_t, std::uint8_t)
     //
     std::vector<std::uint8_t> getRegBytes(std::uint32_t pRegAddr, std::uint32_t pRegSize) const;
-    void setRegBytes(std::uint32_t pRegAddr, const std::vector<std::uint8_t>& pData) const;
+                                                                                            ///< Read a byte sequence from a register address.
+    void setRegBytes(std::uint32_t pRegAddr, const std::vector<std::uint8_t>& pData) const; ///< Write a byte sequence to a register address.
     std::uint64_t getRegValue(std::uint32_t pRegAddr, std::uint32_t pRegSize, std::uint32_t pRegOffs) const;
+                                                                                            ///< Read an integer value from a register address.
     void setRegValue(std::uint32_t pRegAddr, std::uint32_t pRegSize, std::uint32_t pRegOffs, std::uint64_t pValue) const;
+                                                                                            ///< Write an integer value to a register address.
 
 protected:
-    const bool clearRegValCacheOnReset;
+    const bool clearRegValCacheOnReset;                                     ///< Whether to clear the register written value cache on reset().
     //
-    const std::map<std::string, RegisterDescr, std::less<>> registers;
+    const std::map<std::string, RegisterDescr, std::less<>> registers;      ///< Map of all registers with their names as keys.
 
 private:
-    std::map<std::string, RegisterDescr::VariantValueType, std::less<>> registerWrittenCache;
-    std::map<std::string, RegisterDescr::VariantValueType, std::less<>> initValues;
+    std::map<std::string, RegisterDescr::VariantValueType, std::less<>> registerWrittenCache;   ///< Cache of last written register values.
+    std::map<std::string, RegisterDescr::VariantValueType, std::less<>> initValues;     ///< Overridden default values from YAML configuration.
 
 public:
     /*!
@@ -197,31 +205,32 @@ public:
     class RegisterProxy                                                         // cppcheck-suppress noConstructor symbolName=RegisterProxy
     {
     public:
-        RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName);
-        RegisterProxy(const RegisterProxy&) = delete;
-        RegisterProxy(RegisterProxy&&) = delete;
-        ~RegisterProxy() = default;
+        RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName);        ///< Constructor.
+        RegisterProxy(const RegisterProxy&) = delete;                           ///< Deleted copy constructor.
+        RegisterProxy(RegisterProxy&&) = delete;                                ///< Deleted move constructor.
+        ~RegisterProxy() = default;                                             ///< Default destructor.
         //
-        RegisterProxy& operator=(RegisterProxy) = delete;
-        RegisterProxy& operator=(RegisterProxy&&) = delete;
+        RegisterProxy& operator=(RegisterProxy) = delete;                       ///< Deleted copy assignment operator.
+        RegisterProxy& operator=(RegisterProxy&&) = delete;                     ///< Deleted move assignment operator.
         //
-        std::uint64_t operator=(std::uint64_t pValue) const;
-        const std::vector<std::uint8_t>& operator=(const std::vector<std::uint8_t>& pBytes) const;
+        std::uint64_t operator=(std::uint64_t pValue) const;                    ///< Write an integer value to the register.
+        const std::vector<std::uint8_t>& operator=(const std::vector<std::uint8_t>& pBytes) const;  ///< Write a byte sequence to the register.
         //
-        operator std::uint64_t() const;
-        operator std::vector<std::uint8_t>() const;
+        operator std::uint64_t() const;                                         ///< Read an integer value from the register.
+        operator std::vector<std::uint8_t>() const;                             ///< Read a byte sequence from the register.
         //
-        std::variant<std::uint64_t, std::vector<std::uint8_t>> get() const;
+        std::variant<std::uint64_t, std::vector<std::uint8_t>> get() const;     ///< \brief Read an integer or byte sequence from
+                                                                                ///  the register, according to its data type.
         //
-        void trigger() const;
+        void trigger() const;                                   ///< "Trigger" the (write-only) register by writing configured default or zero.
 
     private:
-        RegisterDriver& regDriver;
-        const std::string regName;
+        RegisterDriver& regDriver;      ///< %Driver to which the register belongs.
+        const std::string regName;      ///< Name of the register as used in the driver.
     };
 
 private:
-    std::map<std::string, const RegisterProxy, std::less<>> registerProxies;
+    std::map<std::string, const RegisterProxy, std::less<>> registerProxies;    ///< Map of proxy class instances with register names as keys.
 };
 
 } // namespace HL

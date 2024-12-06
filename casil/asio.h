@@ -40,22 +40,22 @@ namespace casil
 class ASIO
 {
 public:
-    ASIO() = delete;
+    ASIO() = delete;                                                ///< Deleted constructor.
     //
-    static boost::asio::io_context& getIOContext();
+    static boost::asio::io_context& getIOContext();                 ///< Get the IO context object.
     //
-    static bool startRunIOContext(unsigned int pNumThreads = 1);
-    static void stopRunIOContext();
+    static bool startRunIOContext(unsigned int pNumThreads = 1);    ///< Start threads that continuously execute/run the IO context.
+    static void stopRunIOContext();                                 ///< Stop all running IO context threads.
     //
-    static bool ioContextThreadsRunning();
+    static bool ioContextThreadsRunning();                          ///< Check if any IO context threads are currently running.
 
 private:
     using WorkGuard = boost::asio::executor_work_guard<boost::asio::io_context::executor_type>;
-    static WorkGuard& getWorkGuard();
+    static WorkGuard& getWorkGuard();                               ///< Get the "work guard" object for the IO context object.
 
 private:
-    static bool ioContextRunning;
-    static std::vector<std::thread> ioContextThreads;
+    static bool ioContextRunning;                                   ///< Flags whether IO context threads were started and not stopped yet.
+    static std::vector<std::thread> ioContextThreads;               ///< Vector of all IO context threads.
 };
 
 } // namespace casil

@@ -46,37 +46,42 @@ class TCPSocketWrapper
 {
 public:
     TCPSocketWrapper(std::string pHostName, int pPort, std::string pReadTermination, const std::string& pWriteTermination);
-    TCPSocketWrapper(const TCPSocketWrapper&) = delete;
-    TCPSocketWrapper(TCPSocketWrapper&&) = default;
+                                                                ///< Constructor.
+    TCPSocketWrapper(const TCPSocketWrapper&) = delete;         ///< Deleted copy constructor.
+    TCPSocketWrapper(TCPSocketWrapper&&) = default;             ///< Default move constructor.
     //
-    TCPSocketWrapper& operator=(TCPSocketWrapper) = delete;
-    TCPSocketWrapper& operator=(TCPSocketWrapper&&) = delete;
+    TCPSocketWrapper& operator=(TCPSocketWrapper) = delete;     ///< Deleted copy assignment operator.
+    TCPSocketWrapper& operator=(TCPSocketWrapper&&) = delete;   ///< Deleted move assignment operator.
     //
     std::vector<std::uint8_t> read(int pSize, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                    std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                                    ///< \brief Read an amount of bytes from the socket,
+                                                                                    ///  or until read termination.
     std::vector<std::uint8_t> readMax(int pSize, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                       std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                                    ///< Read maximally some amount of bytes from the socket.
     void write(const std::vector<std::uint8_t>& pData, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                                    ///< Write data to the socket (automatically terminated).
     //
-    bool readBufferEmpty() const;
-    void clearReadBuffer();
+    bool readBufferEmpty() const;                               ///< Check if the read buffer is empty (and no remaining data to be read).
+    void clearReadBuffer();                                     ///< Read remaining data from the socket and then clear the read buffer contents.
     //
     void init(std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
-              std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
-    void close();
+              std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);    ///< Connect the %TCP socket.
+    void close();                                                                       ///< Disconnect the %TCP socket.
 
 private:
-    const std::string hostName;
-    const int port;
-    const std::string readTermination;
-    const std::size_t readTerminationLength;
-    const std::vector<std::uint8_t> writeTermination;
-    const std::size_t writeTerminationLength;
+    const std::string hostName;                         ///< Host name of the remote endpoint.
+    const int port;                                     ///< Used network port.
+    const std::string readTermination;                  ///< Read termination to detect end of read data stream.
+    const std::size_t readTerminationLength;            ///< Number of read termination characters.
+    const std::vector<std::uint8_t> writeTermination;   ///< Write termination to append to written data.
+    const std::size_t writeTerminationLength;           ///< Number of read termination characters/bytes.
     //
-    boost::asio::ip::tcp::socket socket;
+    boost::asio::ip::tcp::socket socket;                ///< %TCP socket.
     //
-    std::vector<std::uint8_t> readBuffer;
+    std::vector<std::uint8_t> readBuffer;               ///< Buffer for incoming data.
 };
 
 } // namespace CommonImpl

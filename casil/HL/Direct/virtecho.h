@@ -44,10 +44,10 @@ namespace HL
 class VirtEcho final : public DirectDriver
 {
 public:
-    VirtEcho(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);
-    ~VirtEcho() override = default;
+    VirtEcho(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);    ///< Constructor.
+    ~VirtEcho() override = default;                                                     ///< Default destructor.
     //
-    void operator()(int pN) const;
+    void operator()(int pN) const;                                                      ///< Read and immediately write back a number of bytes.
 
 private:
     bool initImpl() override;

@@ -37,6 +37,8 @@ void bindHL_GPIO(py::module& pM)
     py::class_<GPIO, casil::HL::RegisterDriver>(pM, "GPIO", "Driver for the gpio firmware module.")
             .def(py::init<std::string, GPIO::InterfaceBaseType&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("interface"), py::arg("config"))
+            .def("getData", &GPIO::getData, "Get the INPUT register.", py::arg("size") = -1, py::arg("addrOffs") = 0u)
+            .def("setData", &GPIO::setData, "Set the OUTPUT register.", py::arg("data"), py::arg("addrOffs") = 0u)
             .def("getSize", &GPIO::getSize, "Get the number of IO bits.")
             .def("getOutputEn", &GPIO::getOutputEn, "Get the OUTPUT_EN register.")
             .def("setOutputEn", &GPIO::setOutputEn, "Set the OUTPUT_EN register.", py::arg("enable"))

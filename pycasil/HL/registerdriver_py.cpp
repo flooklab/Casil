@@ -178,6 +178,7 @@ void bindHL_RegisterDriver(py::module& pM)
                                 },
                  "Write something else to a register (will fail) or set a non-register attribute.",
                  py::arg("attr"), py::arg("arg"), py::is_operator())
+            .def("reset", &RegisterDriver::reset, "Reset the firmware module.")
             .def("applyDefaults", &RegisterDriver::applyDefaults, "Write configured default values to all appropriate registers.")
             .def("getBytes", &RegisterDriver::getBytes, "Read the data from a byte array register.", py::arg("regName"))
             .def("setBytes", &RegisterDriver::setBytes, "Write data to a byte array register.", py::arg("regName"), py::arg("data"))

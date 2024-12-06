@@ -134,6 +134,7 @@ void bindHL_SiTCPFifo(py::module& pM)
                                         py::module::import("builtins").attr("super")(selfType, selfObj).attr("__setattr__")(pAttr, pArg);
                                     }
                                 }, "Set a non-register attribute.", py::arg("attr"), py::arg("arg"), py::is_operator())
+            .def("reset", &SiTCPFifo::reset, "Reset the FIFO.")
             .def("getVersion", &SiTCPFifo::getVersion, "Get the pseudo FIFO module version.")
             .def("getFifoSize", &SiTCPFifo::getFifoSize, "Get the FIFO size in number of bytes.")
             .def("getFifoData", &SiTCPFifo::getFifoData, "Read the FIFO content as sequence of 32 bit unsigned integers.")

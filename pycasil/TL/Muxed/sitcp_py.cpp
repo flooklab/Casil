@@ -31,6 +31,8 @@ void bindTL_SiTCP(py::module& pM)
     py::class_<SiTCP, casil::TL::MuxedInterface>(pM, "SiTcp", "Interface to connect to the basil bus on an FPGA "
                                                               "that runs the SiTCP library for communication.")
             .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"))
+            .def("readBufferEmpty", &SiTCP::readBufferEmpty, "Check if the UDP read buffer is empty.")
+            .def("clearReadBuffer", &SiTCP::clearReadBuffer, "Clear the current contents of the UDP read buffer.")
             .def("resetFifo", &SiTCP::resetFifo, "Clear the FIFO and the remaining incoming %TCP buffer.")
             .def("getFifoSize", &SiTCP::getFifoSize, "Get the FIFO size in number of bytes.")
             .def("getFifoData", &SiTCP::getFifoData, "Extract the current FIFO content as sequence of bytes.", py::arg("size") = -1)

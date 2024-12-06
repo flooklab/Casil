@@ -52,7 +52,7 @@ PYBIND11_MODULE(PyCasil, pyCasil)
     py::module modAuxil = pyCasil.def_submodule("Auxil", "Auxiliary functions and classes.");
     bindAuxil(modAuxil);
 
-    py::module modBytes = pyCasil.def_submodule("Bytes", "(Auxiliary) functions for bit/byte manipulation.");
+    py::module modBytes = pyCasil.def_submodule("Bytes", "Auxiliary functions for bit/byte manipulation.");
     bindBytes(modBytes);
 
     py::module modEnv = pyCasil.def_submodule("Env", "Handling of environment variables needed by the library.");
@@ -63,12 +63,12 @@ PYBIND11_MODULE(PyCasil, pyCasil)
 
     //
 
-    py::module modTL = pyCasil.def_submodule("TL", "Transfer layer (interfaces that connect the PyCasil host to its devices/components).");
+    py::module modTL = pyCasil.def_submodule("TL", "Transfer layer: Interfaces that connect the PyCasil host to its devices/components.");
     bindTL(modTL);
 
-    py::module modHL = pyCasil.def_submodule("HL", "Hardware layer (drivers that control the connected devices/components).");
+    py::module modHL = pyCasil.def_submodule("HL", "Hardware layer: Drivers that control the connected devices/components.");
     bindHL(modHL);
 
-    py::module modRL = pyCasil.def_submodule("RL", "Register layer (abstraction for register(-like) functionalities of the drivers).");
+    py::module modRL = pyCasil.def_submodule("RL", "Register layer: Abstraction for register(-like) functionalities of the drivers.");
     bindRL(modRL);
 }

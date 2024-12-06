@@ -67,7 +67,7 @@ struct TmplDevInterface : public TmplDevImpl::TmplDevInterfaceBase
     static_assert(Concepts::IsInterface<T>, "Type must be an interface.");
     static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
 
-    typedef T Type;
+    typedef T Type;     ///< The wrapped interface type.
 };
 
 /*!
@@ -83,7 +83,7 @@ struct TmplDevDriver : public TmplDevImpl::TmplDevDriverBase
     static_assert(Concepts::IsDriver<T>, "Type must be a driver.");
     static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
 
-    typedef T Type;
+    typedef T Type;     ///< The wrapped driver type.
 };
 
 /*!
@@ -99,7 +99,7 @@ struct TmplDevRegister : public TmplDevImpl::TmplDevRegisterBase
     static_assert(Concepts::IsRegister<T>, "Type must be a register.");
     static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
 
-    typedef T Type;
+    typedef T Type;     ///< The wrapped register type.
 };
 
 //

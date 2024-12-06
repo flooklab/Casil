@@ -89,17 +89,29 @@ constexpr std::chrono::microseconds getChronoMicroSecs(const double pSecs)
 class AtomicFlagGuard
 {
 public:
+    /*!
+     * \brief Constructor.
+     *
+     * Sets the flag.
+     *
+     * \param pFlag Atomic flag to be set/cleared.
+     */
     explicit AtomicFlagGuard(std::atomic_flag& pFlag) :
         flag(pFlag)
     {
         flag.test_and_set();
     }
+    /*!
+     * \brief Destructor.
+     *
+     * Clears the flag.
+     */
     ~AtomicFlagGuard()
     {
         flag.clear();
     }
 private:
-    std::atomic_flag& flag;
+    std::atomic_flag& flag;     ///< The atomic flag to be set/cleared.
 };
 
 //
@@ -117,11 +129,21 @@ class AsyncIORunner
     static_assert(numThreads != 0, "Number of threads must be non-zero.");
 
 public:
+    /*!
+     * \brief Constructor.
+     *
+     * Starts the \p numThreads IO context threads.
+     */
     AsyncIORunner()
     {
         if (!ASIO::startRunIOContext(numThreads))
             throw std::runtime_error("Failed to start IO context threads.");
     }
+    /*!
+     * \brief Destructor.
+     *
+     * Stops the IO context threads.
+     */
     ~AsyncIORunner()
     {
         ASIO::stopRunIOContext();

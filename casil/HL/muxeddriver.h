@@ -53,8 +53,8 @@ public:
                                             ///< Constructor.
     ~MuxedDriver() override = default;      ///< Default destructor.
     //
-    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;        ///< Set driver-specific special data.
-    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;     ///< Get driver-specific special data.
+    std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) override;        ///< Get driver-specific special data.
+    void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) override;     ///< Set driver-specific special data.
     void exec() override;                                                                           ///< Perform a driver-specific action.
     bool isDone() override;                                                                 ///< Check if a driver-specific action has finished.
 

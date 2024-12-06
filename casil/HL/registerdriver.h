@@ -91,8 +91,8 @@ struct RegisterDescr
      */
     enum class DataType : std::uint8_t
     {
-        Value = 0,
-        ByteArray = 1
+        Value = 0,      ///< Numerical value.
+        ByteArray = 1   ///< Sequence of individual bytes.
     };
     /*!
      * \brief Defines read-/write-ability of the register.
@@ -101,9 +101,9 @@ struct RegisterDescr
      */
     enum class AccessMode : std::uint8_t
     {
-        ReadOnly = 0b01,
-        WriteOnly = 0b10,
-        ReadWrite = 0b11
+        ReadOnly = 0b01,    ///< Can only read from the register.
+        WriteOnly = 0b10,   ///< Can only write to the register.
+        ReadWrite = 0b11    ///< Can read from and write to the register.
     };
     //
     typedef std::variant<std::monostate, std::uint64_t, std::vector<std::uint8_t>> VariantValueType;

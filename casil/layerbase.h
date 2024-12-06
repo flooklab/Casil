@@ -84,9 +84,9 @@ public:
      */
     enum class Layer : std::uint8_t
     {
-        TransferLayer = 0,
-        HardwareLayer = 1,
-        RegisterLayer = 2
+        TransferLayer = 0,  ///< Transfer layer (TL): Interfaces
+        HardwareLayer = 1,  ///< Hardware layer (HL): Drivers
+        RegisterLayer = 2   ///< Register layer (RL): Registers
     };
 };
 

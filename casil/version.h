@@ -49,10 +49,10 @@ namespace Version
  */
 enum class ReleaseType : std::uint8_t
 {
-    Alpha = 0,
-    Beta = 1,
-    ReleaseCandidate = 2,
-    Normal = 3
+    Alpha = 0,              ///< Pre-release \e alpha status.
+    Beta = 1,               ///< Pre-release \e beta status.
+    ReleaseCandidate = 2,   ///< Pre-release \e release \e candidate status.
+    Normal = 3              ///< %Normal/final release.
 };
 
 inline constexpr int casilVersionMajor = 0;

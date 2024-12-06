@@ -49,6 +49,8 @@ namespace Bytes
  * \brief Check if type is a fixed width (8/16/32/64 bits) unsigned integer.
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept IsUnsignedIntNType = (std::is_same_v<T, std::uint8_t> || std::is_same_v<T, std::uint16_t> ||
@@ -127,6 +129,8 @@ std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);            
  * \brief Compose a byte sequence with a certain endianness from a number of unsigned integers.
  *
  * \todo Detailed doc
+ *
+ * \tparam Ts
  */
 template<typename... Ts>
     requires (IsUnsignedIntNType<Ts> && ...)
@@ -362,6 +366,7 @@ constexpr std::uint64_t composeUInt64(const std::span<const std::uint8_t, 8> pBy
  *
  * \todo Detailed doc
  *
+ * \tparam T
  * \param pUnsignedNumber
  * \param pAddTypePadding
  * \return

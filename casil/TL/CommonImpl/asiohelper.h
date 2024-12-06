@@ -56,12 +56,16 @@ namespace ASIOHelper
 
 /*!
  * \brief Check if type is either a Boost %ASIO %TCP socket or a Boost %ASIO %UDP socket.
+ *
+ * \tparam SocketT
  */
 template<typename SocketT>
 concept IsSocket = (std::same_as<SocketT, boost::asio::ip::tcp::socket> || std::same_as<SocketT, boost::asio::ip::udp::socket>);
 
 /*!
  * \brief Check if a Boost %ASIO %TCP or %UDP socket has a \c cancel() function with \c void return type.
+ *
+ * \tparam SocketT
  */
 template<typename SocketT>
 concept IsCancellableSocket = IsSocket<SocketT> && requires(SocketT sock)
@@ -96,6 +100,8 @@ void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t p
  *
  * \todo Detailed doc
  *
+ * \tparam ReturnT
+ * \tparam SocketT
  * \param pFuture
  * \param pSocket
  * \param pTimeout
@@ -151,6 +157,7 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
  *
  * \todo Detailed doc
  *
+ * \tparam SocketT
  * \param pPromiseN
  * \param pSocket
  * \param pTimeout

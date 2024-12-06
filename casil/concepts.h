@@ -47,6 +47,8 @@ namespace Concepts
  * \brief Helper declaration to test if a char (array) is constexpr.
  *
  * \todo Detailed doc
+ *
+ * \tparam c
  */
 template<char c>
 using TestConstexpr = void;
@@ -55,6 +57,8 @@ using TestConstexpr = void;
  * \brief Check if type is a 1-dim. const char array.
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept IsConstCharArr = requires
@@ -68,6 +72,8 @@ concept IsConstCharArr = requires
  * \brief Check if type declares a \c static \c constexpr \c char[] member called \c typeName.
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept HasRegisteredTypeName = requires
@@ -81,6 +87,8 @@ concept HasRegisteredTypeName = requires
  * \brief Check if type declares a typedef \c InterfaceBaseType to an abstract class derived from \ref casil::TL::Interface "TL::Interface".
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept HasInterfaceBaseType = requires
@@ -96,6 +104,8 @@ concept HasInterfaceBaseType = requires
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept IsInterface = std::is_base_of_v<TL::Interface, T> &&
@@ -106,6 +116,8 @@ concept IsInterface = std::is_base_of_v<TL::Interface, T> &&
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept IsDriver = std::is_base_of_v<HL::Driver, T> &&
@@ -117,6 +129,8 @@ concept IsDriver = std::is_base_of_v<HL::Driver, T> &&
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
  * \todo Detailed doc
+ *
+ * \tparam T
  */
 template<typename T>
 concept IsRegister = std::is_base_of_v<RL::Register, T> &&

@@ -202,6 +202,12 @@ struct TmplDevRegisters
  *
  * See \ref TemplateDeviceSpecialization "TemplateDevice<TmplDevInterfaces<TmplDevInterfaceTs...>, <!--
  *                                                    -->TmplDevDrivers<TmplDevDriverTs...>, TmplDevRegisters<TmplDevRegisterTs...>>"
+ *
+ * \todo Describe or remove tparams here.
+ *
+ * \tparam TmplDevInterfacesT
+ * \tparam TmplDevDriversT
+ * \tparam TmplDevRegistersT
  */
 template<typename TmplDevInterfacesT, typename TmplDevDriversT, typename TmplDevRegistersT>
 class TemplateDevice;
@@ -322,6 +328,9 @@ private:
      *
      * \todo Detailed doc
      *
+     * \tparam N
+     * \tparam layer
+     * \tparam TmplDevComponentTs
      * \param pYAMLLayerSeq
      */
     template<std::size_t N, LayerBase::Layer layer, typename... TmplDevComponentTs>

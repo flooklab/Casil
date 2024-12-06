@@ -11,6 +11,7 @@ set(HEADER_FILE_NAMES
     layerfactorymacros.h
     logger.h
     templatedevice.h
+    templatedevicemacros.h
     version.h
     HL/directdriver.h
     HL/driver.h
@@ -102,6 +103,7 @@ set(TESTS_FILE_NAMES
     core/test_templatedevice/exampledevice.h
     core/test_templatedevice/testdriver.cpp
     core/test_templatedevice/testdriver.h
+    core/test_templatedevicemacros/test_templatedevicemacros.cpp
     components/HL/test_gpio/test_gpio.cpp
     components/HL/test_registerdriver/test_registerdriver.cpp
     components/HL/test_registerdriver/fakeinterface.cpp

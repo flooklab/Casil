@@ -79,7 +79,7 @@ namespace HL
 {
 
 /*!
- * \brief %Driver for the \e gpio FPGA module.
+ * \brief %Driver for the \e gpio firmware module.
  *
  * \todo Detailed doc
  */

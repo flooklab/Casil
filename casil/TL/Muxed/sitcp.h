@@ -198,7 +198,7 @@ namespace TL
  *
  * %TCP to BUS reset sequence (in case of status invalid): 65535 * 0xFF + 6 * 0x00
  *
- * \todo doc...
+ * \todo Detailed doc
  */
 class SiTCP final : public MuxedInterface
 {

@@ -181,7 +181,10 @@ std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize
     }
     else if (pAddr == baseAddrFIFOLimit)
     {
-        return {};      //TODO WTF is going on here (and why)???:   return array('B', chr(sram_fifo_version))
+        return {};
+        //TODO What is actually going on here?:
+        //Python: return array('B', chr(sram_fifo_version))
+        //This probably fakes reading VERSION register of sram_fifo module at base_addr 0x200000000, not sure about purpose of chr() though...
 
         //TODO more python context:
         //from basil.HL.sram_fifo import sram_fifo

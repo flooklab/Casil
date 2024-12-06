@@ -45,8 +45,8 @@ namespace TL
 class MuxedInterface : public Interface
 {
 public:
-    MuxedInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-    ~MuxedInterface() override = default;
+    MuxedInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);  ///< Constructor.
+    ~MuxedInterface() override = default;                                                                           ///< Default destructor.
     //
     virtual std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) = 0;                        ///< Read from the interface.
     virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;                    ///< Write to the interface.

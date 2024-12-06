@@ -38,6 +38,11 @@ namespace casil
 namespace HL
 {
 
+/*!
+ * \brief Base class to derive from for driver components that control \e independent hardware devices connected via a DirectInterface.
+ *
+ * \todo Detailed doc
+ */
 class DirectDriver : public Driver
 {
 public:

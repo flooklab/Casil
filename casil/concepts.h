@@ -35,6 +35,11 @@ namespace casil
 namespace TL { class Interface; }
 namespace RL { class Register; }
 
+/*!
+ * \brief %Concepts for use with \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * \todo Detailed doc
+ */
 namespace Concepts
 {
 

@@ -39,6 +39,11 @@ namespace casil
 namespace TL
 {
 
+/*!
+ * \brief %Interface for network communication using the \e User \e Datagram \e Protocol (%UDP).
+ *
+ * \todo Detailed doc
+ */
 class UDP final : public DirectInterface
 {
 public:

@@ -38,6 +38,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Auxiliary functions and classes.
+ *
+ * \todo Detailed doc
+ */
 namespace Auxil
 {
 
@@ -60,6 +65,11 @@ constexpr std::chrono::microseconds getChronoMicroSecs(const double pSecs)
 
 //
 
+/*!
+ * \brief RAII wrapper to set and clear an atomic flag.
+ *
+ * \todo Detailed doc
+ */
 class AtomicFlagGuard
 {
 public:
@@ -78,6 +88,13 @@ private:
 
 //
 
+/*!
+ * \brief RAII wrapper to run IO context threads for ASIO functionality.
+ *
+ * \todo Detailed doc
+ *
+ * \tparam numThreads Non-zero number of parallel threads to be used.
+ */
 template<unsigned int numThreads = 1>
 struct AsyncIORunner
 {

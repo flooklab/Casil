@@ -32,6 +32,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Limited interface to the used async IO back end from the Boost library.
+ *
+ * \todo Detailed doc
+ */
 class ASIO
 {
 public:

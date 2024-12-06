@@ -83,9 +83,9 @@ namespace HL
 {
 
 /*!
- * \brief Driver for Standard Commands for Programmable Instruments (SCPI) devices.
+ * \brief %Driver for \e Standard \e Commands \e for \e Programmable \e Instruments (%SCPI) devices.
  *
- * \todo doc...
+ * \todo Detailed doc
  */
 class SCPI final : public DirectDriver
 {

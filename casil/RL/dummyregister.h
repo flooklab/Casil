@@ -37,6 +37,11 @@ namespace casil
 namespace RL
 {
 
+/*!
+ * \brief Dummy implementation of Register without actual functionality.
+ *
+ * \todo Detailed doc
+ */
 class DummyRegister final : public Register
 {
 public:

@@ -51,6 +51,13 @@ namespace TmplDevImpl
 
 //
 
+/*!
+ * \brief Interface configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * \todo Detailed doc
+ *
+ * \tparam T %Interface class implementing TL::Interface.
+ */
 template<typename T>
 struct TmplDevInterface : public TmplDevImpl::TmplDevInterfaceBase
 {
@@ -60,6 +67,13 @@ struct TmplDevInterface : public TmplDevImpl::TmplDevInterfaceBase
     typedef T Type;
 };
 
+/*!
+ * \brief Driver configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * \todo Detailed doc
+ *
+ * \tparam T %Driver class implementing HL::Driver.
+ */
 template<typename T>
 struct TmplDevDriver : public TmplDevImpl::TmplDevDriverBase
 {
@@ -69,6 +83,13 @@ struct TmplDevDriver : public TmplDevImpl::TmplDevDriverBase
     typedef T Type;
 };
 
+/*!
+ * \brief Register configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * \todo Detailed doc
+ *
+ * \tparam T %Register class implementing RL::Register.
+ */
 template<typename T>
 struct TmplDevRegister : public TmplDevImpl::TmplDevRegisterBase
 {
@@ -121,6 +142,13 @@ namespace TmplDevImpl
 
 //
 
+/*!
+ * \brief \ref TemplateDeviceSpecialization "TemplateDevice" wrapper for a set of interface configurations.
+ *
+ * \todo Detailed doc
+ *
+ * \tparam Ts Set of interface configurations (each implementing TmplDevInterface).
+ */
 template<typename... Ts>
 struct TmplDevInterfaces
 {
@@ -130,6 +158,13 @@ struct TmplDevInterfaces
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
 };
 
+/*!
+ * \brief \ref TemplateDeviceSpecialization "TemplateDevice" wrapper for a set of driver configurations.
+ *
+ * \todo Detailed doc
+ *
+ * \tparam Ts Set of driver configurations (each implementing TmplDevDriver).
+ */
 template<typename... Ts>
 struct TmplDevDrivers
 {
@@ -140,6 +175,13 @@ struct TmplDevDrivers
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
 };
 
+/*!
+ * \brief \ref TemplateDeviceSpecialization "TemplateDevice" wrapper for a set of register configurations.
+ *
+ * \todo Detailed doc
+ *
+ * \tparam Ts Set of register configurations (each implementing TmplDevRegister).
+ */
 template<typename... Ts>
 struct TmplDevRegisters
 {
@@ -152,9 +194,28 @@ struct TmplDevRegisters
 
 //
 
+/*!
+ * \brief Type-safe wrapper for the "plain" Device class.
+ *
+ * See \ref TemplateDeviceSpecialization "TemplateDevice<TmplDevInterfaces<TmplDevInterfaceTs...>, <!--
+ *                                                    -->TmplDevDrivers<TmplDevDriverTs...>, TmplDevRegisters<TmplDevRegisterTs...>>"
+ */
 template<typename TmplDevInterfacesT, typename TmplDevDriversT, typename TmplDevRegistersT>
 class TemplateDevice;
 
+/*!
+ * \copybrief TemplateDevice
+ * \anchor TemplateDeviceSpecialization
+ *
+ * \todo Detailed doc
+ *
+ * \tparam TmplDevInterfaces Wrapper for a set of interface configurations \p TmplDevInterfaceTs.
+ * \tparam TmplDevInterfaceTs Set of interface configurations (each implementing TmplDevInterface).
+ * \tparam TmplDevDrivers Wrapper for a set of driver configurations \p TmplDevDriverTs.
+ * \tparam TmplDevDriverTs Set of driver configurations (each implementing TmplDevDriver).
+ * \tparam TmplDevRegisters Wrapper for a set of register configurations.
+ * \tparam TmplDevRegisterTs Set of register configurations (each implementing TmplDevRegister).
+ */
 template<typename... TmplDevInterfaceTs, typename... TmplDevDriverTs, typename... TmplDevRegisterTs>
 class TemplateDevice<TmplDevInterfaces<TmplDevInterfaceTs...>,
                      TmplDevDrivers<TmplDevDriverTs...>,

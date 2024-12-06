@@ -33,9 +33,19 @@
 namespace casil
 {
 
+/*!
+ * \brief Transfer layer: Interfaces that connect the Casil host to its devices/components.
+ *
+ * \todo Detailed doc
+ */
 namespace TL
 {
 
+/*!
+ * \brief Common base class for all interface components in the transfer layer (TL).
+ *
+ * \todo Detailed doc
+ */
 class Interface : public LayerBase
 {
 public:

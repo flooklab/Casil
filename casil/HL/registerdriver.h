@@ -77,13 +77,28 @@ namespace casil
 namespace HL
 {
 
+/*!
+ * \brief Specification for a register accessed via RegisterDriver.
+ *
+ * \todo Detailed doc
+ */
 struct RegisterDescr
 {
+    /*!
+     * \brief Data type modeled by the register.
+     *
+     * \todo Detailed doc
+     */
     enum class DataType : std::uint8_t
     {
         Value = 0,
         ByteArray = 1
     };
+    /*!
+     * \brief Defines read-/write-ability of the register.
+     *
+     * \todo Detailed doc
+     */
     enum class AccessMode : std::uint8_t
     {
         ReadOnly = 0b01,
@@ -101,6 +116,11 @@ struct RegisterDescr
     const VariantValueType defaultValue = std::monostate{};
 };
 
+/*!
+ * \brief Specialization for principally MuxedDriver components that will mainly control their firmware module via register operations.
+ *
+ * \todo Detailed doc
+ */
 class RegisterDriver : public MuxedDriver
 {
 public:
@@ -169,6 +189,11 @@ private:
     std::map<std::string, RegisterDescr::VariantValueType, std::less<>> initValues;
 
 public:
+    /*!
+     * \brief Proxy class for accessing an individual RegisterDriver register.
+     *
+     * \todo Detailed doc
+     */
     class RegisterProxy                                                         // cppcheck-suppress noConstructor symbolName=RegisterProxy
     {
     public:

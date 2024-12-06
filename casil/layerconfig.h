@@ -32,6 +32,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Configuration object for layer components derived from LayerBase.
+ *
+ * \todo Detailed doc
+ */
 class LayerConfig
 {
 public:

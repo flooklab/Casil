@@ -32,6 +32,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Handling of environment variables needed by the library.
+ *
+ * \todo Detailed doc
+ */
 namespace Env
 {
 

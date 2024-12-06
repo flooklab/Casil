@@ -37,6 +37,11 @@ namespace casil
 namespace TL
 {
 
+/*!
+ * \brief Base class to derive from for interface components that \e directly connect to an \e independent hardware device.
+ *
+ * \todo Detailed doc
+ */
 class DirectInterface : public Interface
 {
 public:

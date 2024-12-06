@@ -38,6 +38,11 @@ namespace casil
 namespace HL
 {
 
+/*!
+ * \brief Base class to derive from for driver components that control firmware modules on a basil bus connected via a MuxedInterface.
+ *
+ * \todo Detailed doc
+ */
 class MuxedDriver : public Driver
 {
 public:

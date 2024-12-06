@@ -37,6 +37,11 @@ namespace casil
 namespace TL
 {
 
+/*!
+ * \brief Base class to derive from for interface components that connect to an FPGA endpoint running the basil bus and firmware modules.
+ *
+ * \todo Detailed doc
+ */
 class MuxedInterface : public Interface
 {
 public:

@@ -37,6 +37,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Auxiliary functions for bit/byte manipulation.
+ *
+ * \todo Detailed doc
+ */
 namespace Bytes
 {
 

@@ -39,6 +39,11 @@ namespace casil
 namespace TL
 {
 
+/*!
+ * \brief %Interface for network communication using the \e Transmission \e Control \e Protocol (%TCP).
+ *
+ * \todo Detailed doc
+ */
 class TCP final : public DirectInterface
 {
 public:

@@ -26,12 +26,27 @@
 #include <cstdint>
 #include <string>
 
+/*!
+ * \brief Casil base namespace.
+ *
+ * \todo Detailed doc
+ */
 namespace casil
 {
 
+/*!
+ * \brief Library version information.
+ *
+ * \todo Detailed doc
+ */
 namespace Version
 {
 
+/*!
+ * \brief Release type of the released library version.
+ *
+ * \todo Detailed doc
+ */
 enum class ReleaseType : std::uint8_t
 {
     Alpha = 0,

@@ -33,9 +33,19 @@
 namespace casil
 {
 
+/*!
+ * \brief %Register layer: Abstraction for register(-like) functionalities of the drivers.
+ *
+ * \todo Detailed doc
+ */
 namespace RL
 {
 
+/*!
+ * \brief Common base class for all register components in the register layer (RL).
+ *
+ * \todo Detailed doc
+ */
 class Register : public LayerBase
 {
 public:

@@ -39,6 +39,11 @@ namespace casil
 namespace TL
 {
 
+/*!
+ * \brief %Interface for communication via a serial port.
+ *
+ * \todo Detailed doc
+ */
 class Serial final : public DirectInterface
 {
 public:

@@ -78,6 +78,11 @@ namespace casil
 namespace HL
 {
 
+/*!
+ * \brief %Driver for the \e gpio FPGA module.
+ *
+ * \todo Detailed doc
+ */
 class GPIO final : public RegisterDriver
 {
 public:

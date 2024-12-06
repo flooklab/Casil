@@ -31,6 +31,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Common top-level base class that connects the different layers and components of the basil layer structure.
+ *
+ * \todo Detailed doc
+ */
 class LayerBase
 {
 public:
@@ -72,6 +77,11 @@ private:
     const std::string selfDescription;
 
 public:
+    /*!
+     * \brief Enumeration of identifiers for the distinguished component layers TL, HL and RL.
+     *
+     * \todo Detailed doc
+     */
     enum class Layer : std::uint8_t
     {
         TransferLayer = 0,

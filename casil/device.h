@@ -39,6 +39,11 @@
 namespace casil
 {
 
+/*!
+ * \brief Configurable container class for interdependent layer components to interact with an arbitrary DAQ setup.
+ *
+ * \todo Detailed doc
+ */
 class Device
 {
 private:

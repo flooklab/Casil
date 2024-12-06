@@ -34,9 +34,19 @@
 namespace casil
 {
 
+/*!
+ * \brief Hardware layer: Drivers that control the connected devices/components.
+ *
+ * \todo Detailed doc
+ */
 namespace HL
 {
 
+/*!
+ * \brief Common base class for all driver components in the hardware layer (HL).
+ *
+ * \todo Detailed doc
+ */
 class Driver : public LayerBase
 {
 public:

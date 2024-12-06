@@ -78,6 +78,11 @@ namespace TL { class SiTCP; }
 namespace HL
 {
 
+/*!
+ * \brief Special driver to access the FIFO of the SiTCP interface.
+ *
+ * \todo Detailed doc
+ */
 class SiTCPFifo final : public MuxedDriver
 {
 public:

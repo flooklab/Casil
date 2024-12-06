@@ -37,6 +37,11 @@ namespace TL { class Interface; }
 namespace HL { class Driver; }
 namespace RL { class Register; }
 
+/*!
+ * \brief Factory for LayerBase classes of the three component layers TL, HL and RL.
+ *
+ * \todo Detailed doc
+ */
 class LayerFactory
 {
 public:

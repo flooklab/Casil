@@ -87,7 +87,7 @@ namespace TL
 {
 
 /*!
- * \brief ...
+ * \brief %Interface to connect to the basil bus on an FPGA that runs the \e %SiTCP library for communication.
  *
  * ...
  *

@@ -27,7 +27,6 @@
 #include <casil/templatedevice.h>
 
 #include <cstdint>
-#include <string>
 #include <vector>
 
 //

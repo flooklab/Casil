@@ -211,8 +211,8 @@ public:
     std::vector<std::uint8_t> query(std::uint64_t pWriteAddr, std::uint64_t pReadAddr,
                                     const std::vector<std::uint8_t>& pData, int pSize = -1) override;
     //
-    bool readBufferEmpty() const override;
-    void clearReadBuffer() override;
+    bool readBufferEmpty() const override;                  ///< Check if the %UDP read buffer is empty.
+    void clearReadBuffer() override;                        ///< Clear the current contents of the %UDP read buffer.
     //
     void resetFifo();                                       ///< Clear the FIFO and the remaining incoming %TCP buffer.
     void resetFifoMod32();                                  ///< TODO

@@ -100,8 +100,8 @@ public:
     void setFifoData(const std::vector<std::uint32_t>& pData) const;    ///< Write a sequence of 32 bit unsigned integers to the FIFO.
 
 private:
-    bool initImpl() override;
-    bool closeImpl() override;
+    bool initImpl() override;                           ///< Initialize the driver by doing nothing.
+    bool closeImpl() override;                          ///< Close the driver by doing nothing.
 
 private:
     using SiTCP = TL::SiTCP;                            ///< \copybrief TL::SiTCP

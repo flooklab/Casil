@@ -377,43 +377,6 @@ void SiTCP::resetFifo()
 }
 
 /*!
- * \brief TODO
- *
- * \todo Detailed doc
- */
-void SiTCP::resetFifoMod32()
-{
-    {
-        //Make it easier/quicker to acquire the lock using this flag to notify FIFO thread
-        Auxil::AtomicFlagGuard flagGuard(wantLockTCPSocket);
-        (void)flagGuard;
-
-        const std::lock_guard<std::mutex> socketLock(tcpSocketMutex);
-        (void)socketLock;
-
-        try
-        {
-            if (tcpSocketWrapperPtr)
-                tcpSocketWrapperPtr->clearReadBuffer();
-            else
-                throw std::runtime_error("Undefined TCP socket.");
-        }
-        catch (const std::runtime_error& exc)
-        {
-            throw std::runtime_error("Could not properly clear FIFO of SiTcp socket \"" + name + "\": " + exc.what());
-        }
-    }
-    {
-        const std::lock_guard<std::mutex> bufferLock(fifoMutex);
-        (void)bufferLock;
-
-        std::size_t eraseCount = fifoBuffer.size() - fifoBuffer.size() % 4;
-
-        fifoBuffer.erase(fifoBuffer.begin(), fifoBuffer.begin() + eraseCount);
-    }
-}
-
-/*!
  * \brief Get the FIFO size in number of bytes.
  *
  * \todo Detailed doc

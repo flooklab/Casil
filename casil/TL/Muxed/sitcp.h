@@ -215,7 +215,6 @@ public:
     void clearReadBuffer() override;                        ///< Clear the current contents of the %UDP read buffer.
     //
     void resetFifo();                                       ///< Clear the FIFO and the remaining incoming %TCP buffer.
-    void resetFifoMod32();                                  ///< TODO
     std::size_t getFifoSize() const;                        ///< Get the FIFO size in number of bytes.
     std::vector<std::uint8_t> getFifoData(int pSize = -1);  ///< Extract the current FIFO content as sequence of bytes.
 

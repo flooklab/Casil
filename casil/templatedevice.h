@@ -106,12 +106,12 @@ struct TmplDevRegister : public TmplDevImpl::TmplDevRegisterBase
 
 namespace TmplDevImpl
 {
-    template<typename T, template <typename> typename U>
+    template<typename T, template<typename> typename U>
     concept DerivedFromTmplDevStruct = requires { typename T::Type; } &&
                                        std::is_base_of_v<U<typename T::Type>, T> &&
                                        !std::is_same_v<U<typename T::Type>, T>;
 
-    template<typename T, template <typename> typename U>
+    template<typename T, template<typename> typename U>
     concept ImplementsTmplDevStruct = DerivedFromTmplDevStruct<T, U> && requires
     {
         T::name;

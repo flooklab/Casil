@@ -63,8 +63,9 @@ namespace RegistryImpl\
     using casil::LayerFactory;\
     using casil::TL::Interface;\
     using ThisInterfaceType = TYPE_CLASS;\
-    struct RegistryHelper\
+    class RegistryHelper\
     {\
+    public:\
         RegistryHelper()\
         {\
             LayerFactory::registerInterfaceType(\
@@ -90,8 +91,9 @@ namespace RegistryImpl\
     using casil::HL::Driver;\
     using casil::TL::Interface;\
     using ThisDriverType = TYPE_CLASS;\
-    struct RegistryHelper\
+    class RegistryHelper\
     {\
+    public:\
         RegistryHelper()\
         {\
             LayerFactory::registerDriverType(\
@@ -127,8 +129,9 @@ namespace RegistryImpl\
     using casil::HL::Driver;\
     using casil::RL::Register;\
     using ThisRegisterType = TYPE_CLASS;\
-    struct RegistryHelper\
+    class RegistryHelper\
     {\
+    public:\
         RegistryHelper()\
         {\
             LayerFactory::registerRegisterType(\
@@ -154,8 +157,9 @@ namespace\
 {\
 namespace RegistryImpl\
 {\
-    struct CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
+    class CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
     {\
+    public:\
         CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)()\
         {\
             LayerFactory::registerInterfaceAlias(ThisInterfaceType::typeName, ALIAS_NAME);\
@@ -170,8 +174,9 @@ namespace\
 {\
 namespace RegistryImpl\
 {\
-    struct CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
+    class CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
     {\
+    public:\
         CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)()\
         {\
             LayerFactory::registerDriverAlias(ThisDriverType::typeName, ALIAS_NAME);\
@@ -186,8 +191,9 @@ namespace\
 {\
 namespace RegistryImpl\
 {\
-    struct CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
+    class CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
     {\
+    public:\
         CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)()\
         {\
             LayerFactory::registerRegisterAlias(ThisRegisterType::typeName, ALIAS_NAME);\

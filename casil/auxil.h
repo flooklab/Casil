@@ -112,9 +112,11 @@ private:
  * \tparam numThreads Non-zero number of parallel threads to be used.
  */
 template<unsigned int numThreads = 1>
-struct AsyncIORunner
+class AsyncIORunner
 {
     static_assert(numThreads != 0, "Number of threads must be non-zero.");
+
+public:
     AsyncIORunner()
     {
         if (!ASIO::startRunIOContext(numThreads))

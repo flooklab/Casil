@@ -43,9 +43,19 @@ namespace RL { class Register; }
 namespace Concepts
 {
 
+/*!
+ * \brief Helper declaration to test if a char (array) is constexpr.
+ *
+ * \todo Detailed doc
+ */
 template<char c>
 using TestConstexpr = void;
 
+/*!
+ * \brief Check if type is a 1-dim. const char array.
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
 concept IsConstCharArr = requires
 {
@@ -54,16 +64,26 @@ concept IsConstCharArr = requires
     requires std::is_same_v<std::remove_extent_t<const char[]>, std::remove_extent_t<T>>;   //Type corresponds to const char[]
 };
 
+/*!
+ * \brief Check if type declares a \c static \c constexpr \c char[] member called \c typeName.
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
-concept HasRegisteredTypeName = requires    //Must have 'static constexpr char typeName[]' member
+concept HasRegisteredTypeName = requires
 {
     T::typeName;                                    //Member exists
     requires IsConstCharArr<decltype(T::typeName)>; //Type corresponds to const char[]
     typename TestConstexpr<T::typeName[0]>;         //Is usable as constexpr
 };
 
+/*!
+ * \brief Check if type declares a typedef \c InterfaceBaseType to an abstract class derived from \ref casil::TL::Interface "TL::Interface".
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
-concept HasInterfaceBaseType = requires     //Must declare typedef for abstract class derived from TL::Interface
+concept HasInterfaceBaseType = requires
 {
     typename T::InterfaceBaseType;
     requires (std::is_base_of_v<TL::Interface, typename T::InterfaceBaseType> &&    //Derived from Interface
@@ -71,15 +91,33 @@ concept HasInterfaceBaseType = requires     //Must declare typedef for abstract 
              std::is_abstract_v<typename T::InterfaceBaseType>;                     //Abstract, i.e. no actual interface
 };
 
+/*!
+ * \brief Check if type is a proper \ref casil::TL::Interface "Interface" component
+ *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
 concept IsInterface = std::is_base_of_v<TL::Interface, T> &&
                       std::is_constructible_v<T, std::string, LayerConfig>;
 
+/*!
+ * \brief Check if type is a proper \ref casil::HL::Driver "Driver" component
+ *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
 concept IsDriver = std::is_base_of_v<HL::Driver, T> &&
                    HasInterfaceBaseType<T> &&
                    std::is_constructible_v<T, std::string, typename T::InterfaceBaseType&, LayerConfig>;
 
+/*!
+ * \brief Check if type is a proper \ref casil::RL::Register "Register" component
+ *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
 concept IsRegister = std::is_base_of_v<RL::Register, T> &&
                      std::is_constructible_v<T, std::string, HL::Driver&, LayerConfig>;

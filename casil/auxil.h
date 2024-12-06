@@ -46,18 +46,34 @@ namespace casil
 namespace Auxil
 {
 
-boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString);
+boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString);   ///< Parse a YAML document into a Boost Property Tree.
 
 //TODO this is now unused but maybe still useful in the future or for python; keep it?
-std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString);
+std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString);         ///< Parse a sequence of unsigned integers from YAML format.
 
 //
 
+/*!
+ * \brief Convert a floating point time duration to an std::chrono interval.
+ *
+ * \todo Detailed doc
+ *
+ * \param pSecs
+ * \return
+ */
 constexpr std::chrono::milliseconds getChronoMilliSecs(const double pSecs)
 {
     return std::chrono::milliseconds(std::lround(pSecs*1e3));
 }
 
+/*!
+ * \copybrief getChronoMilliSecs
+ *
+ * \todo Detailed doc
+ *
+ * \param pSecs
+ * \return
+ */
 constexpr std::chrono::microseconds getChronoMicroSecs(const double pSecs)
 {
     return std::chrono::microseconds(std::lround(pSecs*1e6));

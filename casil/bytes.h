@@ -45,54 +45,88 @@ namespace casil
 namespace Bytes
 {
 
+/*!
+ * \brief Check if type is a fixed width (8/16/32/64 bits) unsigned integer.
+ *
+ * \todo Detailed doc
+ */
 template<typename T>
 concept IsUnsignedIntNType = (std::is_same_v<T, std::uint8_t> || std::is_same_v<T, std::uint16_t> ||
                               std::is_same_v<T, std::uint32_t> || std::is_same_v<T, std::uint64_t>);
 
 template<typename... Ts>
     requires (IsUnsignedIntNType<Ts> && ...)
-constexpr std::vector<std::uint8_t> composeByteVec(bool pBigEndian, Ts... pArgs);
+constexpr std::vector<std::uint8_t> composeByteVec(bool pBigEndian, Ts... pArgs);   ///< \brief Compose a byte sequence with a certain
+                                                                                    ///  endianness from a number of unsigned integers.
 
 constexpr std::uint16_t composeUInt16(const std::vector<std::uint8_t>& pBytes, bool pBigEndian = true);
+                                                                                    ///< \brief Create a 16 bit unsigned integer from
+                                                                                    ///  a two byte sequence of a certain endianness.
 constexpr std::uint16_t composeUInt16(std::span<const std::uint8_t, 2> pBytes, bool pBigEndian = true);
+                                                                                    ///< \brief Create a 16 bit unsigned integer from
+                                                                                    ///  a two byte sequence of a certain endianness.
 constexpr std::uint32_t composeUInt32(const std::vector<std::uint8_t>& pBytes, bool pBigEndian = true);
+                                                                                    ///< \brief Create a 32 bit unsigned integer from
+                                                                                    ///  a four byte sequence of a certain endianness.
 constexpr std::uint32_t composeUInt32(std::span<const std::uint8_t, 4> pBytes, bool pBigEndian = true);
+                                                                                    ///< \brief Create a 32 bit unsigned integer from
+                                                                                    ///  a four byte sequence of a certain endianness.
 constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, bool pBigEndian = true);
+                                                                                    ///< \brief Create a 64 bit unsigned integer from
+                                                                                    ///  an eight byte sequence of a certain endianness.
 constexpr std::uint64_t composeUInt64(std::span<const std::uint8_t, 8> pBytes, bool pBigEndian = true);
+                                                                                    ///< \brief Create a 64 bit unsigned integer from
+                                                                                    ///  an eight byte sequence of a certain endianness.
 
 //
 
 boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes, std::size_t pBitSize);
+                                                                                    ///< Convert a sequence of bytes to a dynamic bitset.
 std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits, std::size_t pByteSize);
+                                                                                    ///< Convert a dynamic bitset to a sequence of bytes.
 
 //
 
-std::vector<std::uint8_t> byteVecFromStr(const std::string& pStr);
-std::string strFromByteVec(const std::vector<std::uint8_t>& pVec);
+std::vector<std::uint8_t> byteVecFromStr(const std::string& pStr);                  ///< Interpret a character string as a sequence of bytes.
+std::string strFromByteVec(const std::vector<std::uint8_t>& pVec);                  ///< Interpret a sequence of bytes as a character string.
 
-void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uint8_t>& pAppend);
+void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uint8_t>& pAppend);    ///< Concatenate two sequences of bytes.
 
 //
 
 template<typename T>
     requires IsUnsignedIntNType<T>
-std::string formatHex(T pUnsignedNumber, bool pAddTypePadding = false);
+std::string formatHex(T pUnsignedNumber, bool pAddTypePadding = false);             ///< Format an unsigned integer as hexadecimal literal.
 
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint8_t>& pByteVec);
+                                                                                    ///< \brief Output a vector of 8 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint16_t>& pVec);
+                                                                                    ///< \brief Output a vector of 16 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint32_t>& pVec);
+                                                                                    ///< \brief Output a vector of 32 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint64_t>& pVec);
+                                                                                    ///< \brief Output a vector of 64 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
 
-std::string formatByteVec(const std::vector<std::uint8_t>& pVec);
-
-std::string formatUInt16Vec(const std::vector<std::uint16_t>& pVec);
-std::string formatUInt32Vec(const std::vector<std::uint32_t>& pVec);
-std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);
-
+std::string formatByteVec(const std::vector<std::uint8_t>& pVec);                   ///< \brief Format a vector of 8 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
+std::string formatUInt16Vec(const std::vector<std::uint16_t>& pVec);                ///< \brief Format a vector of 16 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
+std::string formatUInt32Vec(const std::vector<std::uint32_t>& pVec);                ///< \brief Format a vector of 32 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
+std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);                ///< \brief Format a vector of 64 bit unsigned integers
+                                                                                    ///  as brace-enclosed sequence of hexadecimal literals.
 
 //Template and constexpr function definitions
 
-
+/*!
+ * \brief Compose a byte sequence with a certain endianness from a number of unsigned integers.
+ *
+ * \todo Detailed doc
+ */
 template<typename... Ts>
     requires (IsUnsignedIntNType<Ts> && ...)
 constexpr std::vector<std::uint8_t> composeByteVec(const bool pBigEndian, Ts... pArgs)
@@ -227,6 +261,15 @@ constexpr T composeUInt(const bool pBigEndian, const std::span<const std::uint8_
 
 } // namespace BytesImpl
 
+/*!
+ * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBigEndian
+ * \return
+ */
 constexpr std::uint16_t composeUInt16(const std::vector<std::uint8_t>& pBytes, const bool pBigEndian)
 {
     if (pBytes.size() != 2)
@@ -234,11 +277,29 @@ constexpr std::uint16_t composeUInt16(const std::vector<std::uint8_t>& pBytes, c
     return BytesImpl::composeUInt<std::uint16_t, 2>(pBigEndian, std::span<const std::uint8_t, 2>(pBytes.begin(), 2));
 }
 
+/*!
+ * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBigEndian
+ * \return
+ */
 constexpr std::uint16_t composeUInt16(const std::span<const std::uint8_t, 2> pBytes, const bool pBigEndian)
 {
     return BytesImpl::composeUInt<std::uint16_t, 2>(pBigEndian, pBytes);
 }
 
+/*!
+ * \brief Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBigEndian
+ * \return
+ */
 constexpr std::uint32_t composeUInt32(const std::vector<std::uint8_t>& pBytes, const bool pBigEndian)
 {
     if (pBytes.size() != 4)
@@ -246,11 +307,29 @@ constexpr std::uint32_t composeUInt32(const std::vector<std::uint8_t>& pBytes, c
     return BytesImpl::composeUInt<std::uint32_t, 4>(pBigEndian, std::span<const std::uint8_t, 4>(pBytes.begin(), 4));
 }
 
+/*!
+ * \brief Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBigEndian
+ * \return
+ */
 constexpr std::uint32_t composeUInt32(const std::span<const std::uint8_t, 4> pBytes, const bool pBigEndian)
 {
     return BytesImpl::composeUInt<std::uint32_t, 4>(pBigEndian, pBytes);
 }
 
+/*!
+ * \brief Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBigEndian
+ * \return
+ */
 constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, const bool pBigEndian)
 {
     if (pBytes.size() != 8)
@@ -258,6 +337,15 @@ constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, c
     return BytesImpl::composeUInt<std::uint64_t, 8>(pBigEndian, std::span<const std::uint8_t, 8>(pBytes.begin(), 8));
 }
 
+/*!
+ * \brief Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.
+ *
+ * \todo Detailed doc
+ *
+ * \param pBytes
+ * \param pBigEndian
+ * \return
+ */
 constexpr std::uint64_t composeUInt64(const std::span<const std::uint8_t, 8> pBytes, const bool pBigEndian)
 {
     return BytesImpl::composeUInt<std::uint64_t, 8>(pBigEndian, pBytes);
@@ -265,6 +353,15 @@ constexpr std::uint64_t composeUInt64(const std::span<const std::uint8_t, 8> pBy
 
 //
 
+/*!
+ * \brief Format an unsigned integer as hexadecimal literal.
+ *
+ * \todo Detailed doc
+ *
+ * \param pUnsignedNumber
+ * \param pAddTypePadding
+ * \return
+ */
 template<typename T>
     requires IsUnsignedIntNType<T>
 std::string formatHex(const T pUnsignedNumber, const bool pAddTypePadding)

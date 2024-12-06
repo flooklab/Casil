@@ -40,9 +40,9 @@ namespace casil
 namespace Env
 {
 
-const std::map<std::string, std::set<std::string>, std::less<>>& getEnv();
+const std::map<std::string, std::set<std::string>, std::less<>>& getEnv();  ///< Get a map of all Casil environment variables.
 
-const std::set<std::string>& getEnv(std::string_view pVarName);
+const std::set<std::string>& getEnv(std::string_view pVarName);             ///< Get a specific Casil environment variable.
 
 } // namespace Env
 

@@ -52,7 +52,12 @@ public:
     Interface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);   ///< Constructor.
     ~Interface() override = default;                                                                            ///< Default destructor.
     //
-    virtual bool readBufferEmpty() const = 0;   ///< Check if the read buffer is empty.
+    /*!
+     * \brief Check if the read buffer is empty.
+     *
+     * \return True if read buffer is empty.
+     */
+    virtual bool readBufferEmpty() const = 0;
     virtual void clearReadBuffer() = 0;         ///< Clear the current contents of the read buffer.
 
 private:

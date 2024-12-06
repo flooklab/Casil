@@ -57,6 +57,8 @@ MuxedDriver::MuxedDriver(std::string pType, std::string pName, InterfaceBaseType
  *
  * \todo Detailed doc
  *
+ * \param pSize
+ * \param pAddrOffs
  * \return
  */
 std::vector<std::uint8_t> MuxedDriver::getData(int, std::uint32_t)
@@ -68,6 +70,9 @@ std::vector<std::uint8_t> MuxedDriver::getData(int, std::uint32_t)
  * \brief Set driver-specific special data.
  *
  * \todo Detailed doc
+ *
+ * \param pData
+ * \param pAddrOffs
  */
 void MuxedDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 {

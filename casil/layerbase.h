@@ -62,8 +62,18 @@ protected:
     const std::string& getSelfDescription() const;  ///< Get a standard description of this layer component for logging purposes.
 
 private:
-    virtual bool initImpl() = 0;                    ///< Perform component-specific initialization logic for init().
-    virtual bool closeImpl() = 0;                   ///< Perform component-specific closing logic for close().
+    /*!
+     * \brief Perform component-specific initialization logic for init().
+     *
+     * \return True if successful.
+     */
+    virtual bool initImpl() = 0;
+    /*!
+     * \brief Perform component-specific closing logic for close().
+     *
+     * \return True if successful.
+     */
+    virtual bool closeImpl() = 0;
 
 protected:
     const Layer layer;                              ///< %Layer that this layer component belongs to.

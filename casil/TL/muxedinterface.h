@@ -48,8 +48,21 @@ public:
     MuxedInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);  ///< Constructor.
     ~MuxedInterface() override = default;                                                                           ///< Default destructor.
     //
-    virtual std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) = 0;                        ///< Read from the interface.
-    virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;                    ///< Write to the interface.
+    /*!
+     * \brief Read from the interface.
+     *
+     * \param pAddr Bus address.
+     * \param pSize Number of bytes to read.
+     * \return Read bytes.
+     */
+    virtual std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) = 0;
+    /*!
+     * \brief Write to the interface.
+     *
+     * \param pAddr Bus address.
+     * \param pData Bytes to be written.
+     */
+    virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;
     virtual std::vector<std::uint8_t> query(std::uint64_t pWriteAddr, std::uint64_t pReadAddr,
                                             const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;    ///< \brief Write a query to the
                                                                                                             ///  interface and read the response.

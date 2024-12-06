@@ -293,6 +293,10 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
  *
  * \todo Detailed doc
  *
+ * \param pWriteAddr
+ * \param pReadAddr
+ * \param pData
+ * \param pSize
  * \return
  */
 std::vector<std::uint8_t> SiTCP::query(std::uint64_t, std::uint64_t, const std::vector<std::uint8_t>&, int)

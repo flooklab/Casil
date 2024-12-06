@@ -55,10 +55,28 @@ public:
     //
     virtual void reset();                                                                           ///< Reset the controlled device/module.
     //
-    virtual std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) = 0;     ///< Get driver-specific special data.
-    virtual void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) = 0;  ///< Set driver-specific special data.
+    /*!
+     * \brief Get driver-specific special data.
+     *
+     * \param pSize Potentially number of bytes to get (implementation-defined).
+     * \param pAddrOffs Potentially data offset as number of bytes (implementation-defined).
+     * \return Requested data as byte sequence.
+     */
+    virtual std::vector<std::uint8_t> getData(int pSize = -1, std::uint32_t pAddrOffs = 0) = 0;
+    /*!
+     * \brief Set driver-specific special data.
+     *
+     * \param pData Data to be set as byte sequence.
+     * \param pAddrOffs Potentially data offset as number of bytes (implementation-defined).
+     */
+    virtual void setData(const std::vector<std::uint8_t>& pData, std::uint32_t pAddrOffs = 0) = 0;
     virtual void exec() = 0;                                                                        ///< Perform a driver-specific action.
-    virtual bool isDone() = 0;                                                              ///< Check if a driver-specific action has finished.
+    /*!
+     * \brief Check if a driver-specific action has finished.
+     *
+     * \return True if finished.
+     */
+    virtual bool isDone() = 0;
     //
     //TODO could something be added here to enable direct C++ FunctionalRegister-functionality without python wrapper in between?
 

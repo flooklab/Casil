@@ -173,8 +173,18 @@ private:
     //
     virtual void resetImpl() = 0;       ///< Perform the module-specific reset sequence for reset().
     //
-    virtual std::uint8_t getModuleSoftwareVersion() const = 0;                                          ///< Get the driver software version.
-    virtual std::uint8_t getModuleFirmwareVersion() = 0;                                                ///< Read the module firmware version.
+    /*!
+     * \brief Get the driver software version.
+     *
+     * \return Software version number.
+     */
+    virtual std::uint8_t getModuleSoftwareVersion() const = 0;
+    /*!
+     * \brief Read the module firmware version.
+     *
+     * \return Firmware version number.
+     */
+    virtual std::uint8_t getModuleFirmwareVersion() = 0;
     virtual bool checkVersionRequirement(std::uint8_t pSoftwareVersion, std::uint8_t pFirmwareVersion);
                                                                             ///< Check if software version is compatible with firmware version.
     bool checkVersionRequirement();                                         ///< \copybrief checkVersionRequirement(std::uint8_t, std::uint8_t)

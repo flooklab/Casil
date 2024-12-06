@@ -131,6 +131,9 @@ std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);            
  * \todo Detailed doc
  *
  * \tparam Ts
+ * \param pBigEndian
+ * \param pArgs
+ * \return
  */
 template<typename... Ts>
     requires (IsUnsignedIntNType<Ts> && ...)

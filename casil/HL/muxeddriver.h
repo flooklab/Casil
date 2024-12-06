@@ -67,8 +67,8 @@ protected:
                                                                                                     ///  to the base address.
 
 private:
-    bool initImpl() override = 0;
-    bool closeImpl() override = 0;
+    bool initImpl() override = 0;           ///< Initialize the firmware module.
+    bool closeImpl() override = 0;          ///< Close the firmware module.
 
 protected:
     InterfaceBaseType& interface;           ///< The interface instance to be used for required access to the transfer layer.

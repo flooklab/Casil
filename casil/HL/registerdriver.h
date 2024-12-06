@@ -165,8 +165,8 @@ public:
     static bool isValidRegisterName(std::string_view pRegName);     ///< Check if a string could be a valid register name.
 
 private:
-    bool initImpl() override final;     ///< Initialize the firmware module.
-    bool closeImpl() override final;    ///< Close the firmware module.
+    bool initImpl() override final;
+    bool closeImpl() override final;
     //
     virtual bool initModule();          ///< Perform module-specific initialization steps.
     virtual bool closeModule();         ///< Perform module-specific closing steps.

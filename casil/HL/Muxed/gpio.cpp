@@ -86,7 +86,7 @@ GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig
 
 std::vector<std::uint8_t> GPIO::getData(int, std::uint32_t)
 {
-    return getBytes("OUTPUT");
+    return getBytes("INPUT");
 }
 
 void GPIO::setData(const std::vector<std::uint8_t>& pData, std::uint32_t)

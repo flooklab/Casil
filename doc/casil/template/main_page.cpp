@@ -39,6 +39,7 @@
 /// #include <casil/version.h>
 ///
 /// #include <casil/templatedevice.h>
+/// #include <casil/templatedevicemacros.h>
 /// #include <casil/HL/Muxed/gpio.h>
 /// #include <casil/HL/Muxed/sitcpfifo.h>
 /// #include <casil/RL/dummyregister.h>
@@ -72,12 +73,17 @@
 ///     static constexpr char conf[] = "base_addr: 0x0";    //"base_addr" is not used by SiTCPFifo
 /// };
 ///
-/// struct SomeRegister : public casil::TmplDevRegister<casil::RL::DummyRegister>
-/// {
-///     static constexpr char name[] = "some_register";
-///     static constexpr char driver[] = "GPIO";
-///     static constexpr char conf[] = "";
-/// };
+/// //Can use macros to simplify declaration of component configuration structs:
+/// CASIL_DEFINE_REGISTER(casil::RL::DummyRegister, SomeRegister, "some_register", "GPIO", "")
+///
+/// //Above macro is equivalent to:
+/// //
+/// // struct SomeRegister : public casil::TmplDevRegister<casil::RL::DummyRegister>
+/// // {
+/// //     static constexpr char name[] = "some_register";
+/// //     static constexpr char driver[] = "GPIO";
+/// //     static constexpr char conf[] = "";
+/// // };
 ///
 /// typedef casil::TemplateDevice<
 ///                 casil::TmplDevInterfaces<Intf>,

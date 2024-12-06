@@ -46,8 +46,8 @@ namespace TL
 class DummyMuxedInterface final : public MuxedInterface
 {
 public:
-    DummyMuxedInterface(std::string pName, LayerConfig pConfig);
-    ~DummyMuxedInterface() override = default;
+    DummyMuxedInterface(std::string pName, LayerConfig pConfig);    ///< Constructor.
+    ~DummyMuxedInterface() override = default;                      ///< Default destructor.
     //
     std::vector<std::uint8_t> read(std::uint64_t pAddr, int pSize = -1) override;
     void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) override;

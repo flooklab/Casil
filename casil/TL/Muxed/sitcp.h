@@ -93,7 +93,9 @@ namespace TL
  *
  * Protocol information:
  *
- * UDP (RBCP) Header+Data
+ * %UDP (RBCP) Header+Data
+ *
+ * \code{.unparsed}
  *
  * Bit 7         Bit 0
  * +-----------------+
@@ -124,7 +126,11 @@ namespace TL
  * |      Data N     | (N max. 255)
  * +-----------------+
  *
+ * \endcode
+ *
  * CMD Field
+ *
+ * \code{.unparsed}
  *
  * +-----+------------+-------------+
  * | BIT |    Name    | Description |
@@ -138,7 +144,11 @@ namespace TL
  * |  0  |  Reserved  |   Always 0  |
  * +-----+------------+-------------+
  *
+ * \endcode
+ *
  * FLAG Field
+ *
+ * \code{.unparsed}
  *
  * +-----+------------+-------------+
  * | BIT |    Name    | Description |
@@ -153,7 +163,11 @@ namespace TL
  * |     |            | 1:Bus Error |
  * +-----+------------+-------------+
  *
- * TCP to BUS Header+Data
+ * \endcode
+ *
+ * %TCP to BUS Header+Data
+ *
+ * \code{.unparsed}
  *
  * Bit 7         Bit 0
  * +-----------------+
@@ -180,7 +194,9 @@ namespace TL
  * |   Data Length   | (Length max. 65529)
  * +-----------------+
  *
- * TCP to BUS reset sequence (in case of status invalid): 65535 * 0xFF + 6 * 0x00
+ * \endcode
+ *
+ * %TCP to BUS reset sequence (in case of status invalid): 65535 * 0xFF + 6 * 0x00
  *
  * \todo doc...
  */

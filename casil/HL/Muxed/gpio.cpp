@@ -165,7 +165,7 @@ void GPIO::setOutputEn(const std::vector<std::uint8_t>& pEnable)
 /*!
  * \brief Convert IO register bytes to a bitset.
  *
- * Converts a sequence of %GPIO's IO register bytes (such as returned by e.g. getOutputEn())
+ * Converts a sequence of full IO register bytes (such as returned by e.g. getOutputEn())
  * to a bitset that corresponds to the actual represented IO bits in the firmware module.
  *
  * See also Bytes::bitsetFromBytes().

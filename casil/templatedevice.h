@@ -83,7 +83,7 @@ namespace TmplDevImpl
  *
  * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_INTERFACE macro from \ref templatedevicemacros.h.
  *
- * \tparam T %Interface class implementing TL::Interface.
+ * \tparam T Registered interface class implementing TL::Interface.
  */
 template<typename T>
 struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
@@ -107,7 +107,7 @@ struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
  *
  * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_DRIVER macro from \ref templatedevicemacros.h.
  *
- * \tparam T %Driver class implementing HL::Driver.
+ * \tparam T Registered driver class implementing HL::Driver.
  */
 template<typename T>
 struct DriverConf : public TmplDevImpl::DriverConfBase
@@ -131,7 +131,7 @@ struct DriverConf : public TmplDevImpl::DriverConfBase
  *
  * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_REGISTER macro from \ref templatedevicemacros.h.
  *
- * \tparam T %Register class implementing RL::Register.
+ * \tparam T Registered register class implementing RL::Register.
  */
 template<typename T>
 struct RegisterConf : public TmplDevImpl::RegisterConfBase

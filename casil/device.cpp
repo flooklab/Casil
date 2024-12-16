@@ -322,7 +322,7 @@ bool Device::init(const bool pForce)
 /*!
  * \brief Close by closing all components of all layers.
  *
- * Calls LayerBase::close() for every interface, then for every driver and then for every register.
+ * Calls LayerBase::close() for every register, then for every driver and then for every interface.
  * \p pForce is forwarded for every component.
  *
  * Immediately returns true, instead, if already closed (i.e. unset initialized state), unless \p pForce is set.
@@ -339,16 +339,16 @@ bool Device::close(const bool pForce)
     if (!initialized && !pForce)
         return true;
 
-    for (auto& [key, intf] : interfaces)
-        if (!intf->close(pForce))
+    for (auto& [key, regter] : registers)
+        if (!regter->close(pForce))
             return false;
 
     for (auto& [key, drv] : drivers)
         if (!drv->close(pForce))
             return false;
 
-    for (auto& [key, regter] : registers)
-        if (!regter->close(pForce))
+    for (auto& [key, intf] : interfaces)
+        if (!intf->close(pForce))
             return false;
 
     initialized = false;

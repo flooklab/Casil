@@ -105,6 +105,17 @@ public:
     };
 };
 
+/*!
+ * \brief Starting point for the differentiation into the three layers of the basil layer structure with their associated layer components.
+ *
+ * For every of those layers there is a dedicated nested namespace, in which LayerBase is specialized according to the peculiarities of the
+ * respective layer and in which the actual layer component classes are implemented (which in turn derive from those initial specializations):
+ * - The \ref LayerBase::Layer::TransferLayer "TransferLayer" is formed by the \ref Layers::TL "TL" namespace.
+ * - The \ref LayerBase::Layer::HardwareLayer "HardwareLayer" is formed by the \ref Layers::HL "HL" namespace.
+ * - The \ref LayerBase::Layer::RegisterLayer "RegisterLayer" is formed by the \ref Layers::RL "RL" namespace.
+ */
+namespace Layers {}
+
 } // namespace casil
 
 #endif // CASIL_LAYERBASE_H

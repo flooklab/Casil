@@ -33,12 +33,6 @@
 namespace casil
 {
 
-/*!
- * \brief ...
- *
- * \todo Brief doc
- * \todo Detailed doc
- */
 namespace Layers
 {
 

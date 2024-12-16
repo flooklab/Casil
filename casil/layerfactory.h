@@ -45,7 +45,9 @@ namespace RL { class Register; }
  * Component classes can be registered via registerInterfaceType() / registerDriverType() / registerRegisterType().
  * You can add aliases for registered type names via registerInterfaceAlias() / registerDriverAlias() / registerRegisterAlias().
  *
- * \note The components of this library do register themselves.
+ * The actually recommended way to register any component classes is by using the macros defined in \ref layerfactorymacros.h.
+ *
+ * \note The components of this library do register themselves using the mentioned macros.
  */
 class LayerFactory
 {

@@ -27,6 +27,29 @@
 
 //
 
+/*!
+ * \file templatedevicemacros.h
+ *
+ * \brief Macro function definitions to simplify configuration of layer components for \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * These macros here can be used to avoid having to \e manually define a \ref TemplateDeviceSpecialization "TemplateDevice" configuration
+ * struct (see \ref casil::TmplDev::InterfaceConf "TmplDev::InterfaceConf" / \ref casil::TmplDev::DriverConf "TmplDev::DriverConf" /
+ * \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf") for every layer component.
+*/
+
+/*!
+ * \brief Define an interface configuration struct for use with \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * Defines an interface configuration wrapper derived from \ref casil::TmplDev::InterfaceConf "TmplDev::InterfaceConf"
+ * such that it meets the concept requirement \ref casil::TmplDev::ImplementsInterfaceConf "TmplDev::ImplementsInterfaceConf"
+ * and can hence be used to configure an interface component for \ref TemplateDeviceSpecialization "TemplateDevice".
+ * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::InterfacesConf "TmplDev::InterfacesConf".
+ *
+ * \param INTF_CLASS The registered \ref casil::TL::Interface "TL::Interface" class type to use as component type.
+ * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
+ * \param INTF_NAME Component instance name (as string literal).
+ * \param CONF Component configuration YAML code (as string literal).
+ */
 #define CASIL_DEFINE_INTERFACE(INTF_CLASS, STRUCT_NAME, INTF_NAME, CONF) \
 struct STRUCT_NAME : public casil::TmplDev::InterfaceConf<INTF_CLASS>\
 {\
@@ -34,6 +57,20 @@ struct STRUCT_NAME : public casil::TmplDev::InterfaceConf<INTF_CLASS>\
     static constexpr char conf[] = CONF;\
 };
 
+/*!
+ * \brief Define a driver configuration struct for use with \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * Defines a driver configuration wrapper derived from \ref casil::TmplDev::DriverConf "TmplDev::DriverConf"
+ * such that it meets the concept requirement \ref casil::TmplDev::ImplementsDriverConf "TmplDev::ImplementsDriverConf"
+ * and can hence be used to configure a driver component for \ref TemplateDeviceSpecialization "TemplateDevice".
+ * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::DriversConf "TmplDev::DriversConf".
+ *
+ * \param DRV_CLASS The registered \ref casil::HL::Driver "HL::Driver" class type to use as component type.
+ * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
+ * \param DRV_NAME Component instance name (as string literal).
+ * \param INTERFACE Configured instance name of the interface component to be used (as string literal).
+ * \param CONF Component configuration YAML code (as string literal).
+ */
 #define CASIL_DEFINE_DRIVER(DRV_CLASS, STRUCT_NAME, DRV_NAME, INTERFACE, CONF) \
 struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
 {\
@@ -42,6 +79,20 @@ struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
     static constexpr char conf[] = CONF;\
 };
 
+/*!
+ * \brief Define a register configuration struct for use with \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * Defines a register configuration wrapper derived from \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf"
+ * such that it meets the concept requirement \ref casil::TmplDev::ImplementsRegisterConf "TmplDev::ImplementsRegisterConf"
+ * and can hence be used to configure a register component for \ref TemplateDeviceSpecialization "TemplateDevice".
+ * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::RegistersConf "TmplDev::RegistersConf".
+ *
+ * \param REG_CLASS The registered \ref casil::RL::Register "RL::Register" class type to use as component type.
+ * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
+ * \param REG_NAME Component instance name (as string literal).
+ * \param DRIVER Configured instance name of the driver component to be used (as string literal).
+ * \param CONF Component configuration YAML code (as string literal).
+ */
 #define CASIL_DEFINE_REGISTER(REG_CLASS, STRUCT_NAME, REG_NAME, DRIVER, CONF) \
 struct STRUCT_NAME : public casil::TmplDev::RegisterConf<REG_CLASS>\
 {\

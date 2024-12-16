@@ -81,6 +81,8 @@ namespace TmplDevImpl
  * - <tt>static constexpr char name[] = "instance_name_of_the_interface"</tt>
  * - <tt>static constexpr char conf[] = "interface: specific, yaml: configuration"</tt>
  *
+ * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_INTERFACE macro from \ref templatedevicemacros.h.
+ *
  * \tparam T %Interface class implementing TL::Interface.
  */
 template<typename T>
@@ -103,6 +105,8 @@ struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
  * - <tt>static constexpr char interface[] = "instance_name_of_the_used_interface"</tt>
  * - <tt>static constexpr char conf[] = "driver: specific, yaml: configuration"</tt>
  *
+ * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_DRIVER macro from \ref templatedevicemacros.h.
+ *
  * \tparam T %Driver class implementing HL::Driver.
  */
 template<typename T>
@@ -124,6 +128,8 @@ struct DriverConf : public TmplDevImpl::DriverConfBase
  * - <tt>static constexpr char name[] = "instance_name_of_the_register"</tt>
  * - <tt>static constexpr char driver[] = "instance_name_of_the_used_driver"</tt>
  * - <tt>static constexpr char conf[] = "register: specific, yaml: configuration"</tt>
+ *
+ * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_REGISTER macro from \ref templatedevicemacros.h.
  *
  * \tparam T %Register class implementing RL::Register.
  */

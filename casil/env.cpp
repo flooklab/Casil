@@ -43,13 +43,13 @@ std::map<std::string, std::set<std::string>, std::less<>> readEnv()
     static constexpr char const* separator = ":";
 #endif
 
-    auto combinePaths = [](const std::string& pMacroPaths, const std::string& pEnvPaths) -> std::set<std::string>
+    auto combinePaths = [](const std::string& pEnvPaths, const std::string& pMacroPaths) -> std::set<std::string>
     {
         std::vector<std::string> combinedPaths1;
         std::vector<std::string> combinedPaths2;
 
-        boost::algorithm::split(combinedPaths1, pMacroPaths, boost::algorithm::is_any_of(separator), boost::algorithm::token_compress_on);
-        boost::algorithm::split(combinedPaths2, pEnvPaths, boost::algorithm::is_any_of(separator), boost::algorithm::token_compress_on);
+        boost::algorithm::split(combinedPaths1, pEnvPaths, boost::algorithm::is_any_of(separator), boost::algorithm::token_compress_on);
+        boost::algorithm::split(combinedPaths2, pMacroPaths, boost::algorithm::is_any_of(separator), boost::algorithm::token_compress_on);
 
         std::set<std::string> combinedPaths;
 
@@ -73,7 +73,7 @@ std::map<std::string, std::set<std::string>, std::less<>> readEnv()
     const char *const getenvPtr = std::getenv("CASIL_DEV_DESC_DIRS");
     std::string devDescsEnv = (getenvPtr ? getenvPtr : "");
 
-    env.insert({"CASIL_DEV_DESC_DIRS", combinePaths(devDescsMacro, devDescsEnv)});
+    env.insert({"CASIL_DEV_DESC_DIRS", combinePaths(devDescsEnv, devDescsMacro)});
 
     return env;
 }

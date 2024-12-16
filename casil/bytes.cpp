@@ -193,27 +193,22 @@ void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uin
 /*!
  * \brief Output a vector of 8 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
  *
- * Outputs \p pByteVec to \p pOstream as <tt>"{S1, S2, ..., SN}"</tt> with each \c Si being
- * formatted by formatHex() without zero-padding and where <tt>Si = pByteVec[i-1]</tt>
- *
- * \param pOstream The stream to output to.
- * \param pByteVec The vector to be formatted/outputted.
- * \return \p pOstream.
- */
-std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint8_t>& pByteVec)
-{
-    return ::ostreamOperator<std::uint8_t>(pOstream, pByteVec);
-}
-
-/*!
- * \brief Output a vector of 16 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
- *
  * Outputs \p pVec to \p pOstream as <tt>"{S1, S2, ..., SN}"</tt> with each \c Si being
  * formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>
  *
  * \param pOstream The stream to output to.
  * \param pVec The vector to be formatted/outputted.
  * \return \p pOstream.
+ */
+std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint8_t>& pVec)
+{
+    return ::ostreamOperator<std::uint8_t>(pOstream, pVec);
+}
+
+/*!
+ * \brief Output a vector of 16 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
+ *
+ * \copydetails operator<<(std::ostream&, const std::vector<std::uint8_t>&)
  */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint16_t>& pVec)
 {
@@ -223,7 +218,7 @@ std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint16_t
 /*!
  * \brief Output a vector of 32 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
  *
- * \copydetails operator<<(std::ostream&, const std::vector<std::uint16_t>&)
+ * \copydetails operator<<(std::ostream&, const std::vector<std::uint8_t>&)
  */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint32_t>& pVec)
 {
@@ -233,7 +228,7 @@ std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint32_t
 /*!
  * \brief Output a vector of 64 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
  *
- * \copydetails operator<<(std::ostream&, const std::vector<std::uint16_t>&)
+ * \copydetails operator<<(std::ostream&, const std::vector<std::uint8_t>&)
  */
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint64_t>& pVec)
 {

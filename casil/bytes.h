@@ -101,7 +101,7 @@ template<typename T>
     requires IsUnsignedIntNType<T>
 std::string formatHex(T pUnsignedNumber, bool pAddTypePadding = false);             ///< Format an unsigned integer as hexadecimal literal.
 
-std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint8_t>& pByteVec);
+std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint8_t>& pVec);
                                                                                     ///< \brief Output a vector of 8 bit unsigned integers
                                                                                     ///  as brace-enclosed sequence of hexadecimal literals.
 std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint16_t>& pVec);

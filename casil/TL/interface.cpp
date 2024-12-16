@@ -31,12 +31,19 @@ using casil::TL::Interface;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs LayerBase for Layer::TransferLayer, forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pConfig
- * \param pRequiredConfig
+ * Gets the optional "init.query_delay" value from \p pConfig (floating-point value in milliseconds),
+ * which is intended to be used by DirectInterface::query() and MuxedInterface::query().
+ *
+ * \throws std::runtime_error If "init.query_delay" is set to a negative value.
+ *
+ * Configured delay value for query operations (between write and read) in milliseconds.
+ *
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  */
 Interface::Interface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     LayerBase(Layer::TransferLayer, std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig),

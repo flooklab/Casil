@@ -35,7 +35,13 @@ namespace casil
 /*!
  * \brief Limited interface to the used async IO back end from the Boost library.
  *
- * \todo Detailed doc
+ * Some parts of the Casil library (see TL, TL::Interface) use asynchronous IO functionality
+ * from Boost %ASIO. This class provides access to the required, limited subset of Boost %ASIO,
+ * which basically consists of an "IO context" object (see getIOContext()) and running processing
+ * threads (see startRunIOContext()) to execute handlers for asynchronous requests.
+ *
+ * At least one processing thread must be running for some of the TL interfaces to function properly.
+ * In these cases (or simply always) start the thread(s) \e before calling Device::init() (or TL::Interface::init()).
  */
 class ASIO
 {

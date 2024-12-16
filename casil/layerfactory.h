@@ -40,7 +40,12 @@ namespace RL { class Register; }
 /*!
  * \brief Factory for LayerBase classes of the three component layers TL, HL and RL.
  *
- * \todo Detailed doc
+ * Use createInterface() / createDriver() / createRegister() to construct layer components by their registered type names.
+ *
+ * Component classes can be registered via registerInterfaceType() / registerDriverType() / registerRegisterType().
+ * You can add aliases for registered type names via registerInterfaceAlias() / registerDriverAlias() / registerRegisterAlias().
+ *
+ * \note The components of this library do register themselves.
  */
 class LayerFactory
 {

@@ -29,13 +29,15 @@ using casil::HL::DirectDriver;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs Driver by forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pInterface
- * \param pConfig
- * \param pRequiredConfig
+ * Initializes the internal direct interface instance (for required access to TL) from \p pInterface.
+ *
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  */
 DirectDriver::DirectDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                            LayerConfig pConfig, const LayerConfig& pRequiredConfig) :

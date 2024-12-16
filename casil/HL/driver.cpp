@@ -29,12 +29,12 @@ using casil::HL::Driver;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs LayerBase for Layer::HardwareLayer, forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pConfig
- * \param pRequiredConfig
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  */
 Driver::Driver(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     LayerBase(Layer::HardwareLayer, std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig)
@@ -46,7 +46,7 @@ Driver::Driver(std::string pType, std::string pName, LayerConfig pConfig, const 
 /*!
  * \brief Reset the controlled device/module.
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  */
 void Driver::reset()
 {

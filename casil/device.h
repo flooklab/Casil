@@ -42,7 +42,9 @@ namespace casil
 /*!
  * \brief Configurable container class for interdependent layer components to interact with an arbitrary DAQ setup.
  *
- * \todo Detailed doc
+ * Uses a basil YAML configuration document to automatically construct/configure all required components of all three layers (TL / HL / RL).
+ *
+ * These components can be collectively initialized and then individually accessed and used through this class' interface.
  */
 class Device
 {

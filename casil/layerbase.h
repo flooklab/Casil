@@ -34,7 +34,11 @@ namespace casil
 /*!
  * \brief Common top-level base class that connects the different layers and layer components of the basil layer structure.
  *
- * \todo Detailed doc
+ * All components from the TL, HL and RL layers are ultimately derived from this class.
+ *
+ * It is not intended to directly derive components from this class.
+ * See the classes next in the hierarchy for how to implement components for the specific layers
+ * (transfer layer: TL::Interface, hardware layer: HL::Driver, register layer: RL::Register).
  */
 class LayerBase
 {
@@ -90,8 +94,6 @@ private:
 public:
     /*!
      * \brief Enumeration of identifiers for the distinguished component layers TL, HL and RL.
-     *
-     * \todo Detailed doc
      */
     enum class Layer : std::uint8_t
     {

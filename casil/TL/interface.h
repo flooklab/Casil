@@ -44,7 +44,14 @@ namespace TL
 /*!
  * \brief Common base class for all interface components in the transfer layer (TL).
  *
- * \todo Detailed doc
+ * This class provides very basic/limited functionality likely common to all interfaces.
+ * It is not intended to directly derive interfaces from this class.
+ *
+ * Interfaces are split into two different groups that slightly differ in their needed API:
+ * - "Direct" interfaces: Interfaces for independent/stand-alone hardware (not using the basil bus)
+ * - "Muxed" interfaces: Interfaces for FPGA hardware based on the basil bus
+ *
+ * Hence use either of DirectInterface or MuxedInterface as base class for implementing an interface.
  */
 class Interface : public LayerBase
 {

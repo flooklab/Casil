@@ -41,7 +41,7 @@ using casil::RL::Register;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Base constructor that should be called from the other constructors.
  */
 Device::Device() :
     initialized(false)
@@ -53,9 +53,17 @@ Device::Device() :
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Reads the configurations for all layer components from \p pConfig (TL / HL / RL from "transfer_layer" /
+ * "hw_drivers" / "registers" sections) and constructs all of those components accordingly using
+ * the LayerFactory. First constructs all interfaces, then all drivers and then all registers.
  *
- * \param pConfig
+ * The generally mandatory configuration keys "name" and "type" (and "interface" for HL and "hw_driver" for RL)
+ * are separately processed and therefore stripped from the individual configurations before they are passed
+ * as LayerConfig to the LayerFactory (and eventually to the component constructors).
+ *
+ * \throws std::runtime_error If mandatory parts are missing from \p pConfig or construction of a component fails.
+ *
+ * \param pConfig %Device configuration tree as loaded from a basil YAML configuration file via Auxil::propertyTreeFromYAML().
  */
 Device::Device(const boost::property_tree::ptree& pConfig) :
     Device()
@@ -148,9 +156,9 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Calls Device(const boost::property_tree::ptree&) with the configuration tree loaded from \p pConfig via Auxil::propertyTreeFromYAML().
  *
- * \param pConfig
+ * \param pConfig YAML document with the device configuration.
  */
 Device::Device(const std::string& pConfig) :
     Device(Auxil::propertyTreeFromYAML(pConfig))
@@ -160,7 +168,7 @@ Device::Device(const std::string& pConfig) :
 /*!
  * \brief Destructor.
  *
- * \todo Detailed doc
+ * Calls close() if still initialized (i.e. init() called but close() not called yet or failed).
  */
 Device::~Device()
 {
@@ -182,10 +190,14 @@ Device::~Device()
 /*!
  * \brief Access one of the components from any layer.
  *
- * \todo Detailed doc
+ * Returns a reference to the first component found with configured instance name \p pName
+ * (same as component's "name" value from the YAML configuration tree).
+ * Searches interfaces first, then drivers, then registers.
  *
- * \param pName
- * \return
+ * \throws std::invalid_argument If no component with name \p pName was configured.
+ *
+ * \param pName Configured instance name of the requested component.
+ * \return The LayerBase component with name \p pName.
  */
 LayerBase& Device::operator[](const std::string_view pName) const
 {
@@ -209,10 +221,13 @@ LayerBase& Device::operator[](const std::string_view pName) const
 /*!
  * \brief Access one of the interface components from the transfer layer.
  *
- * \todo Detailed doc
+ * Returns a reference to the TL::Interface component with configured instance name \p pName
+ * (same as component's "name" value from the YAML configuration tree).
  *
- * \param pName
- * \return
+ * \throws std::invalid_argument If no interface with name \p pName was configured.
+ *
+ * \param pName Configured instance name of the requested component.
+ * \return The TL::Interface component with name \p pName.
  */
 casil::TL::Interface& Device::interface(const std::string_view pName) const
 {
@@ -226,10 +241,13 @@ casil::TL::Interface& Device::interface(const std::string_view pName) const
 /*!
  * \brief Access one of the driver components from the hardware layer.
  *
- * \todo Detailed doc
+ * Returns a reference to the HL::Driver component with configured instance name \p pName
+ * (same as component's "name" value from the YAML configuration tree).
  *
- * \param pName
- * \return
+ * \throws std::invalid_argument If no driver with name \p pName was configured.
+ *
+ * \param pName Configured instance name of the requested component.
+ * \return The HL::Driver component with name \p pName.
  */
 casil::HL::Driver& Device::driver(const std::string_view pName) const
 {
@@ -243,10 +261,13 @@ casil::HL::Driver& Device::driver(const std::string_view pName) const
 /*!
  * \brief Access one of the register components from the register layer.
  *
- * \todo Detailed doc
+ * Returns a reference to the RL::Register component with configured instance name \p pName
+ * (same as component's "name" value from the YAML configuration tree).
  *
- * \param pName
- * \return
+ * \throws std::invalid_argument If no register with name \p pName was configured.
+ *
+ * \param pName Configured instance name of the requested component.
+ * \return The RL::Register component with name \p pName.
  */
 casil::RL::Register& Device::reg(const std::string_view pName) const
 {
@@ -262,10 +283,17 @@ casil::RL::Register& Device::reg(const std::string_view pName) const
 /*!
  * \brief Initialize by initializing all components of all layers.
  *
- * \todo Detailed doc
+ * Calls LayerBase::init() for every interface, then for every driver and then for every register.
+ * \p pForce is forwarded for every component.
  *
- * \param pForce
- * \return
+ * Immediately returns true, instead, if already initialized, unless \p pForce is set.
+ *
+ * Skips remaining components, resets initialized state and returns false if LayerBase::init() fails for one component.
+ *
+ * Remembers the initialized state on success for all components. This state can be reset via close().
+ *
+ * \param pForce Ignore initialized state.
+ * \return True if all components were/are successfully initialized.
  */
 bool Device::init(const bool pForce)
 {
@@ -294,10 +322,17 @@ bool Device::init(const bool pForce)
 /*!
  * \brief Close by closing all components of all layers.
  *
- * \todo Detailed doc
+ * Calls LayerBase::close() for every interface, then for every driver and then for every register.
+ * \p pForce is forwarded for every component.
  *
- * \param pForce
- * \return
+ * Immediately returns true, instead, if already closed (i.e. unset initialized state), unless \p pForce is set.
+ *
+ * Skips remaining components and returns false if LayerBase::close() fails for one component.
+ *
+ * Unsets the initialized state (set by init()) on success for all components.
+ *
+ * \param pForce Ignore (not-)initialized state.
+ * \return True if all components were/are successfully closed.
  */
 bool Device::close(const bool pForce)
 {

@@ -41,12 +41,15 @@ using casil::RL::Register;
 /*!
  * \brief Construct a registered interface type.
  *
- * \todo Detailed doc
+ * Calls the generator function for the registered type name \p pType (see registerInterfaceType(), registerInterfaceAlias())
+ * with forwarded \p pName and \p pConfig arguments and returns a pointer to the generated TL::Interface.
  *
- * \param pType
- * \param pName
- * \param pConfig
- * \return
+ * Returns \c nullptr if \p pType is not a registered interface type name.
+ *
+ * \param pType Registered type name (or alias) of the requested interface type.
+ * \param pName Instance name for the new interface component.
+ * \param pConfig Configuration for the new interface component.
+ * \return Pointer to the created TL::Interface.
  */
 std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pType, std::string pName, LayerConfig pConfig)
 {
@@ -72,13 +75,16 @@ std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pTyp
 /*!
  * \brief Construct a registered driver type.
  *
- * \todo Detailed doc
+ * Calls the generator function for the registered type name \p pType (see registerDriverType(), registerDriverAlias())
+ * with forwarded \p pName, \p pInterface and \p pConfig arguments and returns a pointer to the generated HL::Driver.
  *
- * \param pType
- * \param pName
- * \param pInterface
- * \param pConfig
- * \return
+ * Returns \c nullptr if \p pType is not a registered driver type name.
+ *
+ * \param pType Registered type name (or alias) of the requested driver type.
+ * \param pName Instance name for the new driver component.
+ * \param pInterface The interface instance for accessing the TL.
+ * \param pConfig Configuration for the new driver component.
+ * \return Pointer to the created HL::Driver.
  */
 std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std::string pName, Interface& pInterface, LayerConfig pConfig)
 {
@@ -104,13 +110,16 @@ std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std
 /*!
  * \brief Construct a registered register type.
  *
- * \todo Detailed doc
+ * Calls the generator function for the registered type name \p pType (see registerRegisterType(), registerRegisterAlias())
+ * with forwarded \p pName, \p pDriver and \p pConfig arguments and returns a pointer to the generated RL::Register.
  *
- * \param pType
- * \param pName
- * \param pDriver
- * \param pConfig
- * \return
+ * Returns \c nullptr if \p pType is not a registered register type name.
+ *
+ * \param pType Registered type name (or alias) of the requested register type.
+ * \param pName Instance name for the new register component.
+ * \param pDriver The driver instance for accessing the HL.
+ * \param pConfig Configuration for the new register component.
+ * \return Pointer to the created RL::Register.
  */
 std::unique_ptr<Register> LayerFactory::createRegister(const std::string& pType, std::string pName, Driver& pDriver, LayerConfig pConfig)
 {
@@ -138,10 +147,12 @@ std::unique_ptr<Register> LayerFactory::createRegister(const std::string& pType,
 /*!
  * \brief Register a generator for an interface type.
  *
- * \todo Detailed doc
+ * Registers an interface type \p T with a "type name" \p pType, which will enable createInterface() to generate \p T based on \p pType.
+ * \p pGenerator must construct an instance of the desired \ref TL::Interface Interface type and return it as a pointer to TL::Interface.
+ * See also TLGeneratorFunction.
  *
- * \param pType
- * \param pGenerator
+ * \param pType Type name to be used as type identifier for createInterface().
+ * \param pGenerator Generator function to construct an instance of the type.
  */
 void LayerFactory::registerInterfaceType(std::string pType, TLGeneratorFunction pGenerator)
 {
@@ -151,10 +162,12 @@ void LayerFactory::registerInterfaceType(std::string pType, TLGeneratorFunction 
 /*!
  * \brief Register a generator for an driver type.
  *
- * \todo Detailed doc
+ * Registers a driver type \p T with a "type name" \p pType, which will enable createDriver() to generate \p T based on \p pType.
+ * \p pGenerator must construct an instance of the desired \ref HL::Driver Driver type and return it as a pointer to HL::Driver.
+ * See also HLGeneratorFunction.
  *
- * \param pType
- * \param pGenerator
+ * \param pType Type name to be used as type identifier for createDriver().
+ * \param pGenerator Generator function to construct an instance of the type.
  */
 void LayerFactory::registerDriverType(std::string pType, HLGeneratorFunction pGenerator)
 {
@@ -164,10 +177,12 @@ void LayerFactory::registerDriverType(std::string pType, HLGeneratorFunction pGe
 /*!
  * \brief Register a generator for an register type.
  *
- * \todo Detailed doc
+ * Registers a register type \p T with a "type name" \p pType, which will enable createRegister() to generate \p T based on \p pType.
+ * \p pGenerator must construct an instance of the desired \ref RL::Register Register type and return it as a pointer to RL::Register.
+ * See also RLGeneratorFunction.
  *
- * \param pType
- * \param pGenerator
+ * \param pType Type name to be used as type identifier for createRegister().
+ * \param pGenerator Generator function to construct an instance of the type.
  */
 void LayerFactory::registerRegisterType(std::string pType, RLGeneratorFunction pGenerator)
 {
@@ -179,10 +194,11 @@ void LayerFactory::registerRegisterType(std::string pType, RLGeneratorFunction p
 /*!
  * \brief Register an interface type name alias.
  *
- * \todo Detailed doc
+ * Enables an interface type identified by type name \p pType to also be
+ * constructed by createInterface() using the alias type name \p pAlias.
  *
- * \param pType
- * \param pAlias
+ * \param pType Originally registered type name.
+ * \param pAlias New alias for \p pType.
  */
 void LayerFactory::registerInterfaceAlias(const std::string& pType, std::string pAlias)
 {
@@ -199,10 +215,11 @@ void LayerFactory::registerInterfaceAlias(const std::string& pType, std::string 
 /*!
  * \brief Register a driver type name alias.
  *
- * \todo Detailed doc
+ * Enables a driver type identified by type name \p pType to also be
+ * constructed by createDriver() using the alias type name \p pAlias.
  *
- * \param pType
- * \param pAlias
+ * \param pType Originally registered type name.
+ * \param pAlias New alias for \p pType.
  */
 void LayerFactory::registerDriverAlias(const std::string& pType, std::string pAlias)
 {
@@ -219,10 +236,11 @@ void LayerFactory::registerDriverAlias(const std::string& pType, std::string pAl
 /*!
  * \brief Register a register type name alias.
  *
- * \todo Detailed doc
+ * Enables a register type identified by type name \p pType to also be
+ * constructed by createRegister() using the alias type name \p pAlias.
  *
- * \param pType
- * \param pAlias
+ * \param pType Originally registered type name.
+ * \param pAlias New alias for \p pType.
  */
 void LayerFactory::registerRegisterAlias(const std::string& pType, std::string pAlias)
 {
@@ -241,9 +259,10 @@ void LayerFactory::registerRegisterAlias(const std::string& pType, std::string p
 /*!
  * \brief Access the map of interface generators with interface types as keys.
  *
- * \todo Detailed doc
+ * Creates a static map of generator functions and always returns a reference to that one.
+ * Keys shall be the registered type names (see registerInterfaceType()) and aliases (see registerInterfaceAlias()).
  *
- * \return
+ * \return The generator map.
  */
 std::map<std::string, LayerFactory::TLGeneratorFunction>& LayerFactory::tlGenerators()
 {
@@ -254,9 +273,10 @@ std::map<std::string, LayerFactory::TLGeneratorFunction>& LayerFactory::tlGenera
 /*!
  * \brief Access the map of driver generators with driver types as keys.
  *
- * \todo Detailed doc
+ * Creates a static map of generator functions and always returns a reference to that one.
+ * Keys shall be the registered type names (see registerDriverType()) and aliases (see registerDriverAlias()).
  *
- * \return
+ * \return The generator map.
  */
 std::map<std::string, LayerFactory::HLGeneratorFunction>& LayerFactory::hlGenerators()
 {
@@ -267,9 +287,10 @@ std::map<std::string, LayerFactory::HLGeneratorFunction>& LayerFactory::hlGenera
 /*!
  * \brief Access the map of register generators with register types as keys.
  *
- * \todo Detailed doc
+ * Creates a static map of generator functions and always returns a reference to that one.
+ * Keys shall be the registered type names (see registerRegisterType()) and aliases (see registerRegisterAlias()).
  *
- * \return
+ * \return The generator map.
  */
 std::map<std::string, LayerFactory::RLGeneratorFunction>& LayerFactory::rlGenerators()
 {

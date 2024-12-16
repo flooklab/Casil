@@ -40,8 +40,6 @@ namespace casil
 
 /*!
  * \brief Auxiliary functions and classes.
- *
- * \todo Detailed doc
  */
 namespace Auxil
 {
@@ -56,10 +54,10 @@ std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString);     
 /*!
  * \brief Convert a floating point time duration to an std::chrono interval.
  *
- * \todo Detailed doc
+ * Calculates rounded milliseconds from \p pSecs and returns them as chrono interval.
  *
- * \param pSecs
- * \return
+ * \param pSecs Time duration in seconds.
+ * \return Rounded millisecond interval.
  */
 constexpr std::chrono::milliseconds getChronoMilliSecs(const double pSecs)
 {
@@ -67,12 +65,12 @@ constexpr std::chrono::milliseconds getChronoMilliSecs(const double pSecs)
 }
 
 /*!
- * \copybrief getChronoMilliSecs
+ * \brief Convert a floating point time duration to an std::chrono interval.
  *
- * \todo Detailed doc
+ * Calculates rounded microseconds from \p pSecs and returns them as chrono interval.
  *
- * \param pSecs
- * \return
+ * \param pSecs Time duration in seconds.
+ * \return Rounded microsecond interval.
  */
 constexpr std::chrono::microseconds getChronoMicroSecs(const double pSecs)
 {
@@ -84,7 +82,7 @@ constexpr std::chrono::microseconds getChronoMicroSecs(const double pSecs)
 /*!
  * \brief RAII wrapper to set and clear an atomic flag.
  *
- * \todo Detailed doc
+ * Sets an atomic flag on construction and automatically clears it again on destruction.
  */
 class AtomicFlagGuard
 {
@@ -92,7 +90,7 @@ public:
     /*!
      * \brief Constructor.
      *
-     * Sets the flag.
+     * Sets the flag (via \c test_and_set() ).
      *
      * \param pFlag Atomic flag to be set/cleared.
      */
@@ -119,7 +117,7 @@ private:
 /*!
  * \brief RAII wrapper to run IO context threads for ASIO functionality.
  *
- * \todo Detailed doc
+ * Starts ASIO processing threads on construction and automatically stops them again on destruction.
  *
  * \tparam numThreads Non-zero number of parallel threads to be used.
  */

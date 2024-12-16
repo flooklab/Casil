@@ -42,7 +42,15 @@ namespace casil
 /*!
  * \brief Compile-time configuration of \ref TemplateDeviceSpecialization "TemplateDevice" layer components.
  *
- * \todo Detailed doc
+ * Defines the configuration wrapper structs InterfacesConf, DriversConf and RegistersConf, which replace the different layer
+ * sections ("transfer_layer", "hw_drivers" and "registers") of the usual YAML configuration for Device in order to achieve a
+ * compile-time configuration for \ref TemplateDeviceSpecialization "TemplateDevice", using the wrappers as its template arguments.
+ *
+ * Also defines the individual configuration wrapper structs InterfaceConf, DriverConf and RegisterConf,
+ * which will in turn be passed as template arguments to the above wrappers in order to define the
+ * configuration of the individual interfaces, drivers and registers within the different layers.
+ *
+ * See also \ref TemplateDeviceSpecialization "TemplateDevice".
  */
 namespace TmplDev
 {
@@ -65,7 +73,12 @@ namespace TmplDevImpl
 /*!
  * \brief Interface configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
  *
- * \todo Detailed doc
+ * This struct is intended to be derived from for every interface configuration needed. \p T must be the class type of the
+ * interface to be configured. To properly define the interface's configuration (and make it usable by InterfacesConf)
+ * the derived struct must declare the following members:
+ *
+ * - <tt>static constexpr char name[] = "instance_name_of_the_interface"</tt>
+ * - <tt>static constexpr char conf[] = "interface: specific, yaml: configuration"</tt>
  *
  * \tparam T %Interface class implementing TL::Interface.
  */
@@ -81,7 +94,13 @@ struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
 /*!
  * \brief Driver configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
  *
- * \todo Detailed doc
+ * This struct is intended to be derived from for every driver configuration needed. \p T must be the class type of the
+ * driver to be configured. To properly define the driver's configuration (and make it usable by DriversConf)
+ * the derived struct must declare the following members:
+ *
+ * - <tt>static constexpr char name[] = "instance_name_of_the_driver"</tt>
+ * - <tt>static constexpr char interface[] = "instance_name_of_the_used_interface"</tt>
+ * - <tt>static constexpr char conf[] = "driver: specific, yaml: configuration"</tt>
  *
  * \tparam T %Driver class implementing HL::Driver.
  */
@@ -97,7 +116,13 @@ struct DriverConf : public TmplDevImpl::DriverConfBase
 /*!
  * \brief Register configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
  *
- * \todo Detailed doc
+ * This struct is intended to be derived from for every register configuration needed. \p T must be the class type of the
+ * register to be configured. To properly define the register's configuration (and make it usable by RegistersConf)
+ * the derived struct must declare the following members:
+ *
+ * - <tt>static constexpr char name[] = "instance_name_of_the_register"</tt>
+ * - <tt>static constexpr char driver[] = "instance_name_of_the_used_driver"</tt>
+ * - <tt>static constexpr char conf[] = "register: specific, yaml: configuration"</tt>
  *
  * \tparam T %Register class implementing RL::Register.
  */
@@ -156,7 +181,8 @@ namespace TmplDevImpl
 /*!
  * \brief \ref TemplateDeviceSpecialization "TemplateDevice" wrapper for a set of interface configurations.
  *
- * \todo Detailed doc
+ * This struct, instantiated with \p Ts being configurations for individual interfaces, is meant to be passed as template argument
+ * to \ref TemplateDeviceSpecialization "TemplateDevice" in order to compile-time-configure all interface components to be used.
  *
  * \tparam Ts Set of interface configurations (each implementing InterfaceConf).
  */
@@ -172,7 +198,8 @@ struct InterfacesConf
 /*!
  * \brief \ref TemplateDeviceSpecialization "TemplateDevice" wrapper for a set of driver configurations.
  *
- * \todo Detailed doc
+ * This struct, instantiated with \p Ts being configurations for individual drivers, is meant to be passed as template argument
+ * to \ref TemplateDeviceSpecialization "TemplateDevice" in order to compile-time-configure all driver components to be used.
  *
  * \tparam Ts Set of driver configurations (each implementing DriverConf).
  */
@@ -189,7 +216,8 @@ struct DriversConf
 /*!
  * \brief \ref TemplateDeviceSpecialization "TemplateDevice" wrapper for a set of register configurations.
  *
- * \todo Detailed doc
+ * This struct, instantiated with \p Ts being configurations for individual registers, is meant to be passed as template argument
+ * to \ref TemplateDeviceSpecialization "TemplateDevice" in order to compile-time-configure all register components to be used.
  *
  * \tparam Ts Set of register configurations (each implementing RegisterConf).
  */
@@ -212,12 +240,6 @@ struct RegistersConf
  *
  * See \ref TemplateDeviceSpecialization "TemplateDevice<TmplDev::InterfacesConf<InterfaceConfTs...>, <!--
  *                                                      -->TmplDev::DriversConf<DriverConfTs...>, TmplDev::RegistersConf<RegisterConfTs...>>"
- *
- * \todo Describe or remove tparams here.
- *
- * \tparam InterfacesConfT
- * \tparam DriversConfT
- * \tparam RegistersConfT
  */
 template<typename InterfacesConfT, typename DriversConfT, typename RegistersConfT>
 class TemplateDevice;
@@ -226,7 +248,10 @@ class TemplateDevice;
  * \copybrief TemplateDevice
  * \anchor TemplateDeviceSpecialization
  *
- * \todo Detailed doc
+ * Wraps Device by enabling its configuration through the template arguments \p InterfaceConfTs, \p DriverConfTs and
+ * \p RegisterConfTs, i.e. fixed at compile time, and by providing automatic component type conversion at compile time
+ * for the return types of the component getters (see interface(), driver() and reg()), which enables for an uncomplicated
+ * use of possibly component-specific functionality (unlike with Device, which requires manual casting in such cases).
  *
  * \tparam TmplDev::InterfacesConf Wrapper for a set of interface configurations \p InterfaceConfTs.
  * \tparam InterfaceConfTs Set of interface configurations (each implementing TmplDev::InterfaceConf).
@@ -244,7 +269,11 @@ public:
     /*!
      * \brief Constructor.
      *
-     * \todo Detailed doc
+     * Configures the Device by taking the compile-time configuration and generating an equivalent YAML configuration from it,
+     * i.e. \p InterfaceConfTs / \p DriverConfTs / \p RegisterConfTs will be parsed as sequence elements for the
+     * "transfer_layer" / "hw_drivers" / "registers" sections of a usual YAML configuration document for Device.
+     *
+     * See Device::Device(const boost::property_tree::ptree&) for details on the further processing.
      */
     TemplateDevice() :
         Device(generateConfig())
@@ -252,6 +281,8 @@ public:
     }
     /*!
      * \brief Default destructor.
+     *
+     * See Device::~Device().
      */
     ~TemplateDevice() override = default;
 
@@ -259,10 +290,12 @@ public:
     /*!
      * \brief Access one of the interface components from the transfer layer.
      *
-     * \todo Detailed doc
+     * Returns a reference to the interface component configured by \p T, which is equivalent to
+     * Device::interface() being called with the configured instance name \c T::name, except that here
+     * the return type is the specific interface type (\c T::Type ) instead of the base type TL::Interface.
      *
-     * \tparam T
-     * \return
+     * \tparam T An interface configuration out of \p InterfaceConfTs.
+     * \return The interface component configured by \p T, casted to the specific interface type.
      */
     template<typename T>
     typename T::Type& interface()
@@ -275,10 +308,12 @@ public:
     /*!
      * \brief Access one of the driver components from the hardware layer.
      *
-     * \todo Detailed doc
+     * Returns a reference to the driver component configured by \p T, which is equivalent to
+     * Device::driver() being called with the configured instance name \c T::name, except that here
+     * the return type is the specific driver type (\c T::Type ) instead of the base type HL::Driver.
      *
-     * \tparam T
-     * \return
+     * \tparam T A driver configuration out of \p DriverConfTs.
+     * \return The driver component configured by \p T, casted to the specific driver type.
      */
     template<typename T>
     typename T::Type& driver()
@@ -291,10 +326,12 @@ public:
     /*!
      * \brief Access one of the register components from the register layer.
      *
-     * \todo Detailed doc
+     * Returns a reference to the register component configured by \p T, which is equivalent to
+     * Device::reg() being called with the configured instance name \c T::name, except that here
+     * the return type is the specific register type (\c T::Type ) instead of the base type RL::Register.
      *
-     * \tparam T
-     * \return
+     * \tparam T A register configuration out of \p RegisterConfTs.
+     * \return The register component configured by \p T, casted to the specific register type.
      */
     template<typename T>
     typename T::Type& reg()
@@ -309,9 +346,13 @@ private:
     /*!
      * \brief Generate the device configuration tree from the template arguments.
      *
-     * \todo Detailed doc
+     * Generates the component configuration tree needed for initializing the Device base class.
+     * This is done by generating YAML configuration code for the individual layers from the configuration wrappers passed
+     * as class template parameters \p InterfaceConfTs, \p DriverConfTs and \p RegisterConfTs using addLayerElementsToYAML(),
+     * inserting the resulting sequences into <tt>"{transfer_layer: #, hw_drivers: #, registers: #}"</tt>
+     * (where the number signs are) and parsing the resulting YAML document by Auxil::propertyTreeFromYAML().
      *
-     * \return
+     * \return %Device configuration tree as generated by Auxil::propertyTreeFromYAML() from a YAML configuration document.
      */
     static boost::property_tree::ptree generateConfig()
     {
@@ -336,12 +377,19 @@ private:
     /*!
      * \brief Recursively generate the YAML sequence for the components of a certain layer.
      *
-     * \todo Detailed doc
+     * Generates and adds the YAML code (a map) for the <tt>N</tt>-th component configuration out of \p ComponentConfTs
+     * to the layer configuration sequence \p pYAMLLayerSeq, assuming that \p ComponentConfTs are from layer \p layer,
+     * and recursively calls the function itself for the next component \p N+1 until the last element of \p ComponentConfTs.
      *
-     * \tparam N
-     * \tparam layer
-     * \tparam ComponentConfTs
-     * \param pYAMLLayerSeq
+     * For the first and last components (i.e. if \p N equals \p 0 or <tt>sizeof...(ComponentConfTs)-1</tt>) opening and
+     * closing brackets are added to \p pYAMLLayerSeq such that calling this function with <tt>N = 0</tt> results in a
+     * full YAML sequence for layer component configurations \p ComponentConfTs for layer \p layer, as needed for Device.
+     *
+     * \tparam N Process the N-th component out of \p ComponentConfTs.
+     * \tparam layer The layer of components configured by \p ComponentConfTs.
+     * \tparam ComponentConfTs %Layer component configurations for \p layer, all implementing TmplDev::InterfaceConf,
+     *         TmplDev::DriverConf or TmplDev::RegisterConf, depending on \p layer.
+     * \param pYAMLLayerSeq Resulting YAML configuration sequence for layer \p layer.
      */
     template<std::size_t N, LayerBase::Layer layer, typename... ComponentConfTs>
     static void addLayerElementsToYAML(std::string& pYAMLLayerSeq)

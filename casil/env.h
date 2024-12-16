@@ -35,7 +35,18 @@ namespace casil
 /*!
  * \brief Handling of environment variables needed by the library.
  *
- * \todo Detailed doc
+ * Provides access to environment variables used for configuration of Casil behavior (e.g. special paths, ...),
+ * combined with possible defaults of them that can be compiled into the library via macro definitions.
+ *
+ * For each variable a set of values is defined, in which environment variables (if set) come first and macro defaults last.
+ *
+ * In case of variables used for file/directory paths, individual paths will be automatically
+ * split at OS-specific separators (':' / ';') and added as individual set elements.
+ *
+ * See getEnv() for details on how to access specific variables.
+ *
+ * List of supported variables:
+ * - \c CASIL_DEV_DESC_DIRS: Directories containing \ref HL::SCPI "SCPI" device description files.
  */
 namespace Env
 {

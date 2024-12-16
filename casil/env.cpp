@@ -86,9 +86,15 @@ namespace casil::Env
 /*!
  * \brief Get a map of all Casil environment variables.
  *
- * \todo Detailed doc
+ * Returns a map that contains configured/determined value sets for every supported environment variable.
+ * A value set is filled by reading set environment variables and then adding compiled macro defaults;
+ * filesystem paths get split and added as individual elements. See Env for more details and a list of supported variables.
  *
- * \return
+ * The value sets might be empty if neither the variable is set at runtime nor a default is defined during compilation.
+ *
+ * Use getEnv(std::string_view) to get just for a single variable.
+ *
+ * \return Map of variable value sets for all supported environment variables.
  */
 const std::map<std::string, std::set<std::string>, std::less<>>& getEnv()
 {
@@ -100,10 +106,12 @@ const std::map<std::string, std::set<std::string>, std::less<>>& getEnv()
 /*!
  * \brief Get a specific Casil environment variable.
  *
- * \todo Detailed doc
+ * Gets a single entry of the getEnv() map.
  *
- * \param pVarName
- * \return
+ * \throws std::invalid_argument If \p pVarName is not supported (see Env for a list of supported variables).
+ *
+ * \param pVarName The name of the environment variable.
+ * \return A set of all determined values for \p pVarName.
  */
 const std::set<std::string>& getEnv(const std::string_view pVarName)
 {

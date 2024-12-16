@@ -35,7 +35,8 @@ namespace casil
 /*!
  * \brief Configuration object for layer components derived from LayerBase.
  *
- * \todo Detailed doc
+ * This is basically a convenience wrapper around a Boost Property Tree that represents a parsed YAML document.
+ * There are getters for different types of configuration values and you can easily check the tree structure and contained value types.
  */
 class LayerConfig
 {

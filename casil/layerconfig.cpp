@@ -87,9 +87,9 @@ using casil::LayerConfig;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Loads \p pTree as the configuration tree.
  *
- * \param pTree
+ * \param pTree Component configuration tree with format according to Auxil::propertyTreeFromYAML.
  */
 LayerConfig::LayerConfig(const boost::property_tree::ptree& pTree) :
     tree(pTree)
@@ -101,10 +101,10 @@ LayerConfig::LayerConfig(const boost::property_tree::ptree& pTree) :
 /*!
  * \brief Equality operator.
  *
- * \todo Detailed doc
+ * Compares the configuration tree to the one of \p pOther. See also \c boost::property_tree::ptree::operator==().
  *
- * \param pOther
- * \return
+ * \param pOther Other component configuration to compare to.
+ * \return True if the structures and all elements of the configuration trees are equal.
  */
 bool LayerConfig::operator==(const LayerConfig& pOther) const
 {
@@ -116,11 +116,31 @@ bool LayerConfig::operator==(const LayerConfig& pOther) const
 /*!
  * \brief Check the configuration tree structure (and value types).
  *
- * \todo Detailed doc
+ * Checks if the configuration tree contains every key/branch that is in the tree of \p pOther.
+ * If \p pCheckTypes is true the values at the tree's branch tips will be checked against the
+ * type descriptions from the corresponding branch tips of \p pOther by trying to convert
+ * the stored strings to the respective types in accordance with the YAML specification.
  *
- * \param pOther
- * \param pCheckTypes
- * \return
+ * Type descriptions can be any of the following:
+ * - "bool": Boolean value
+ * - "int": Integer value
+ * - "uint": Unsigned integer value (max. 64 bit)
+ * - "double": Floating point value with double precision
+ * - "float": Equivalent to "double"
+ * - "string": Anything else, as values are stored as strings anyway (i.e. this type check will never fail)
+ * - "byteSeq": Must not be a scalar value but a sequence-like sub-tree with scalar elements of 8 bit unsigned integer type
+ * - "uintSeq" Must not be a scalar value but a sequence-like sub-tree with scalar elements of max. 64 bit unsigned integer type
+ * - Everything else is treated as "string"
+ *
+ * This function returns false if a branch from \p pOther is not found or if a type check fails.
+ *
+ * Example with YAML code:
+ * <tt>{init: {port: /dev/ttyUSB1, baudrate: 19200, nested: [1, 2, 3]}}</tt> contains
+ * <tt>{init: {port: string, nested: byteSeq}}</tt> with type check enabled.
+ *
+ * \param pOther Reference configuration to compare to.
+ * \param pCheckTypes Check type conversion of stored values.
+ * \return True if \p pOther is fully contained in the configuration tree.
  */
 bool LayerConfig::contains(const LayerConfig& pOther, const bool pCheckTypes) const
 {
@@ -208,11 +228,13 @@ bool LayerConfig::contains(const LayerConfig& pOther, const bool pCheckTypes) co
 /*!
  * \brief Get a boolean configuration value.
  *
- * \todo Detailed doc
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to boolean type.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
 {
@@ -231,11 +253,13 @@ bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
 /*!
  * \brief Get a (signed) integer configuration value.
  *
- * \todo Detailed doc
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to integer type.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
 {
@@ -254,11 +278,13 @@ int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
 /*!
  * \brief Get an unsigned integer configuration value.
  *
- * \todo Detailed doc
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to unsigned integer type.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t pDefault) const
 {
@@ -277,11 +303,13 @@ std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t 
 /*!
  * \brief Get a floating point configuration value.
  *
- * \todo Detailed doc
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to floating point type.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
 {
@@ -300,11 +328,13 @@ double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
 /*!
  * \brief Get a string-type configuration value.
  *
- * \todo Detailed doc
+ * Gets the configuration value stored in the tree at branch location \p pKey as string.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 std::string LayerConfig::getStr(const std::string& pKey,
                                 const std::string pDefault) const   // cppcheck-suppress passedByValue symbolName=pDefault
@@ -317,11 +347,14 @@ std::string LayerConfig::getStr(const std::string& pKey,
 /*!
  * \brief Get an 8 bit unsigned integer sequence from the configuration tree.
  *
- * \todo Detailed doc
+ * Gets the configuration value sequence stored in the tree at branch location \p pKey
+ * with sequence elements converted to 8 bit unsigned integer type.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault) const
 {
@@ -331,11 +364,14 @@ std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::
 /*!
  * \brief Get a 64 bit unsigned integer sequence from the configuration tree.
  *
- * \todo Detailed doc
+ * Gets the configuration value sequence stored in the tree at branch location \p pKey
+ * with sequence elements converted to 64 bit unsigned integer type.
  *
- * \param pKey
- * \param pDefault
- * \return
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault) const
 {
@@ -347,10 +383,11 @@ std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std:
 /*!
  * \brief Create a configuration object from YAML format.
  *
- * \todo Detailed doc
+ * Constructs a LayerConfig instance from a configuration tree obtained from Auxil::propertyTreeFromYAML().
+ * See also LayerConfig(const boost::property_tree::ptree&).
  *
- * \param pYAMLString
- * \return
+ * \param pYAMLString The YAML document to be parsed.
+ * \return The according layer component configuration object.
  */
 LayerConfig LayerConfig::fromYAML(const std::string& pYAMLString)
 {

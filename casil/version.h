@@ -28,8 +28,6 @@
 
 /*!
  * \brief Casil base namespace.
- *
- * \todo Detailed doc
  */
 namespace casil
 {
@@ -37,7 +35,8 @@ namespace casil
 /*!
  * \brief Library version information.
  *
- * \todo Detailed doc
+ * The current version of the Casil library is defined here by \ref casilVersionMajor, \ref casilVersionMinor,
+ * \ref casilVersionPatch and \ref casilVersionType.
  */
 namespace Version
 {
@@ -45,7 +44,8 @@ namespace Version
 /*!
  * \brief Release type of the released library version.
  *
- * \todo Detailed doc
+ * Before a stable release of the library, a release can have one of the listed pre-release states to specify the current development status.
+ * Use toString() to obtain a the current version as a combined string.
  */
 enum class ReleaseType : std::uint8_t
 {

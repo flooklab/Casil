@@ -44,7 +44,8 @@ namespace RL
 /*!
  * \brief Common base class for all register components in the register layer (RL).
  *
- * \todo Detailed doc
+ * This class provides very basic/limited functionality likely common to all registers.
+ * Use this class as base class for implementing any register.
  */
 class Register : public LayerBase
 {

@@ -36,9 +36,10 @@ namespace TL { class Interface; }
 namespace RL { class Register; }
 
 /*!
- * \brief %Concepts for use with \ref TemplateDeviceSpecialization "TemplateDevice".
+ * \brief %Concepts for use with \ref TemplateDeviceSpecialization "TemplateDevice" / TmplDev.
  *
- * \todo Detailed doc
+ * These concepts are used by TmplDev to ensure proper use of and useful error messages for
+ * the configuration wrappers for the \ref TemplateDeviceSpecialization "TemplateDevice" class.
  */
 namespace Concepts
 {
@@ -46,9 +47,9 @@ namespace Concepts
 /*!
  * \brief Helper declaration to test if a char (array) is constexpr.
  *
- * \todo Detailed doc
+ * Trivial check as \p c as template argument must be available at compile-time.
  *
- * \tparam c
+ * \tparam c Char (array element) variable/expression to be checked for constexpr evaluability.
  */
 template<char c>
 using TestConstexpr = void;
@@ -56,9 +57,9 @@ using TestConstexpr = void;
 /*!
  * \brief Check if type is a 1-dim. const char array.
  *
- * \todo Detailed doc
+ * \p T must equal \c const \c char[].
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept IsConstCharArr = requires
@@ -71,9 +72,9 @@ concept IsConstCharArr = requires
 /*!
  * \brief Check if type declares a \c static \c constexpr \c char[] member called \c typeName.
  *
- * \todo Detailed doc
+ * \c T::typeName must exist and be of type \c const \c char[] and it must be declared \c constexpr.
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept HasRegisteredTypeName = requires
@@ -86,9 +87,11 @@ concept HasRegisteredTypeName = requires
 /*!
  * \brief Check if type declares a typedef \c InterfaceBaseType to an abstract class derived from \ref casil::TL::Interface "TL::Interface".
  *
- * \todo Detailed doc
+ * \c T::InterfaceBaseType must be a type/class that is derived from \ref casil::TL::Interface "TL::Interface"
+ * and not constructible. This effectively boils down to being one of the two classes
+ * \ref casil::TL::DirectInterface "TL::DirectInterface" or \ref casil::TL::MuxedInterface "TL::MuxedInterface".
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept HasInterfaceBaseType = requires
@@ -103,9 +106,10 @@ concept HasInterfaceBaseType = requires
  * \brief Check if type is a proper \ref casil::TL::Interface "Interface" component
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
- * \todo Detailed doc
+ * \p T must be derived from \ref casil::TL::Interface "TL::Interface" and have a constructor
+ * with a signature that is compatible with <tt>T(std::string, LayerConfig)</tt>.
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept IsInterface = std::is_base_of_v<TL::Interface, T> &&
@@ -115,9 +119,10 @@ concept IsInterface = std::is_base_of_v<TL::Interface, T> &&
  * \brief Check if type is a proper \ref casil::HL::Driver "Driver" component
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
- * \todo Detailed doc
+ * \p T must be derived from \ref casil::HL::Driver "HL::Driver" and have a constructor
+ * with a signature that is compatible with <tt>T(std::string, T::InterfaceBaseType&, LayerConfig)</tt>.
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept IsDriver = std::is_base_of_v<HL::Driver, T> &&
@@ -128,9 +133,10 @@ concept IsDriver = std::is_base_of_v<HL::Driver, T> &&
  * \brief Check if type is a proper \ref casil::RL::Register "Register" component
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
- * \todo Detailed doc
+ * \p T must be derived from \ref casil::RL::Register "RL::Register" and have a constructor
+ * with a signature that is compatible with <tt>T(std::string, HL::Driver&, LayerConfig)</tt>.
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept IsRegister = std::is_base_of_v<RL::Register, T> &&

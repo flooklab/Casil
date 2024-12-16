@@ -77,13 +77,23 @@ using casil::HL::RegisterDriver;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs MuxedDriver by forwarding \p pType, \p pName, \p pInterface, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pInterface
- * \param pConfig
- * \param pRequiredConfig
+ * Gets the optional "clear_cache_after_reset" value from \p pConfig (boolean value, default: false),
+ * which defines, whether to clear the cache for written register values on reset (see reset()).
+ *
+ * Configures the registers for this driver from the passed definitions in \p pRegisters and checks
+ * for potentially invalid register configurations (see the documented exceptions and also RegisterDescr).
+ * Also gets any optional default values "init.REG_NAME" for these registers (which override any defaults
+ * from \p pRegisters) from \p pConfig (unsigned integers or byte sequences, depending on RegisterDescr::DataType).
+ *
+ * \todo Throws for all the failure modes
+ *
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  * \param pRegisters
  */
 RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,

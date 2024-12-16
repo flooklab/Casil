@@ -165,10 +165,15 @@ void GPIO::setOutputEn(const std::vector<std::uint8_t>& pEnable)
 /*!
  * \brief Convert IO register bytes to a bitset.
  *
- * \todo Detailed doc
+ * Converts a sequence of %GPIO's IO register bytes (such as returned by e.g. getOutputEn())
+ * to a bitset that corresponds to the actual represented IO bits in the firmware module.
  *
- * \param pBytes
- * \return
+ * See also Bytes::bitsetFromBytes().
+ *
+ * \throws std::invalid_argument If size of \p pBytes differs from ((getSize() - 1) / 8) + 1.
+ *
+ * \param pBytes The byte sequence to convert.
+ * \return The IO bits.
  */
 boost::dynamic_bitset<> GPIO::bitsetFromBytes(const std::vector<std::uint8_t>& pBytes) const
 {
@@ -181,10 +186,15 @@ boost::dynamic_bitset<> GPIO::bitsetFromBytes(const std::vector<std::uint8_t>& p
 /*!
  * \brief Convert a bitset to IO register bytes.
  *
- * \todo Detailed doc
+ * Converts a sequence of actual IO bits of/for the firmware module (i.e. with length equal to getSize())
+ * to a byte sequence that corresponds to the full register bytes (as needed by e.g. setOutputEn()).
  *
- * \param pBits
- * \return
+ * See also Bytes::bytesFromBitset().
+ *
+ * \throws std::invalid_argument If bit size of \p pBits differs from getSize().
+ *
+ * \param pBits The bit sequence to convert.
+ * \return The register bytes.
  */
 std::vector<std::uint8_t> GPIO::bytesFromBitset(const boost::dynamic_bitset<>& pBits) const
 {

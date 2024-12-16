@@ -42,10 +42,14 @@ namespace casil::Auxil
 /*!
  * \brief Parse a YAML document into a Boost Property Tree.
  *
- * \todo Detailed doc
+ * - The top node of the YAML document must be a sequence or map.
+ * - Elements of sequences and maps are iteratively added as sub-trees to the current branch of the tree.
+ * - In case of a sequence, these sub-trees are assigned to made-up keys "#0", "#1", etc...
+ * - Scalar elements are represented as a sub-tree with a value (see \c boost::property_tree::ptree::data() ) and no childs.
+ * - Elements of sequence/map type are recursively parsed sub-trees.
  *
- * \param pYAMLString
- * \return
+ * \param pYAMLString The YAML document to be parsed.
+ * \return Property Tree representing the YAML document structure/content.
  */
 boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
 {
@@ -114,10 +118,12 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
 /*!
  * \brief Parse a sequence of unsigned integers from YAML format.
  *
- * \todo Detailed doc
+ * Assumes that \p pYAMLString is a YAML document with a single top node of type sequence (or map)
+ * with only scalar elements of type unsigned integer. The document is parsed by propertyTreeFromYAML()
+ * and then the unsigned integer elements are collected in declaration order and returned as a vector.
  *
- * \param pYAMLString
- * \return
+ * \param pYAMLString The unsigned integer sequence as YAML sequence/map.
+ * \return A vector filled with the parsed numbers (in declaration order).
  */
 std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString)
 {

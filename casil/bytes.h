@@ -40,7 +40,8 @@ namespace casil
 /*!
  * \brief Auxiliary functions for bit/byte manipulation.
  *
- * \todo Detailed doc
+ * Contains conversion functions between unsigned integers and their bit and byte sequence representations,
+ * string and stream formatting for unsigned integers and similar things.
  */
 namespace Bytes
 {
@@ -48,9 +49,9 @@ namespace Bytes
 /*!
  * \brief Check if type is a fixed width (8/16/32/64 bits) unsigned integer.
  *
- * \todo Detailed doc
+ * \p T must be equivalent to one of the \c std::uintX_t types.
  *
- * \tparam T
+ * \tparam T Type to be checked.
  */
 template<typename T>
 concept IsUnsignedIntNType = (std::is_same_v<T, std::uint8_t> || std::is_same_v<T, std::uint16_t> ||
@@ -128,12 +129,17 @@ std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);            
 /*!
  * \brief Compose a byte sequence with a certain endianness from a number of unsigned integers.
  *
- * \todo Detailed doc
+ * The sequence is composed from all \p pArgs... in passed order and each \p pArgs is treated according to the endianness \p pBigEndian.
  *
- * \tparam Ts
- * \param pBigEndian
- * \param pArgs
- * \return
+ * That means for \p pArgs... = <tt>{val_1, ..., val_m}</tt>, \p Ts... = <tt>{T_1, ..., T_m}</tt>,
+ * \p MSB_i = <tt>mostSignificantByte(T_i)</tt>, \p LSB_i = <tt>leastSignificantByte(T_i)</tt> the returned sequence is:
+ * - <tt>{val_1[MSB_1], ..., val_1[LSB_1], ..., val_m[MSB_m], ..., val_m[LSB_m]}</tt>, for \p pBigEndian = true
+ * - <tt>{val_1[LSB_1], ..., val_1[MSB_1], ..., val_m[LSB_m], ..., val_m[MSB_m]}</tt>, for \p pBigEndian = false
+ *
+ * \tparam Ts Types of passed unsigned integers \p pArgs.
+ * \param pBigEndian Use big endian byte order for each number if true and little endian else.
+ * \param pArgs Unsigned integers to add to the returned sequence in the passed order.
+ * \return The composed byte sequence.
  */
 template<typename... Ts>
     requires (IsUnsignedIntNType<Ts> && ...)
@@ -275,11 +281,17 @@ constexpr T composeUInt(const bool pBigEndian, const std::span<const std::uint8_
 /*!
  * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.
  *
- * \todo Detailed doc
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], pBytes[1]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[1], pBytes[0]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = false
  *
- * \param pBytes
- * \param pBigEndian
- * \return
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \throws std::invalid_argument If \p pBytes has a size other than 2.
+ *
+ * \param pBytes The two byte long sequence representing the value to be returned.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \return The interpreted unsigned integer number.
  */
 constexpr std::uint16_t composeUInt16(const std::vector<std::uint8_t>& pBytes, const bool pBigEndian)
 {
@@ -291,11 +303,15 @@ constexpr std::uint16_t composeUInt16(const std::vector<std::uint8_t>& pBytes, c
 /*!
  * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.
  *
- * \todo Detailed doc
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], pBytes[1]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[1], pBytes[0]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = false
  *
- * \param pBytes
- * \param pBigEndian
- * \return
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \param pBytes The two byte long sequence representing the value to be returned.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \return The interpreted unsigned integer number.
  */
 constexpr std::uint16_t composeUInt16(const std::span<const std::uint8_t, 2> pBytes, const bool pBigEndian)
 {
@@ -305,11 +321,17 @@ constexpr std::uint16_t composeUInt16(const std::span<const std::uint8_t, 2> pBy
 /*!
  * \brief Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.
  *
- * \todo Detailed doc
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], ..., pBytes[3]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[3], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * \param pBytes
- * \param pBigEndian
- * \return
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \throws std::invalid_argument If \p pBytes has a size other than 4.
+ *
+ * \param pBytes The four byte long sequence representing the value to be returned.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \return The interpreted unsigned integer number.
  */
 constexpr std::uint32_t composeUInt32(const std::vector<std::uint8_t>& pBytes, const bool pBigEndian)
 {
@@ -321,11 +343,15 @@ constexpr std::uint32_t composeUInt32(const std::vector<std::uint8_t>& pBytes, c
 /*!
  * \brief Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.
  *
- * \todo Detailed doc
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], ..., pBytes[3]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[3], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * \param pBytes
- * \param pBigEndian
- * \return
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \param pBytes The four byte long sequence representing the value to be returned.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \return The interpreted unsigned integer number.
  */
 constexpr std::uint32_t composeUInt32(const std::span<const std::uint8_t, 4> pBytes, const bool pBigEndian)
 {
@@ -335,11 +361,17 @@ constexpr std::uint32_t composeUInt32(const std::span<const std::uint8_t, 4> pBy
 /*!
  * \brief Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.
  *
- * \todo Detailed doc
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], ..., pBytes[7]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[7], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * \param pBytes
- * \param pBigEndian
- * \return
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \throws std::invalid_argument If \p pBytes has a size other than 8.
+ *
+ * \param pBytes The eight byte long sequence representing the value to be returned.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \return The interpreted unsigned integer number.
  */
 constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, const bool pBigEndian)
 {
@@ -351,11 +383,15 @@ constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, c
 /*!
  * \brief Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.
  *
- * \todo Detailed doc
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], ..., pBytes[7]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[7], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * \param pBytes
- * \param pBigEndian
- * \return
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \param pBytes The eight byte long sequence representing the value to be returned.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \return The interpreted unsigned integer number.
  */
 constexpr std::uint64_t composeUInt64(const std::span<const std::uint8_t, 8> pBytes, const bool pBigEndian)
 {
@@ -367,12 +403,14 @@ constexpr std::uint64_t composeUInt64(const std::span<const std::uint8_t, 8> pBy
 /*!
  * \brief Format an unsigned integer as hexadecimal literal.
  *
- * \todo Detailed doc
+ * Returns a string showing \p pUnsignedNumber as hexadecimal literal (like "0xABC").
  *
- * \tparam T
- * \param pUnsignedNumber
- * \param pAddTypePadding
- * \return
+ * If \p pAddTypePadding is true, a zero-padding is added according to the byte length of \p T.
+ *
+ * \tparam T Type of the unsigned integer.
+ * \param pUnsignedNumber The number to format.
+ * \param pAddTypePadding Add integer size-dependent padding zeros after "0x" prefix if true.
+ * \return The formatted string.
  */
 template<typename T>
     requires IsUnsignedIntNType<T>

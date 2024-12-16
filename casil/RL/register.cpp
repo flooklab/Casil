@@ -29,13 +29,15 @@ using casil::RL::Register;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs LayerBase for Layer::RegisterLayer, forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pDriver
- * \param pConfig
- * \param pRequiredConfig
+ * Initializes the internal driver instance (for required access to HL) from \p pDriver.
+ *
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pDriver %Driver instance to be used.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  */
 Register::Register(std::string pType, std::string pName, HL::Driver& pDriver, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     LayerBase(Layer::RegisterLayer, std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig),

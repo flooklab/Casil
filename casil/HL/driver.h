@@ -45,7 +45,15 @@ namespace HL
 /*!
  * \brief Common base class for all driver components in the hardware layer (HL).
  *
- * \todo Detailed doc
+ * This class provides very basic/limited functionality likely common to all drivers.
+ * It is not intended to directly derive drivers from this class.
+ *
+ * Because of the \e direct/muxed interface split in the TL, drivers must be split into two such groups as well:
+ * - "Direct" drivers: Drivers for independent/stand-alone hardware (not using the basil bus)
+ * - "Muxed" drivers: Drivers for firmware modules running on FPGA hardware based on the basil bus
+ *
+ * Hence use either DirectDriver for implementing a \e direct driver or MuxedDriver
+ * (or its RegisterDriver specialization) for implementing a \e muxed driver.
  */
 class Driver : public LayerBase
 {

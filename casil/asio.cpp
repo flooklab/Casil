@@ -39,9 +39,11 @@ std::vector<std::thread> ASIO::ioContextThreads;
 /*!
  * \brief Get the IO context object.
  *
- * \todo Detailed doc
+ * Creates a static IO context object and always returns that one.
  *
- * \return
+ * See also the \e Boost documentation for \c boost::asio::io_context.
+ *
+ * \return The IO context object.
  */
 boost::asio::io_context& ASIO::getIOContext()
 {
@@ -54,10 +56,16 @@ boost::asio::io_context& ASIO::getIOContext()
 /*!
  * \brief Start threads that continuously execute/run the IO context.
  *
- * \todo Detailed doc
+ * Starts \p pNumThreads processing threads that are responsible for executing async IO handlers for respective
+ * async requests made to the Boost %ASIO library. Sets up a "work guard" (see getWorkGuard()) to keep the threads
+ * running even if no handlers are scheduled at some time. Hence stopping the threads is achieved with stopRunIOContext().
  *
- * \param pNumThreads
- * \return
+ * See also Auxil::AsyncIORunner for a RAII approach of running these threads.
+ *
+ * If IO context threads are already/still running (see ioContextThreadsRunning()), this function will do nothing but return false.
+ *
+ * \param pNumThreads Number of threads to start.
+ * \return True if the threads were started.
  */
 bool ASIO::startRunIOContext(const unsigned int pNumThreads)
 {
@@ -113,7 +121,7 @@ bool ASIO::startRunIOContext(const unsigned int pNumThreads)
 /*!
  * \brief Stop all running IO context threads.
  *
- * \todo Detailed doc
+ * Resets the work guard set up by and joins the threads started by startRunIOContext().
  */
 void ASIO::stopRunIOContext()
 {
@@ -145,9 +153,9 @@ void ASIO::stopRunIOContext()
 /*!
  * \brief Check if any IO context threads are currently running.
  *
- * \todo Detailed doc
+ * Checks whether threads were started via startRunIOContext() and not stopped via stopRunIOContext() yet.
  *
- * \return
+ * \return True if threads are running.
  */
 bool ASIO::ioContextThreadsRunning()
 {
@@ -159,9 +167,14 @@ bool ASIO::ioContextThreadsRunning()
 /*!
  * \brief Get the "work guard" object for the IO context object.
  *
- * \todo Detailed doc
+ * Creates a static "work guard" for the IO context object (from getIOContext()) and always returns that one,
+ * except if \c reset() was called on the work guard before; then a new work guard instance will be assigned.
  *
- * \return
+ * This guard is used to keep the threads from startRunIOContext() running all the time until explicitly stopped by stopRunIOContext().
+ *
+ * See also the \e Boost documentation for \c boost::asio::make_work_guard.
+ *
+ * \return The work guard object.
  */
 ASIO::WorkGuard& ASIO::getWorkGuard()
 {

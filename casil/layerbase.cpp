@@ -32,13 +32,18 @@ using casil::LayerBase;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs a layer component as a component of layer \p pLayer with registered component type name \p pType
+ * and configured instance name \p pName with component type-specific configuration \p pConfig.
  *
- * \param pLayer
- * \param pType
- * \param pName
- * \param pConfig
- * \param pRequiredConfig
+ * Checks that \p pRequiredConfig is "contained" in \p pConfig (see LayerConfig::contains()).
+ *
+ * \throws std::runtime_error If \p pConfig is incomplete/invalid because \p pRequiredConfig is not contained.
+ *
+ * \param pLayer %Layer that this component belongs to.
+ * \param pType %Name of the component type (as registered to the LayerFactory).
+ * \param pName Name of the instance (as e.g. used in Device).
+ * \param pConfig Instance-specific component configuration.
+ * \param pRequiredConfig Reference configuration required for the components of type \p pType.
  */
 LayerBase::LayerBase(const Layer pLayer, std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     layer(pLayer),
@@ -59,9 +64,7 @@ LayerBase::LayerBase(const Layer pLayer, std::string pType, std::string pName, L
 /*!
  * \brief Get the layer of this layer component.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return %Layer that this component belongs to.
  */
 LayerBase::Layer LayerBase::getLayer() const
 {
@@ -71,9 +74,7 @@ LayerBase::Layer LayerBase::getLayer() const
 /*!
  * \brief Get the type name of this layer component.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return Name of the component type.
  */
 const std::string& LayerBase::getType() const
 {
@@ -83,9 +84,7 @@ const std::string& LayerBase::getType() const
 /*!
  * \brief Get the instance name of this layer component.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return Name of the component instance.
  */
 const std::string& LayerBase::getName() const
 {
@@ -97,10 +96,14 @@ const std::string& LayerBase::getName() const
 /*!
  * \brief Initialize this layer component.
  *
- * \todo Detailed doc
+ * Initializes by performing component-specific initialization logic. Returns false if this fails and true else.
  *
- * \param pForce
- * \return
+ * Immediately returns true if already initialized, unless \p pForce is set.
+ *
+ * Remembers the initialized state on success (gets unset otherwise).
+ *
+ * \param pForce Ignore initialized state.
+ * \return True if already or successfully initialized.
  */
 bool LayerBase::init(const bool pForce)
 {
@@ -122,10 +125,14 @@ bool LayerBase::init(const bool pForce)
 /*!
  * \brief Close ("uninitialize") this layer component.
  *
- * \todo Detailed doc
+ * Closes by performing component-specific closing logic. Returns false if this fails and true else.
  *
- * \param pForce
- * \return
+ * Immediately returns true if already closed (i.e. unset initialized state), unless \p pForce is set.
+ *
+ * Unsets the initialized state (set by init()) on success.
+ *
+ * \param pForce Ignore (not-)initialized state.
+ * \return True if already or successfully closed.
  */
 bool LayerBase::close(const bool pForce)
 {
@@ -147,9 +154,9 @@ bool LayerBase::close(const bool pForce)
 /*!
  * \brief Get a standard description of this layer component for logging purposes.
  *
- * \todo Detailed doc
+ * Returns a string like e.g. <tt>"TYPE"-interface instance "NAME"</tt> for an interface.
  *
- * \return
+ * \return Component description including layer, type name and instance name.
  */
 const std::string& LayerBase::getSelfDescription() const
 {

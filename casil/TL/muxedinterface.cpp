@@ -34,12 +34,12 @@ using casil::TL::MuxedInterface;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs Interface by forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pConfig
- * \param pRequiredConfig
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  */
 MuxedInterface::MuxedInterface(std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig) :
     Interface(std::move(pType), std::move(pName), std::move(pConfig), pRequiredConfig)

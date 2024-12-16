@@ -28,9 +28,10 @@ namespace casil::Version
 /*!
  * \brief Get the library version formatted as string.
  *
- * \todo Detailed doc
+ * The format is "MAJ.MIN.PATCH" plus "-alpha" / "-beta" / "-rc" for the pre-release types
+ * ReleaseType::Alpha / ReleaseType::Beta / ReleaseType::ReleaseCandidate.
  *
- * \return
+ * \return The current library version.
  */
 std::string toString()
 {

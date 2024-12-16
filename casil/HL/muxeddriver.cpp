@@ -32,13 +32,22 @@ using casil::HL::MuxedDriver;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Constructs Driver by forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * \param pType
- * \param pName
- * \param pInterface
- * \param pConfig
- * \param pRequiredConfig
+ * Initializes the internal muxed interface instance (for required access to TL) from \p pInterface.
+ *
+ * Gets the mandatory "base_addr" value from \p pConfig (unsigned integer value), which must be the bus address of the
+ * corresponding firmware module instance. This "base address" is used to offset fixed module addresses according to
+ * the instance bus address when calling MuxedInterface::read() / MuxedInterface::write() / MuxedInterface::query().
+ * See also read() / write() / query() from this class.
+ *
+ * \throws std::runtime_error If "base_addr" is not an unsigned integer (max. 64 bit).
+ *
+ * \param pType Registered component type name.
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
+ * \param pRequiredConfig Configuration required to be specified by \p pConfig.
  */
 MuxedDriver::MuxedDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                          LayerConfig pConfig, const LayerConfig& pRequiredConfig) :

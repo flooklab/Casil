@@ -56,8 +56,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_HL_REGISTERDRIVER_H
-#define CASIL_HL_REGISTERDRIVER_H
+#ifndef CASIL_LAYERS_HL_REGISTERDRIVER_H
+#define CASIL_LAYERS_HL_REGISTERDRIVER_H
 
 #include <casil/HL/muxeddriver.h>
 
@@ -72,6 +72,9 @@
 #include <vector>
 
 namespace casil
+{
+
+namespace Layers
 {
 
 namespace HL
@@ -243,6 +246,8 @@ private:
 
 } // namespace HL
 
+} // namespace Layers
+
 } // namespace casil
 
-#endif // CASIL_HL_REGISTERDRIVER_H
+#endif // CASIL_LAYERS_HL_REGISTERDRIVER_H

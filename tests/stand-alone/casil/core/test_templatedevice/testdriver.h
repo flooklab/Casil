@@ -33,7 +33,7 @@
 namespace casil
 {
 
-namespace HL
+namespace Layers::HL
 {
 
 class TestDriver final : public DirectDriver

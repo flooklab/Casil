@@ -27,7 +27,7 @@
 #include <stdexcept>
 #include <utility>
 
-using casil::TL::TCP;
+using casil::Layers::TL::TCP;
 
 CASIL_REGISTER_INTERFACE_CPP(TCP)
 CASIL_REGISTER_INTERFACE_ALIAS("Socket")

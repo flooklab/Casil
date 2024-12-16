@@ -27,7 +27,7 @@
 
 #include <utility>
 
-using casil::HL::DummyMuxedDriver;
+using casil::Layers::HL::DummyMuxedDriver;
 
 CASIL_REGISTER_DRIVER_CPP(DummyMuxedDriver)
 

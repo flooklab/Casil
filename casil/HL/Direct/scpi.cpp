@@ -72,7 +72,7 @@
 #include <set>
 #include <stdexcept>
 
-using casil::HL::SCPI;
+using casil::Layers::HL::SCPI;
 
 CASIL_REGISTER_DRIVER_CPP(SCPI)
 CASIL_REGISTER_DRIVER_ALIAS("scpi")

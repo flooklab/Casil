@@ -24,7 +24,7 @@
 
 #include <utility>
 
-using casil::RL::DummyRegister;
+using casil::Layers::RL::DummyRegister;
 
 CASIL_REGISTER_REGISTER_CPP(DummyRegister)
 

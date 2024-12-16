@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_COMMONIMPL_ASIOHELPER_ASIOHELPER_H
-#define CASIL_TL_COMMONIMPL_ASIOHELPER_ASIOHELPER_H
+#ifndef CASIL_LAYERS_TL_COMMONIMPL_ASIOHELPER_ASIOHELPER_H
+#define CASIL_LAYERS_TL_COMMONIMPL_ASIOHELPER_ASIOHELPER_H
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/udp.hpp>
@@ -39,7 +39,7 @@
 namespace casil
 {
 
-namespace TL
+namespace Layers::TL
 {
 
 /*!
@@ -227,8 +227,8 @@ std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPr
 
 } // namespace CommonImpl
 
-} // namespace TL
+} // namespace Layers::TL
 
 } // namespace casil
 
-#endif // CASIL_TL_COMMONIMPL_ASIOHELPER_ASIOHELPER_H
+#endif // CASIL_LAYERS_TL_COMMONIMPL_ASIOHELPER_ASIOHELPER_H

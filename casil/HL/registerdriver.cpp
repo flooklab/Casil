@@ -72,7 +72,7 @@
 #include <stdexcept>
 #include <utility>
 
-using casil::HL::RegisterDriver;
+using casil::Layers::HL::RegisterDriver;
 
 /*!
  * \brief Constructor.

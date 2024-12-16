@@ -32,8 +32,8 @@
 namespace casil
 {
 
-namespace TL { class Interface; }
-namespace RL { class Register; }
+namespace Layers { namespace TL { class Interface; } }
+namespace Layers { namespace RL { class Register; } }
 
 /*!
  * \brief %Concepts for use with \ref TemplateDeviceSpecialization "TemplateDevice" / TmplDev.
@@ -43,6 +43,10 @@ namespace RL { class Register; }
  */
 namespace Concepts
 {
+
+using Layers::TL::Interface;
+using HL::Driver;
+using Layers::RL::Register;
 
 /*!
  * \brief Helper declaration to test if a char (array) is constexpr.
@@ -85,11 +89,12 @@ concept HasRegisteredTypeName = requires
 };
 
 /*!
- * \brief Check if type declares a typedef \c InterfaceBaseType to an abstract class derived from \ref casil::TL::Interface "TL::Interface".
+ * \brief Check if type declares a typedef \c InterfaceBaseType to an abstract class
+ *        derived from \ref casil::Layers::TL::Interface "TL::Interface".
  *
- * \c T::InterfaceBaseType must be a type/class that is derived from \ref casil::TL::Interface "TL::Interface"
+ * \c T::InterfaceBaseType must be a type/class that is derived from \ref casil::Layers::TL::Interface "TL::Interface"
  * and not constructible. This effectively boils down to being one of the two classes
- * \ref casil::TL::DirectInterface "TL::DirectInterface" or \ref casil::TL::MuxedInterface "TL::MuxedInterface".
+ * \ref casil::Layers::TL::DirectInterface "TL::DirectInterface" or \ref casil::Layers::TL::MuxedInterface "TL::MuxedInterface".
  *
  * \tparam T Type to be checked.
  */
@@ -97,50 +102,50 @@ template<typename T>
 concept HasInterfaceBaseType = requires
 {
     typename T::InterfaceBaseType;
-    requires (std::is_base_of_v<TL::Interface, typename T::InterfaceBaseType> &&    //Derived from Interface
-             !std::is_same_v<TL::Interface, typename T::InterfaceBaseType>) &&      //Not Interface itself
-             std::is_abstract_v<typename T::InterfaceBaseType>;                     //Abstract, i.e. no actual interface
+    requires (std::is_base_of_v<Interface, typename T::InterfaceBaseType> &&    //Derived from Interface
+             !std::is_same_v<Interface, typename T::InterfaceBaseType>) &&      //Not Interface itself
+             std::is_abstract_v<typename T::InterfaceBaseType>;                 //Abstract, i.e. no actual interface
 };
 
 /*!
- * \brief Check if type is a proper \ref casil::TL::Interface "Interface" component
+ * \brief Check if type is a proper \ref casil::Layers::TL::Interface "Interface" component
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
- * \p T must be derived from \ref casil::TL::Interface "TL::Interface" and have a constructor
+ * \p T must be derived from \ref casil::Layers::TL::Interface "TL::Interface" and have a constructor
  * with a signature that is compatible with <tt>T(std::string, LayerConfig)</tt>.
  *
  * \tparam T Type to be checked.
  */
 template<typename T>
-concept IsInterface = std::is_base_of_v<TL::Interface, T> &&
+concept IsInterface = std::is_base_of_v<Interface, T> &&
                       std::is_constructible_v<T, std::string, LayerConfig>;
 
 /*!
- * \brief Check if type is a proper \ref casil::HL::Driver "Driver" component
+ * \brief Check if type is a proper \ref casil::Layers::HL::Driver "Driver" component
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
- * \p T must be derived from \ref casil::HL::Driver "HL::Driver" and have a constructor
+ * \p T must be derived from \ref casil::Layers::HL::Driver "HL::Driver" and have a constructor
  * with a signature that is compatible with <tt>T(std::string, T::InterfaceBaseType&, LayerConfig)</tt>.
  *
  * \tparam T Type to be checked.
  */
 template<typename T>
-concept IsDriver = std::is_base_of_v<HL::Driver, T> &&
+concept IsDriver = std::is_base_of_v<Driver, T> &&
                    HasInterfaceBaseType<T> &&
                    std::is_constructible_v<T, std::string, typename T::InterfaceBaseType&, LayerConfig>;
 
 /*!
- * \brief Check if type is a proper \ref casil::RL::Register "Register" component
+ * \brief Check if type is a proper \ref casil::Layers::RL::Register "Register" component
  *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
  *
- * \p T must be derived from \ref casil::RL::Register "RL::Register" and have a constructor
+ * \p T must be derived from \ref casil::Layers::RL::Register "RL::Register" and have a constructor
  * with a signature that is compatible with <tt>T(std::string, HL::Driver&, LayerConfig)</tt>.
  *
  * \tparam T Type to be checked.
  */
 template<typename T>
-concept IsRegister = std::is_base_of_v<RL::Register, T> &&
-                     std::is_constructible_v<T, std::string, HL::Driver&, LayerConfig>;
+concept IsRegister = std::is_base_of_v<Register, T> &&
+                     std::is_constructible_v<T, std::string, Driver&, LayerConfig>;
 
 } // namespace Concepts
 

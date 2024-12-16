@@ -56,8 +56,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_SITCP_H
-#define CASIL_TL_SITCP_H
+#ifndef CASIL_LAYERS_TL_SITCP_H
+#define CASIL_LAYERS_TL_SITCP_H
 
 #include <casil/TL/muxedinterface.h>
 
@@ -83,7 +83,7 @@
 namespace casil
 {
 
-namespace TL
+namespace Layers::TL
 {
 
 /*!
@@ -279,8 +279,8 @@ private:
     CASIL_REGISTER_INTERFACE_H("SiTCP")
 };
 
-} // namespace TL
+} // namespace Layers::TL
 
 } // namespace casil
 
-#endif // CASIL_TL_SITCP_H
+#endif // CASIL_LAYERS_TL_SITCP_H

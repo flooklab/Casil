@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_HL_MUXEDDRIVER_H
-#define CASIL_HL_MUXEDDRIVER_H
+#ifndef CASIL_LAYERS_HL_MUXEDDRIVER_H
+#define CASIL_LAYERS_HL_MUXEDDRIVER_H
 
 #include <casil/HL/driver.h>
 
@@ -35,11 +35,14 @@
 namespace casil
 {
 
+namespace Layers
+{
+
 namespace HL
 {
 
 /*!
- * \brief Base class to derive from for driver components that control firmware modules on a basil bus connected via a MuxedInterface.
+ * \brief Base class to derive from for driver components that control firmware modules on a basil bus connected via a TL::MuxedInterface.
  *
  * \todo Detailed doc
  */
@@ -78,6 +81,8 @@ protected:
 
 } // namespace HL
 
+} // namespace Layers
+
 } // namespace casil
 
-#endif // CASIL_HL_MUXEDDRIVER_H
+#endif // CASIL_LAYERS_HL_MUXEDDRIVER_H

@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_RL_REGISTER_H
-#define CASIL_RL_REGISTER_H
+#ifndef CASIL_LAYERS_RL_REGISTER_H
+#define CASIL_LAYERS_RL_REGISTER_H
 
 #include <casil/layerbase.h>
 
@@ -31,6 +31,9 @@
 #include <string>
 
 namespace casil
+{
+
+namespace Layers
 {
 
 /*!
@@ -64,6 +67,10 @@ protected:
 
 } // namespace RL
 
+} // namespace Layers
+
+namespace RL = Layers::RL;
+
 } // namespace casil
 
-#endif // CASIL_RL_REGISTER_H
+#endif // CASIL_LAYERS_RL_REGISTER_H

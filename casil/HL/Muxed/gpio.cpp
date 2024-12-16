@@ -66,7 +66,7 @@
 #include <bitset>
 #include <utility>
 
-using casil::HL::GPIO;
+using casil::Layers::HL::GPIO;
 
 CASIL_REGISTER_DRIVER_CPP(GPIO)
 CASIL_REGISTER_DRIVER_ALIAS("gpio")

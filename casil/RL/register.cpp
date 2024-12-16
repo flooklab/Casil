@@ -24,14 +24,14 @@
 
 #include <utility>
 
-using casil::RL::Register;
+using casil::Layers::RL::Register;
 
 /*!
  * \brief Constructor.
  *
  * Constructs LayerBase for Layer::RegisterLayer, forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * Initializes the internal driver instance (for required access to HL) from \p pDriver.
+ * Initializes the internal driver instance (for required access to \ref Layers::HL "HL") from \p pDriver.
  *
  * \param pType Registered component type name.
  * \param pName Component instance name.

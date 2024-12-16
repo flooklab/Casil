@@ -45,7 +45,7 @@
  * and can hence be used to configure an interface component for \ref TemplateDeviceSpecialization "TemplateDevice".
  * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::InterfacesConf "TmplDev::InterfacesConf".
  *
- * \param INTF_CLASS The registered \ref casil::TL::Interface "TL::Interface" class type to use as component type.
+ * \param INTF_CLASS The registered \ref casil::Layers::TL::Interface "TL::Interface" class type to use as component type.
  * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
  * \param INTF_NAME Component instance name (as string literal).
  * \param CONF Component configuration YAML code (as string literal).
@@ -65,7 +65,7 @@ struct STRUCT_NAME : public casil::TmplDev::InterfaceConf<INTF_CLASS>\
  * and can hence be used to configure a driver component for \ref TemplateDeviceSpecialization "TemplateDevice".
  * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::DriversConf "TmplDev::DriversConf".
  *
- * \param DRV_CLASS The registered \ref casil::HL::Driver "HL::Driver" class type to use as component type.
+ * \param DRV_CLASS The registered \ref casil::Layers::HL::Driver "HL::Driver" class type to use as component type.
  * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
  * \param DRV_NAME Component instance name (as string literal).
  * \param INTERFACE Configured instance name of the interface component to be used (as string literal).
@@ -87,7 +87,7 @@ struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
  * and can hence be used to configure a register component for \ref TemplateDeviceSpecialization "TemplateDevice".
  * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::RegistersConf "TmplDev::RegistersConf".
  *
- * \param REG_CLASS The registered \ref casil::RL::Register "RL::Register" class type to use as component type.
+ * \param REG_CLASS The registered \ref casil::Layers::RL::Register "RL::Register" class type to use as component type.
  * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
  * \param REG_NAME Component instance name (as string literal).
  * \param DRIVER Configured instance name of the driver component to be used (as string literal).

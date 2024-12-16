@@ -70,7 +70,7 @@
 #include <system_error>
 #include <utility>
 
-using casil::TL::SiTCP;
+using casil::Layers::TL::SiTCP;
 
 CASIL_REGISTER_INTERFACE_CPP(SiTCP)
 CASIL_REGISTER_INTERFACE_ALIAS("SiTcp")

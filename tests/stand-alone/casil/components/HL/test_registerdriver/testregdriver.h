@@ -34,7 +34,7 @@
 namespace casil
 {
 
-namespace HL
+namespace Layers::HL
 {
 
 class TestRegDriver final : public RegisterDriver

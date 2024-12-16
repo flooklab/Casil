@@ -27,7 +27,7 @@
 
 #include <utility>
 
-using casil::TL::DummyInterface;
+using casil::Layers::TL::DummyInterface;
 
 CASIL_REGISTER_INTERFACE_CPP(DummyInterface)
 

@@ -53,13 +53,13 @@ Device::Device() :
 /*!
  * \brief Constructor.
  *
- * Reads the configurations for all layer components from \p pConfig (TL / HL / RL from "transfer_layer" /
- * "hw_drivers" / "registers" sections) and constructs all of those components accordingly using
- * the LayerFactory. First constructs all interfaces, then all drivers and then all registers.
+ * Reads the configurations for all layer components from \p pConfig (\ref Layers::TL "TL" / \ref Layers::HL "HL" /
+ * \ref Layers::RL "RL" from "transfer_layer" / "hw_drivers" / "registers" sections) and constructs all of those
+ * components accordingly using the LayerFactory. First constructs all interfaces, then all drivers and then all registers.
  *
- * The generally mandatory configuration keys "name" and "type" (and "interface" for HL and "hw_driver" for RL)
- * are separately processed and therefore stripped from the individual configurations before they are passed
- * as LayerConfig to the LayerFactory (and eventually to the component constructors).
+ * The generally mandatory configuration keys "name" and "type" (and "interface" for \ref Layers::HL "HL" and "hw_driver"
+ * for \ref Layers::RL "RL") are separately processed and therefore stripped from the individual configurations before
+ * they are passed as LayerConfig to the LayerFactory (and eventually to the component constructors).
  *
  * \throws std::runtime_error If mandatory parts are missing from \p pConfig or construction of a component fails.
  *
@@ -221,13 +221,13 @@ LayerBase& Device::operator[](const std::string_view pName) const
 /*!
  * \brief Access one of the interface components from the transfer layer.
  *
- * Returns a reference to the TL::Interface component with configured instance name \p pName
+ * Returns a reference to the \ref Layers::TL::Interface "TL::Interface" component with configured instance name \p pName
  * (same as component's "name" value from the YAML configuration tree).
  *
  * \throws std::invalid_argument If no interface with name \p pName was configured.
  *
  * \param pName Configured instance name of the requested component.
- * \return The TL::Interface component with name \p pName.
+ * \return The \ref Layers::TL::Interface "TL::Interface" component with name \p pName.
  */
 casil::TL::Interface& Device::interface(const std::string_view pName) const
 {
@@ -241,13 +241,13 @@ casil::TL::Interface& Device::interface(const std::string_view pName) const
 /*!
  * \brief Access one of the driver components from the hardware layer.
  *
- * Returns a reference to the HL::Driver component with configured instance name \p pName
+ * Returns a reference to the \ref Layers::HL::Driver "HL::Driver" component with configured instance name \p pName
  * (same as component's "name" value from the YAML configuration tree).
  *
  * \throws std::invalid_argument If no driver with name \p pName was configured.
  *
  * \param pName Configured instance name of the requested component.
- * \return The HL::Driver component with name \p pName.
+ * \return The \ref Layers::HL::Driver "HL::Driver" component with name \p pName.
  */
 casil::HL::Driver& Device::driver(const std::string_view pName) const
 {
@@ -261,13 +261,13 @@ casil::HL::Driver& Device::driver(const std::string_view pName) const
 /*!
  * \brief Access one of the register components from the register layer.
  *
- * Returns a reference to the RL::Register component with configured instance name \p pName
+ * Returns a reference to the \ref Layers::RL::Register "RL::Register" component with configured instance name \p pName
  * (same as component's "name" value from the YAML configuration tree).
  *
  * \throws std::invalid_argument If no register with name \p pName was configured.
  *
  * \param pName Configured instance name of the requested component.
- * \return The RL::Register component with name \p pName.
+ * \return The \ref Layers::RL::Register "RL::Register" component with name \p pName.
  */
 casil::RL::Register& Device::reg(const std::string_view pName) const
 {

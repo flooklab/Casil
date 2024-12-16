@@ -26,7 +26,7 @@
 
 #include <utility>
 
-using casil::TL::Interface;
+using casil::Layers::TL::Interface;
 
 /*!
  * \brief Constructor.

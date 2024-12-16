@@ -24,4 +24,4 @@
 
 #include <casil/TL/CommonImpl/serialportwrapper.h>
 
-using casil::TL::CommonImpl::SerialPortWrapper;
+using casil::Layers::TL::CommonImpl::SerialPortWrapper;

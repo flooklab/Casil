@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_MUXEDINTERFACE_H
-#define CASIL_TL_MUXEDINTERFACE_H
+#ifndef CASIL_LAYERS_TL_MUXEDINTERFACE_H
+#define CASIL_LAYERS_TL_MUXEDINTERFACE_H
 
 #include <casil/TL/interface.h>
 
@@ -32,6 +32,9 @@
 #include <vector>
 
 namespace casil
+{
+
+namespace Layers
 {
 
 namespace TL
@@ -77,6 +80,8 @@ private:
 
 } // namespace TL
 
+} // namespace Layers
+
 } // namespace casil
 
-#endif // CASIL_TL_MUXEDINTERFACE_H
+#endif // CASIL_LAYERS_TL_MUXEDINTERFACE_H

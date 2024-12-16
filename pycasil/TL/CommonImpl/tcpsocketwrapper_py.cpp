@@ -24,4 +24,4 @@
 
 #include <casil/TL/CommonImpl/tcpsocketwrapper.h>
 
-using casil::TL::CommonImpl::TCPSocketWrapper;
+using casil::Layers::TL::CommonImpl::TCPSocketWrapper;

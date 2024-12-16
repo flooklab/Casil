@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_RL_DUMMYREGISTER_H
-#define CASIL_RL_DUMMYREGISTER_H
+#ifndef CASIL_LAYERS_RL_DUMMYREGISTER_H
+#define CASIL_LAYERS_RL_DUMMYREGISTER_H
 
 #include <casil/RL/register.h>
 
@@ -34,7 +34,7 @@
 namespace casil
 {
 
-namespace RL
+namespace Layers::RL
 {
 
 /*!
@@ -53,8 +53,8 @@ private:
     CASIL_REGISTER_REGISTER_H("DummyRegister")
 };
 
-} // namespace RL
+} // namespace Layers::RL
 
 } // namespace casil
 
-#endif // CASIL_RL_DUMMYREGISTER_H
+#endif // CASIL_LAYERS_RL_DUMMYREGISTER_H

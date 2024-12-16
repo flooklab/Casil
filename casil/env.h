@@ -46,7 +46,7 @@ namespace casil
  * See getEnv() for details on how to access specific variables.
  *
  * List of supported variables:
- * - \c CASIL_DEV_DESC_DIRS: Directories containing \ref HL::SCPI "SCPI" device description files.
+ * - \c CASIL_DEV_DESC_DIRS: Directories containing \ref Layers::HL::SCPI "SCPI" device description files.
  */
 namespace Env
 {

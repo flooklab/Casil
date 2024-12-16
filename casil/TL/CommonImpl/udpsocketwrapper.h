@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_COMMONIMPL_UDPSOCKETWRAPPER_H
-#define CASIL_TL_COMMONIMPL_UDPSOCKETWRAPPER_H
+#ifndef CASIL_LAYERS_TL_COMMONIMPL_UDPSOCKETWRAPPER_H
+#define CASIL_LAYERS_TL_COMMONIMPL_UDPSOCKETWRAPPER_H
 
 #include <boost/asio/ip/udp.hpp>
 
@@ -37,7 +37,7 @@
 namespace casil
 {
 
-namespace TL
+namespace Layers::TL
 {
 
 namespace CommonImpl
@@ -87,8 +87,8 @@ private:
 
 } // namespace CommonImpl
 
-} // namespace TL
+} // namespace Layers::TL
 
 } // namespace casil
 
-#endif // CASIL_TL_COMMONIMPL_UDPSOCKETWRAPPER_H
+#endif // CASIL_LAYERS_TL_COMMONIMPL_UDPSOCKETWRAPPER_H

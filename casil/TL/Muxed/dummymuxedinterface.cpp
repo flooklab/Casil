@@ -27,7 +27,7 @@
 
 #include <utility>
 
-using casil::TL::DummyMuxedInterface;
+using casil::Layers::TL::DummyMuxedInterface;
 
 CASIL_REGISTER_INTERFACE_CPP(DummyMuxedInterface)
 

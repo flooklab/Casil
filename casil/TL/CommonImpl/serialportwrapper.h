@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_COMMONIMPL_SERIALPORTWRAPPER_H
-#define CASIL_TL_COMMONIMPL_SERIALPORTWRAPPER_H
+#ifndef CASIL_LAYERS_TL_COMMONIMPL_SERIALPORTWRAPPER_H
+#define CASIL_LAYERS_TL_COMMONIMPL_SERIALPORTWRAPPER_H
 
 #include <boost/asio/serial_port.hpp>
 #include <boost/system/error_code.hpp>
@@ -37,7 +37,7 @@
 namespace casil
 {
 
-namespace TL
+namespace Layers::TL
 {
 
 namespace CommonImpl
@@ -101,8 +101,8 @@ private:
 
 } // namespace CommonImpl
 
-} // namespace TL
+} // namespace Layers::TL
 
 } // namespace casil
 
-#endif // CASIL_TL_COMMONIMPL_SERIALPORTWRAPPER_H
+#endif // CASIL_LAYERS_TL_COMMONIMPL_SERIALPORTWRAPPER_H

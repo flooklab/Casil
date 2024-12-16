@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_HL_DIRECTDRIVER_H
-#define CASIL_HL_DIRECTDRIVER_H
+#ifndef CASIL_LAYERS_HL_DIRECTDRIVER_H
+#define CASIL_LAYERS_HL_DIRECTDRIVER_H
 
 #include <casil/HL/driver.h>
 
@@ -35,11 +35,14 @@
 namespace casil
 {
 
+namespace Layers
+{
+
 namespace HL
 {
 
 /*!
- * \brief Base class to derive from for driver components that control \e independent hardware devices connected via a DirectInterface.
+ * \brief Base class to derive from for driver components that control \e independent hardware devices connected via a TL::DirectInterface.
  *
  * \todo Detailed doc
  */
@@ -70,6 +73,8 @@ protected:
 
 } // namespace HL
 
+} // namespace Layers
+
 } // namespace casil
 
-#endif // CASIL_HL_DIRECTDRIVER_H
+#endif // CASIL_LAYERS_HL_DIRECTDRIVER_H

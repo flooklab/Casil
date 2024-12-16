@@ -29,7 +29,7 @@
 #include <thread>
 #include <utility>
 
-using casil::TL::DirectInterface;
+using casil::Layers::TL::DirectInterface;
 
 /*!
  * \brief Constructor.

@@ -33,12 +33,12 @@ namespace casil
 
 class LayerConfig;
 
-namespace TL { class Interface; }
-namespace HL { class Driver; }
-namespace RL { class Register; }
+namespace Layers { namespace TL { class Interface; } }
+namespace Layers { namespace HL { class Driver; } }
+namespace Layers { namespace RL { class Register; } }
 
 /*!
- * \brief Factory for LayerBase classes of the three component layers TL, HL and RL.
+ * \brief Factory for LayerBase classes of the three component layers \ref Layers::TL "TL", \ref Layers::HL "HL" and \ref Layers::RL "RL".
  *
  * Use createInterface() / createDriver() / createRegister() to construct layer components by their registered type names.
  *
@@ -51,22 +51,27 @@ namespace RL { class Register; }
  */
 class LayerFactory
 {
+private:
+    using Interface = Layers::TL::Interface;
+    using Driver = Layers::HL::Driver;
+    using Register = Layers::RL::Register;
+
 public:
-    typedef std::function<std::unique_ptr<TL::Interface>(std::string, LayerConfig)> TLGeneratorFunction;
+    typedef std::function<std::unique_ptr<Interface>(std::string, LayerConfig)> TLGeneratorFunction;
                                                                                     ///< Function signature required for interface generators.
-    typedef std::function<std::unique_ptr<HL::Driver>(std::string, TL::Interface&, LayerConfig)> HLGeneratorFunction;
+    typedef std::function<std::unique_ptr<Driver>(std::string, Interface&, LayerConfig)> HLGeneratorFunction;
                                                                                     ///< Function signature required for driver generators.
-    typedef std::function<std::unique_ptr<RL::Register>(std::string, HL::Driver&, LayerConfig)> RLGeneratorFunction;
+    typedef std::function<std::unique_ptr<Register>(std::string, Driver&, LayerConfig)> RLGeneratorFunction;
                                                                                     ///< Function signature required for register generators.
 
 public:
     LayerFactory() = delete;                                                                ///< Deleted constructor.
     //
-    static std::unique_ptr<TL::Interface> createInterface(const std::string& pType, std::string pName, LayerConfig pConfig);
+    static std::unique_ptr<Interface> createInterface(const std::string& pType, std::string pName, LayerConfig pConfig);
                                                                                             ///< Construct a registered interface type.
-    static std::unique_ptr<HL::Driver> createDriver(const std::string& pType, std::string pName, TL::Interface& pInterface, LayerConfig pConfig);
+    static std::unique_ptr<Driver> createDriver(const std::string& pType, std::string pName, Interface& pInterface, LayerConfig pConfig);
                                                                                             ///< Construct a registered driver type.
-    static std::unique_ptr<RL::Register> createRegister(const std::string& pType, std::string pName, HL::Driver& pDriver, LayerConfig pConfig);
+    static std::unique_ptr<Register> createRegister(const std::string& pType, std::string pName, Driver& pDriver, LayerConfig pConfig);
                                                                                             ///< Construct a registered register type.
     //
     static void registerInterfaceType(std::string pType, TLGeneratorFunction pGenerator);   ///< Register a generator for an interface type.

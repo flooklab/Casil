@@ -30,7 +30,7 @@
 #include <stdexcept>
 #include <utility>
 
-using casil::TL::Serial;
+using casil::Layers::TL::Serial;
 
 CASIL_REGISTER_INTERFACE_CPP(Serial)
 

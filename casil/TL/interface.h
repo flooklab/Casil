@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_INTERFACE_H
-#define CASIL_TL_INTERFACE_H
+#ifndef CASIL_LAYERS_TL_INTERFACE_H
+#define CASIL_LAYERS_TL_INTERFACE_H
 
 #include <casil/layerbase.h>
 
@@ -31,6 +31,15 @@
 #include <string>
 
 namespace casil
+{
+
+/*!
+ * \brief ...
+ *
+ * \todo Brief doc
+ * \todo Detailed doc
+ */
+namespace Layers
 {
 
 /*!
@@ -78,6 +87,10 @@ protected:
 
 } // namespace TL
 
+} // namespace Layers
+
+namespace TL = Layers::TL;
+
 } // namespace casil
 
-#endif // CASIL_TL_INTERFACE_H
+#endif // CASIL_LAYERS_TL_INTERFACE_H

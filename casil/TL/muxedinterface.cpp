@@ -29,7 +29,7 @@
 #include <thread>
 #include <utility>
 
-using casil::TL::MuxedInterface;
+using casil::Layers::TL::MuxedInterface;
 
 /*!
  * \brief Constructor.

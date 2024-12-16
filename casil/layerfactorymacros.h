@@ -50,10 +50,11 @@
 /*!
  * \brief Register an interface component class's type name.
  *
- * Append this to a \ref casil::TL::Interface "TL::Interface" class definition in order to define a type name via the \c typeName member,
- * which is needed by \ref CASIL_REGISTER_INTERFACE_CPP for registering the component type to the \ref casil::LayerFactory "LayerFactory".
- * The presence of this member is also used by the \ref TemplateDeviceSpecialization "TemplateDevice" configuration helpers
- * (see \ref casil::TmplDev "TmplDev" and \ref casil::Concepts::HasRegisteredTypeName "Concepts::HasRegisteredTypeName")
+ * Append this to a \ref casil::Layers::TL::Interface "TL::Interface" class definition in order to define a
+ * type name via the \c typeName member, which is needed by \ref CASIL_REGISTER_INTERFACE_CPP for registering
+ * the component type to the \ref casil::LayerFactory "LayerFactory". The presence of this member is also used by
+ * the \ref TemplateDeviceSpecialization "TemplateDevice" configuration helpers (see \ref casil::TmplDev "TmplDev"
+ * and \ref casil::Concepts::HasRegisteredTypeName "Concepts::HasRegisteredTypeName")
  * to check at compile time that the type is actually registered.
  *
  * \param TYPE_NAME The type name to register to the factory for the class.
@@ -66,7 +67,7 @@ private:
 /*!
  * \brief Register a driver component class's type name.
  *
- * Append this to a \ref casil::HL::Driver "HL::Driver" class definition in order to define a type name via the \c typeName member,
+ * Append this to a \ref casil::Layers::HL::Driver "HL::Driver" class definition in order to define a type name via the \c typeName member,
  * which is needed by \ref CASIL_REGISTER_DRIVER_CPP for registering the component type to the \ref casil::LayerFactory "LayerFactory".
  * The presence of this member is also used by the \ref TemplateDeviceSpecialization "TemplateDevice" configuration helpers
  * (see \ref casil::TmplDev "TmplDev" and \ref casil::Concepts::HasRegisteredTypeName "Concepts::HasRegisteredTypeName")
@@ -82,7 +83,7 @@ private:
 /*!
  * \brief Register a register component class's type name.
  *
- * Append this to a \ref casil::RL::Register "RL::Register" class definition in order to define a type name via the \c typeName member,
+ * Append this to a \ref casil::Layers::RL::Register "RL::Register" class definition in order to define a type name via the \c typeName member,
  * which is needed by \ref CASIL_REGISTER_REGISTER_CPP for registering the component type to the \ref casil::LayerFactory "LayerFactory".
  * The presence of this member is also used by the \ref TemplateDeviceSpecialization "TemplateDevice" configuration helpers
  * (see \ref casil::TmplDev "TmplDev" and \ref casil::Concepts::HasRegisteredTypeName "Concepts::HasRegisteredTypeName")
@@ -100,7 +101,7 @@ private:
 /*!
  * \brief Register an interface component to the \ref casil::LayerFactory "LayerFactory".
  *
- * Put this into the translation unit (the source file) of a \ref casil::TL::Interface "TL::Interface" class
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::TL::Interface "TL::Interface" class
  * in order to register the component type to the \ref casil::LayerFactory "LayerFactory", which is needed to
  * use the component with \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice".
  * You need to also place \ref CASIL_REGISTER_INTERFACE_H within the class's definition to make this work,
@@ -140,7 +141,7 @@ namespace RegistryImpl\
 /*!
  * \brief Register a driver component to the \ref casil::LayerFactory "LayerFactory".
  *
- * Put this into the translation unit (the source file) of a \ref casil::HL::Driver "HL::Driver" class
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::HL::Driver "HL::Driver" class
  * in order to register the component type to the \ref casil::LayerFactory "LayerFactory", which is needed to
  * use the component with \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice".
  * You need to also place \ref CASIL_REGISTER_DRIVER_H within the class's definition to make this work,
@@ -191,7 +192,7 @@ namespace RegistryImpl\
 /*!
  * \brief Register a register component to the \ref casil::LayerFactory "LayerFactory".
  *
- * Put this into the translation unit (the source file) of a \ref casil::RL::Register "HL::Register" class
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::RL::Register "HL::Register" class
  * in order to register the component type to the \ref casil::LayerFactory "LayerFactory", which is needed to
  * use the component with \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice".
  * You need to also place \ref CASIL_REGISTER_REGISTER_H within the class's definition to make this work,
@@ -238,7 +239,7 @@ namespace RegistryImpl\
 /*!
  * \brief Register an alias type name for an interface component.
  *
- * Put this into the translation unit (the source file) of a \ref casil::TL::Interface "TL::Interface" class \e after
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::TL::Interface "TL::Interface" class \e after
  * \ref CASIL_REGISTER_INTERFACE_CPP in order to allow using this component type with the \ref casil::LayerFactory "LayerFactory"
  * and \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice" under an alternative type name
  * (i.e. different from the one defined by \ref CASIL_REGISTER_INTERFACE_H).
@@ -269,7 +270,7 @@ namespace RegistryImpl\
 /*!
  * \brief Register an alias type name for a driver component.
  *
- * Put this into the translation unit (the source file) of a \ref casil::HL::Driver "HL::Driver" class \e after
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::HL::Driver "HL::Driver" class \e after
  * \ref CASIL_REGISTER_DRIVER_CPP in order to allow using this component type with the \ref casil::LayerFactory "LayerFactory"
  * and \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice" under an alternative type name
  * (i.e. different from the one defined by \ref CASIL_REGISTER_DRIVER_H).
@@ -300,7 +301,7 @@ namespace RegistryImpl\
 /*!
  * \brief Register an alias type name for a register component.
  *
- * Put this into the translation unit (the source file) of a \ref casil::RL::Register "RL::Register" class \e after
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::RL::Register "RL::Register" class \e after
  * \ref CASIL_REGISTER_REGISTER_CPP in order to allow using this component type with the \ref casil::LayerFactory "LayerFactory"
  * and \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice" under an alternative type name
  * (i.e. different from the one defined by \ref CASIL_REGISTER_REGISTER_H).

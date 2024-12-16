@@ -24,7 +24,7 @@
 
 #include <utility>
 
-using casil::HL::VirtEcho;
+using casil::Layers::HL::VirtEcho;
 
 CASIL_REGISTER_DRIVER_CPP(VirtEcho)
 

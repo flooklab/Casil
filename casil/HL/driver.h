@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_HL_DRIVER_H
-#define CASIL_HL_DRIVER_H
+#ifndef CASIL_LAYERS_HL_DRIVER_H
+#define CASIL_LAYERS_HL_DRIVER_H
 
 #include <casil/layerbase.h>
 
@@ -32,6 +32,9 @@
 #include <vector>
 
 namespace casil
+{
+
+namespace Layers
 {
 
 /*!
@@ -48,7 +51,7 @@ namespace HL
  * This class provides very basic/limited functionality likely common to all drivers.
  * It is not intended to directly derive drivers from this class.
  *
- * Because of the \e direct/muxed interface split in the TL, drivers must be split into two such groups as well:
+ * Because of the \e direct/muxed interface split in the \ref Layers::TL "TL", drivers must be split into two such groups as well:
  * - "Direct" drivers: Drivers for independent/stand-alone hardware (not using the basil bus)
  * - "Muxed" drivers: Drivers for firmware modules running on FPGA hardware based on the basil bus
  *
@@ -95,6 +98,10 @@ private:
 
 } // namespace HL
 
+} // namespace Layers
+
+namespace HL = Layers::HL;
+
 } // namespace casil
 
-#endif // CASIL_HL_DRIVER_H
+#endif // CASIL_LAYERS_HL_DRIVER_H

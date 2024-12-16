@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_HL_DUMMYMUXEDDRIVER_H
-#define CASIL_HL_DUMMYMUXEDDRIVER_H
+#ifndef CASIL_LAYERS_HL_DUMMYMUXEDDRIVER_H
+#define CASIL_LAYERS_HL_DUMMYMUXEDDRIVER_H
 
 #include <casil/HL/muxeddriver.h>
 
@@ -35,7 +35,7 @@
 namespace casil
 {
 
-namespace HL
+namespace Layers::HL
 {
 
 /*!
@@ -59,8 +59,8 @@ private:
     CASIL_REGISTER_DRIVER_H("DummyMuxedDriver")
 };
 
-} // namespace HL
+} // namespace Layers::HL
 
 } // namespace casil
 
-#endif // CASIL_HL_DUMMYMUXEDDRIVER_H
+#endif // CASIL_LAYERS_HL_DUMMYMUXEDDRIVER_H

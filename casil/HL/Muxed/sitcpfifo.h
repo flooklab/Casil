@@ -56,8 +56,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_HL_SITCPFIFO_H
-#define CASIL_HL_SITCPFIFO_H
+#ifndef CASIL_LAYERS_HL_SITCPFIFO_H
+#define CASIL_LAYERS_HL_SITCPFIFO_H
 
 #include <casil/HL/muxeddriver.h>
 
@@ -73,9 +73,9 @@
 namespace casil
 {
 
-namespace TL { class SiTCP; }
+namespace Layers::TL { class SiTCP; }
 
-namespace HL
+namespace Layers::HL
 {
 
 /*!
@@ -113,8 +113,8 @@ private:
     CASIL_REGISTER_DRIVER_H("SiTCPFifo")
 };
 
-} // namespace HL
+} // namespace Layers::HL
 
 } // namespace casil
 
-#endif // CASIL_HL_SITCPFIFO_H
+#endif // CASIL_LAYERS_HL_SITCPFIFO_H

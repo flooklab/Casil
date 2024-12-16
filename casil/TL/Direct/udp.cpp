@@ -27,7 +27,7 @@
 #include <stdexcept>
 #include <utility>
 
-using casil::TL::UDP;
+using casil::Layers::TL::UDP;
 
 CASIL_REGISTER_INTERFACE_CPP(UDP)
 

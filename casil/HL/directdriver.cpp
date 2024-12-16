@@ -24,14 +24,14 @@
 
 #include <utility>
 
-using casil::HL::DirectDriver;
+using casil::Layers::HL::DirectDriver;
 
 /*!
  * \brief Constructor.
  *
  * Constructs Driver by forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * Initializes the internal direct interface instance (for required access to TL) from \p pInterface.
+ * Initializes the internal direct interface instance (for required access to \ref Layers::TL "TL") from \p pInterface.
  *
  * \param pType Registered component type name.
  * \param pName Component instance name.

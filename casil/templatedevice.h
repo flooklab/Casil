@@ -83,7 +83,7 @@ namespace TmplDevImpl
  *
  * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_INTERFACE macro from \ref templatedevicemacros.h.
  *
- * \tparam T Registered interface class implementing TL::Interface.
+ * \tparam T Registered interface class implementing \ref Layers::TL::Interface "TL::Interface".
  */
 template<typename T>
 struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
@@ -107,7 +107,7 @@ struct InterfaceConf : public TmplDevImpl::InterfaceConfBase
  *
  * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_DRIVER macro from \ref templatedevicemacros.h.
  *
- * \tparam T Registered driver class implementing HL::Driver.
+ * \tparam T Registered driver class implementing \ref Layers::HL::Driver "HL::Driver".
  */
 template<typename T>
 struct DriverConf : public TmplDevImpl::DriverConfBase
@@ -131,7 +131,7 @@ struct DriverConf : public TmplDevImpl::DriverConfBase
  *
  * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_REGISTER macro from \ref templatedevicemacros.h.
  *
- * \tparam T Registered register class implementing RL::Register.
+ * \tparam T Registered register class implementing \ref Layers::RL::Register "RL::Register".
  */
 template<typename T>
 struct RegisterConf : public TmplDevImpl::RegisterConfBase
@@ -323,7 +323,7 @@ public:
      *
      * Returns a reference to the interface component configured by \p T, which is equivalent to
      * Device::interface() being called with the configured instance name \c T::name, except that here
-     * the return type is the specific interface type (\c T::Type ) instead of the base type TL::Interface.
+     * the return type is the specific interface type (\c T::Type ) instead of the base type \ref Layers::TL::Interface "TL::Interface".
      *
      * \tparam T An interface configuration out of \p InterfaceConfTs.
      * \return The interface component configured by \p T, casted to the specific interface type.
@@ -341,7 +341,7 @@ public:
      *
      * Returns a reference to the driver component configured by \p T, which is equivalent to
      * Device::driver() being called with the configured instance name \c T::name, except that here
-     * the return type is the specific driver type (\c T::Type ) instead of the base type HL::Driver.
+     * the return type is the specific driver type (\c T::Type ) instead of the base type \ref Layers::HL::Driver "HL::Driver".
      *
      * \tparam T A driver configuration out of \p DriverConfTs.
      * \return The driver component configured by \p T, casted to the specific driver type.
@@ -357,9 +357,9 @@ public:
     /*!
      * \brief Access one of the register components from the register layer.
      *
-     * Returns a reference to the register component configured by \p T, which is equivalent to
-     * Device::reg() being called with the configured instance name \c T::name, except that here
-     * the return type is the specific register type (\c T::Type ) instead of the base type RL::Register.
+     * Returns a reference to the register component configured by \p T, which is equivalent to Device::reg() being
+     * called with the configured instance name \c T::name, except that here the return type is the specific
+     * register type (\c T::Type ) instead of the base type \ref Layers::RL::Register "RL::Register".
      *
      * \tparam T A register configuration out of \p RegisterConfTs.
      * \return The register component configured by \p T, casted to the specific register type.

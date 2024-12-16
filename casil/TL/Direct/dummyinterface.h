@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef CASIL_TL_DUMMYINTERFACE_H
-#define CASIL_TL_DUMMYINTERFACE_H
+#ifndef CASIL_LAYERS_TL_DUMMYINTERFACE_H
+#define CASIL_LAYERS_TL_DUMMYINTERFACE_H
 
 #include <casil/TL/directinterface.h>
 
@@ -35,7 +35,7 @@
 namespace casil
 {
 
-namespace TL
+namespace Layers::TL
 {
 
 /*!
@@ -61,8 +61,8 @@ private:
     CASIL_REGISTER_INTERFACE_H("DummyInterface")
 };
 
-} // namespace TL
+} // namespace Layers::TL
 
 } // namespace casil
 
-#endif // CASIL_TL_DUMMYINTERFACE_H
+#endif // CASIL_LAYERS_TL_DUMMYINTERFACE_H

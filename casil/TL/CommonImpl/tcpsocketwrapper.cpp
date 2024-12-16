@@ -39,7 +39,7 @@
 #include <stdexcept>
 #include <utility>
 
-using casil::TL::CommonImpl::TCPSocketWrapper;
+using casil::Layers::TL::CommonImpl::TCPSocketWrapper;
 
 //
 

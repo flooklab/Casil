@@ -65,7 +65,7 @@
 #include <stdexcept>
 #include <utility>
 
-using casil::HL::SiTCPFifo;
+using casil::Layers::HL::SiTCPFifo;
 
 CASIL_REGISTER_DRIVER_CPP(SiTCPFifo)
 CASIL_REGISTER_DRIVER_ALIAS("sitcp_fifo")

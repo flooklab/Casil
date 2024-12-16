@@ -117,7 +117,7 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
         pTimedOut->get() = false;
 
     if (!pFuture.valid())
-        throw std::runtime_error("Invalid future. THIS SHOULD NEVER HAPPEN!");
+        throw std::invalid_argument("Invalid future.");
 
     const std::future_status status = pFuture.wait_for(pTimeout);
 

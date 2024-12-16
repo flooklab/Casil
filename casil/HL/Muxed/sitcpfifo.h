@@ -79,7 +79,7 @@ namespace Layers::HL
 {
 
 /*!
- * \brief Special driver to access the FIFO of the SiTCP interface.
+ * \brief Special driver to access the FIFO of the \ref TL::SiTCP "SiTCP" interface.
  *
  * \todo Detailed doc
  */

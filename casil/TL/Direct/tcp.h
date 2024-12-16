@@ -67,7 +67,7 @@ private:
     const std::string readTermination;              ///< Read termination to detect end of read data stream.
     const std::string writeTermination;             ///< Write termination to append to written data.
     //
-    CommonImpl::TCPSocketWrapper socketWrapper;     ///< Detailed TCP socket logic wrapper.
+    CommonImpl::TCPSocketWrapper socketWrapper;     ///< Detailed %TCP socket logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("TCP")
 };

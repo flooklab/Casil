@@ -65,7 +65,7 @@ private:
     const std::string hostName;                     ///< Host name of the remote endpoint.
     const int port;                                 ///< Used network port.
     //
-    CommonImpl::UDPSocketWrapper socketWrapper;     ///< Detailed UDP socket logic wrapper.
+    CommonImpl::UDPSocketWrapper socketWrapper;     ///< Detailed %UDP socket logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("UDP")
 };

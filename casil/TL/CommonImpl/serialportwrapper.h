@@ -77,7 +77,7 @@ private:
                                                                                                 ///  by pollReadBuffer() and issue next poll.
 
 private:
-    const std::string port;                                 ///< Serial port identifier (e.g. device file).
+    const std::string port;                                 ///< %Serial port identifier (e.g. device file).
     const std::vector<std::uint8_t> readTermination;        ///< Read termination to detect end of read data stream.
     const std::size_t readTerminationLength;                ///< Number of read termination bytes.
     const std::vector<std::uint8_t> writeTermination;       ///< Write termination to append to written data.

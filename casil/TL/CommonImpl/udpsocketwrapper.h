@@ -81,7 +81,7 @@ private:
     //
     boost::asio::ip::udp::socket socket;                    ///< %UDP socket.
     //
-    static constexpr std::size_t readBufferSize = 65527;    ///< Maximum UDP datagram payload size.
+    static constexpr std::size_t readBufferSize = 65527;    ///< Maximum %UDP datagram payload size.
     std::array<std::uint8_t, readBufferSize> readBuffer;    ///< Buffer for incoming datagrams.
 };
 

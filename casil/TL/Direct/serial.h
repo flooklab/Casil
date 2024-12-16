@@ -62,7 +62,7 @@ private:
     bool closeImpl() override;
 
 private:
-    const std::string port;                 ///< Serial port identifier (e.g. device file).
+    const std::string port;                 ///< %Serial port identifier (e.g. device file).
     const std::string readTermination;      ///< Read termination to detect end of read data stream.
     const std::string writeTermination;     ///< Write termination to append to written data.
     const int baudRate;                     ///< Baud rate setting for the serial communication.

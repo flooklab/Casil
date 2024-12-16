@@ -94,7 +94,7 @@ using casil::HL::RegisterDriver;
  * \param pInterface %Interface instance to be used.
  * \param pConfig Component configuration.
  * \param pRequiredConfig Configuration required to be specified by \p pConfig.
- * \param pRegisters
+ * \param pRegisters Map of needed registers (their names as keys) to be defined by the derived class (the actual driver component).
  */
 RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface,
                                LayerConfig pConfig, const LayerConfig& pRequiredConfig,

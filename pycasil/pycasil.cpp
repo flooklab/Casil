@@ -63,12 +63,15 @@ PYBIND11_MODULE(PyCasil, pyCasil)
 
     //
 
-    py::module modTL = pyCasil.def_submodule("TL", "Transfer layer: Interfaces that connect the PyCasil host to its devices/components.");
+    py::module modLayers = pyCasil.def_submodule("Layers", "Starting point for the differentiation into the three layers of "
+                                                           "the basil layer structure with their associated layer components.");
+
+    py::module modTL = modLayers.def_submodule("TL", "Transfer layer: Interfaces that connect the PyCasil host to its devices/components.");
     bindTL(modTL);
 
-    py::module modHL = pyCasil.def_submodule("HL", "Hardware layer: Drivers that control the connected devices/components.");
+    py::module modHL = modLayers.def_submodule("HL", "Hardware layer: Drivers that control the connected devices/components.");
     bindHL(modHL);
 
-    py::module modRL = pyCasil.def_submodule("RL", "Register layer: Abstraction for register(-like) functionalities of the drivers.");
+    py::module modRL = modLayers.def_submodule("RL", "Register layer: Abstraction for register(-like) functionalities of the drivers.");
     bindRL(modRL);
 }

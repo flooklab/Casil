@@ -60,6 +60,7 @@ namespace TmplDev
  */
 namespace TmplDevImpl
 {
+
     struct ComponentConfBase { ComponentConfBase() = delete; };
 
     struct InterfaceConfBase : public ComponentConfBase {};
@@ -139,6 +140,7 @@ struct RegisterConf : public TmplDevImpl::RegisterConfBase
 
 namespace TmplDevImpl
 {
+
     template<typename T, template<typename> typename U>
     concept DerivedFromConfStruct = requires { typename T::Type; } &&
                                     std::is_base_of_v<U<typename T::Type>, T> &&
@@ -155,26 +157,49 @@ namespace TmplDevImpl
         typename Concepts::TestConstexpr<T::conf[0]>;
     };
 
-    template<typename T>
-    concept ImplementsInterfaceConf = ImplementsConfStruct<T, InterfaceConf>;
-
-    template<typename T>
-    concept ImplementsDriverConf = ImplementsConfStruct<T, DriverConf> && requires
-    {
-        T::interface;
-        requires Concepts::IsConstCharArr<decltype(T::interface)>;
-        typename Concepts::TestConstexpr<T::interface[0]>;
-    };
-
-    template<typename T>
-    concept ImplementsRegisterConf = ImplementsConfStruct<T, RegisterConf> && requires
-    {
-        T::driver;
-        requires Concepts::IsConstCharArr<decltype(T::driver)>;
-        typename Concepts::TestConstexpr<T::driver[0]>;
-    };
-
 } // namespace TmplDevImpl
+
+//
+
+/*!
+ * \brief Check if type is a valid interface configuration wrapper.
+ *
+ * See InterfaceConf for the requirements on \p T.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept ImplementsInterfaceConf = TmplDevImpl::ImplementsConfStruct<T, InterfaceConf>;
+
+/*!
+ * \brief Check if type is a valid driver configuration wrapper.
+ *
+ * See DriverConf for the requirements on \p T.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept ImplementsDriverConf = TmplDevImpl::ImplementsConfStruct<T, DriverConf> && requires
+{
+    T::interface;
+    requires Concepts::IsConstCharArr<decltype(T::interface)>;
+    typename Concepts::TestConstexpr<T::interface[0]>;
+};
+
+/*!
+ * \brief Check if type is a valid register configuration wrapper.
+ *
+ * See RegisterConf for the requirements on \p T.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept ImplementsRegisterConf = TmplDevImpl::ImplementsConfStruct<T, RegisterConf> && requires
+{
+    T::driver;
+    requires Concepts::IsConstCharArr<decltype(T::driver)>;
+    typename Concepts::TestConstexpr<T::driver[0]>;
+};
 
 //
 
@@ -189,7 +214,7 @@ namespace TmplDevImpl
 template<typename... Ts>
 struct InterfacesConf
 {
-    static_assert((TmplDevImpl::ImplementsInterfaceConf<Ts> && ...),
+    static_assert((ImplementsInterfaceConf<Ts> && ...),
                   "Each interface must be specified by deriving from InterfaceConf and defining "
                   "'static constexpr char name[] = \"name_of_interface\";' and "
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
@@ -206,7 +231,7 @@ struct InterfacesConf
 template<typename... Ts>
 struct DriversConf
 {
-    static_assert((TmplDevImpl::ImplementsDriverConf<Ts> && ...),
+    static_assert((ImplementsDriverConf<Ts> && ...),
                   "Each driver must be specified by deriving from DriverConf and defining "
                   "'static constexpr char name[] = \"name_of_driver\";' and "
                   "'static constexpr char interface[] = \"name_of_used_interface\";' and "
@@ -224,7 +249,7 @@ struct DriversConf
 template<typename... Ts>
 struct RegistersConf
 {
-    static_assert((TmplDevImpl::ImplementsRegisterConf<Ts> && ...),
+    static_assert((ImplementsRegisterConf<Ts> && ...),
                   "Each register must be specified by deriving from RegisterConf and defining "
                   "'static constexpr char name[] = \"name_of_register\";' and "
                   "'static constexpr char driver[] = \"name_of_used_hw_driver\";' and "
@@ -298,9 +323,9 @@ public:
      * \return The interface component configured by \p T, casted to the specific interface type.
      */
     template<typename T>
+        requires TmplDev::ImplementsInterfaceConf<T>
     typename T::Type& interface()
     {
-        static_assert(std::is_base_of_v<TL::Interface, typename T::Type>, "Requested type is not an interface.");
         static_assert((std::is_same_v<T, InterfaceConfTs> || ...), "Device does not have the requested interface.");
 
         return dynamic_cast<typename T::Type&>(Device::interface(T::name));
@@ -316,9 +341,9 @@ public:
      * \return The driver component configured by \p T, casted to the specific driver type.
      */
     template<typename T>
+        requires TmplDev::ImplementsDriverConf<T>
     typename T::Type& driver()
     {
-        static_assert(std::is_base_of_v<HL::Driver, typename T::Type>, "Requested type is not a driver.");
         static_assert((std::is_same_v<T, DriverConfTs> || ...), "Device does not have the requested driver.");
 
         return dynamic_cast<typename T::Type&>(Device::driver(T::name));
@@ -334,9 +359,9 @@ public:
      * \return The register component configured by \p T, casted to the specific register type.
      */
     template<typename T>
+        requires TmplDev::ImplementsRegisterConf<T>
     typename T::Type& reg()
     {
-        static_assert(std::is_base_of_v<RL::Register, typename T::Type>, "Requested type is not a register.");
         static_assert((std::is_same_v<T, RegisterConfTs> || ...), "Device does not have the requested register.");
 
         return dynamic_cast<typename T::Type&>(Device::reg(T::name));

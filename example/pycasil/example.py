@@ -31,16 +31,16 @@ pcs.Logger.log("HelloWorld0", pcs.Logger.LogLevel.Error)
 pcs.Logger.log("HelloWorld1", pcs.Logger.LogLevel.Info)
 pcs.Logger.log("HelloWorld2", pcs.Logger.LogLevel.DebugDebug)
 
-pcs.Logger.log("Casil version: " + pcs.Version.toString(), pcs.Logger.LogLevel.Info)
+pcs.Logger.logInfo("Casil version: " + pcs.Version.toString())
 
 with pcs.Auxil.AsyncIORunner(2):
 
     d = pcs.Device("{transfer_layer: [{name: intf, type: Serial,"
-                                       "init: {port: /dev/pts/2, read_termination: \"\\n\\r\", baudrate: 19200}},"
-                                      "{name: intf2, type: Serial,"
-                                       "init: {port: /dev/pts/3, read_termination: \"\\n\\r\", baudrate: 19200}}],"
-                     "hw_drivers: [{name: echo, type: VirtEcho, interface: intf2}],"
-                     "registers: []}")
+                                      "init: {port: /dev/pts/2, read_termination: \"\\n\\r\", baudrate: 19200}},"
+                                     "{name: intf2, type: Serial,"
+                                      "init: {port: /dev/pts/3, read_termination: \"\\n\\r\", baudrate: 19200}}],"
+                    "hw_drivers: [{name: echo, type: VirtEcho, interface: intf2}],"
+                    "registers: []}")
 
     d.init()
 

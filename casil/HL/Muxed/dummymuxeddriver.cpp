@@ -36,11 +36,9 @@ CASIL_REGISTER_DRIVER_CPP(DummyMuxedDriver)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
- *
- * \param pName
- * \param pInterface
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
  */
 DummyMuxedDriver::DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     MuxedDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig())
@@ -52,11 +50,11 @@ DummyMuxedDriver::DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterf
 /*!
  * \copybrief MuxedDriver::getData()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \param pSize
- * \param pAddrOffs
- * \return
+ * \param pSize Number of bytes to get (ignored).
+ * \param pAddrOffs Data offset as number of bytes (ignored).
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::uint32_t pAddrOffs)
 {
@@ -69,10 +67,10 @@ std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::
 /*!
  * \copybrief MuxedDriver::setData()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \param pData
- * \param pAddrOffs
+ * \param pData Data to be set as byte sequence (ignored).
+ * \param pAddrOffs Data offset as number of bytes (ignored).
  */
 void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std::uint32_t pAddrOffs)
 {
@@ -84,7 +82,7 @@ void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std
 /*!
  * \copybrief MuxedDriver::exec()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  */
 void DummyMuxedDriver::exec()
 {
@@ -94,9 +92,9 @@ void DummyMuxedDriver::exec()
 /*!
  * \copybrief MuxedDriver::isDone()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return False.
  */
 bool DummyMuxedDriver::isDone()
 {
@@ -109,9 +107,9 @@ bool DummyMuxedDriver::isDone()
 /*!
  * \copybrief MuxedDriver::initImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyMuxedDriver::initImpl()
 {
@@ -122,9 +120,9 @@ bool DummyMuxedDriver::initImpl()
 /*!
  * \copybrief MuxedDriver::closeImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyMuxedDriver::closeImpl()
 {

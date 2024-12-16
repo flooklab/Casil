@@ -36,10 +36,8 @@ CASIL_REGISTER_INTERFACE_CPP(DummyMuxedInterface)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
- *
- * \param pName
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
  */
 DummyMuxedInterface::DummyMuxedInterface(std::string pName, LayerConfig pConfig) :
     MuxedInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig())
@@ -51,11 +49,11 @@ DummyMuxedInterface::DummyMuxedInterface(std::string pName, LayerConfig pConfig)
 /*!
  * \copybrief MuxedInterface::read()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pAddr
- * \param pSize
- * \return
+ * \param pAddr Bus address (ignored).
+ * \param pSize Number of bytes to read (ignored).
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, const int pSize)
 {
@@ -68,10 +66,10 @@ std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, c
 /*!
  * \copybrief MuxedInterface::write()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pAddr
- * \param pData
+ * \param pAddr Bus address (ignored).
+ * \param pData Bytes to be written (ignored).
  */
 void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData)
 {
@@ -83,13 +81,13 @@ void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std
 /*!
  * \copybrief MuxedInterface::query()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pWriteAddr
- * \param pReadAddr
- * \param pData
- * \param pSize
- * \return
+ * \param pWriteAddr Bus address to write to (ignored).
+ * \param pReadAddr Bus address to read from (ignored).
+ * \param pData Query bytes to be written (ignored).
+ * \param pSize Number of response bytes to read (ignored).
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteAddr, const std::uint64_t pReadAddr,
                                                      const std::vector<std::uint8_t>& pData, const int pSize)
@@ -107,9 +105,9 @@ std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteA
 /*!
  * \copybrief MuxedInterface::readBufferEmpty()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyMuxedInterface::readBufferEmpty() const
 {
@@ -120,7 +118,7 @@ bool DummyMuxedInterface::readBufferEmpty() const
 /*!
  * \copybrief MuxedInterface::clearReadBuffer()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  */
 void DummyMuxedInterface::clearReadBuffer()
 {
@@ -132,9 +130,9 @@ void DummyMuxedInterface::clearReadBuffer()
 /*!
  * \copybrief MuxedInterface::initImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyMuxedInterface::initImpl()
 {
@@ -145,9 +143,9 @@ bool DummyMuxedInterface::initImpl()
 /*!
  * \copybrief MuxedInterface::closeImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyMuxedInterface::closeImpl()
 {

@@ -33,11 +33,9 @@ CASIL_REGISTER_DRIVER_CPP(VirtEcho)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
- *
- * \param pName
- * \param pInterface
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
  */
 VirtEcho::VirtEcho(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     DirectDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig())
@@ -49,9 +47,9 @@ VirtEcho::VirtEcho(std::string pName, InterfaceBaseType& pInterface, LayerConfig
 /*!
  * \brief Read and immediately write back a number of bytes.
  *
- * \todo Detailed doc
+ * Reads via TL::DirectInterface::read() and then writes via TL::DirectInterface::write().
  *
- * \param pN
+ * \param pN Number of bytes as taken by TL::DirectInterface::read() and TL::DirectInterface::write().
  */
 void VirtEcho::operator()(const int pN) const
 {
@@ -63,9 +61,9 @@ void VirtEcho::operator()(const int pN) const
 /*!
  * \copybrief DirectDriver::initImpl()
  *
- * \todo Detailed doc
+ * Does nothing.
  *
- * \return
+ * \return True.
  */
 bool VirtEcho::initImpl()
 {
@@ -75,9 +73,9 @@ bool VirtEcho::initImpl()
 /*!
  * \copybrief DirectDriver::closeImpl()
  *
- * \todo Detailed doc
+ * Does nothing.
  *
- * \return
+ * \return True.
  */
 bool VirtEcho::closeImpl()
 {

@@ -40,8 +40,6 @@ namespace TL
 
 /*!
  * \brief Dummy implementation of DirectInterface without actual functionality.
- *
- * \todo Detailed doc
  */
 class DummyInterface final : public DirectInterface
 {

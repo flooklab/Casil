@@ -36,10 +36,8 @@ CASIL_REGISTER_INTERFACE_CPP(DummyInterface)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
- *
- * \param pName
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
  */
 DummyInterface::DummyInterface(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig())
@@ -51,10 +49,10 @@ DummyInterface::DummyInterface(std::string pName, LayerConfig pConfig) :
 /*!
  * \copybrief DirectInterface::read()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pSize
- * \return
+ * \param pSize Number of bytes to read (ignored).
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> DummyInterface::read(const int pSize)
 {
@@ -65,9 +63,9 @@ std::vector<std::uint8_t> DummyInterface::read(const int pSize)
 /*!
  * \copybrief DirectInterface::write()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pData
+ * \param pData Bytes to be written (ignored).
  */
 void DummyInterface::write(const std::vector<std::uint8_t>& pData)
 {
@@ -77,11 +75,11 @@ void DummyInterface::write(const std::vector<std::uint8_t>& pData)
 /*!
  * \copybrief DirectInterface::query()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pData
- * \param pSize
- * \return
+ * \param pData Query bytes to be written (ignored).
+ * \param pSize Number of response bytes to read (ignored).
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> DummyInterface::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
@@ -96,9 +94,9 @@ std::vector<std::uint8_t> DummyInterface::query(const std::vector<std::uint8_t>&
 /*!
  * \copybrief DirectInterface::readBufferEmpty()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyInterface::readBufferEmpty() const
 {
@@ -109,7 +107,7 @@ bool DummyInterface::readBufferEmpty() const
 /*!
  * \copybrief DirectInterface::clearReadBuffer()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  */
 void DummyInterface::clearReadBuffer()
 {
@@ -121,9 +119,9 @@ void DummyInterface::clearReadBuffer()
 /*!
  * \copybrief DirectInterface::initImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyInterface::initImpl()
 {
@@ -134,9 +132,9 @@ bool DummyInterface::initImpl()
 /*!
  * \copybrief DirectInterface::closeImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyInterface::closeImpl()
 {

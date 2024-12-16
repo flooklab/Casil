@@ -40,8 +40,6 @@ namespace TL
 
 /*!
  * \brief Dummy implementation of MuxedInterface without actual functionality.
- *
- * \todo Detailed doc
  */
 class DummyMuxedInterface final : public MuxedInterface
 {

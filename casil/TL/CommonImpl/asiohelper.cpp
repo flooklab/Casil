@@ -30,11 +30,20 @@ namespace casil::TL::CommonImpl::ASIOHelper
 /*!
  * \brief Handler for socket transfer operations that does not fail when the socket gets cancelled.
  *
- * \todo Detailed doc
+ * This is a handler prototype for asynchronous operations on Boost %ASIO's %TCP/%UDP sockets that transfer bytes and pass the number
+ * of successfully transferred bytes to the handler (\p pNumBytes in this case). This handler treats both \e success and \e cancelled
+ * error codes (\p pErrorCode equal to \c boost::system::errc::success or \c boost::system::errc::operation_canceled, respectively)
+ * as successful outcome. This means that the value of \p pNumBytesPromise will be set to \p pNumBytes not only on success but also if
+ * the socket gets cancelled before completion of the operation (i.e. retrieval of \e already transferred bytes from the promise/future is
+ * possible). For any \e other error code the \e exception of \p pNumBytesPromise is set to the corresponding \c boost::system::system_error.
  *
- * \param pErrorCode
- * \param pNumBytes
- * \param pNumBytesPromise
+ * Use this function with \c std::bind to bind \p pNumBytesPromise and pass the bound function as actual handler.
+ *
+ * \throws std::invalid_argument If \p pNumBytesPromise has no shared state or already stores a value/exception.
+ *
+ * \param pErrorCode Result/error code of the handled async operation.
+ * \param pNumBytes Number of successfully transferred bytes.
+ * \param pNumBytesPromise The promise to use to communicate the number of transferred bytes (or exception on unhandled error).
  */
 void readWriteHandler(const boost::system::error_code& pErrorCode, const std::size_t pNumBytes, std::promise<std::size_t>& pNumBytesPromise)
 {

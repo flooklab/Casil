@@ -39,7 +39,7 @@ namespace HL
 /*!
  * \brief Pseudo driver to write back to its interface what can be read from it.
  *
- * \todo Detailed doc
+ * Reads some data \e on \e request and immediately writes it back (see operator()()).
  */
 class VirtEcho final : public DirectDriver
 {

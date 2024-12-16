@@ -164,7 +164,7 @@ namespace TmplDevImpl
 /*!
  * \brief Check if type is a valid interface configuration wrapper.
  *
- * See InterfaceConf for the requirements on \p T.
+ * See \ref casil::TmplDev::InterfaceConf "InterfaceConf" for the requirements on \p T.
  *
  * \tparam T Type to be checked.
  */
@@ -174,7 +174,7 @@ concept ImplementsInterfaceConf = TmplDevImpl::ImplementsConfStruct<T, Interface
 /*!
  * \brief Check if type is a valid driver configuration wrapper.
  *
- * See DriverConf for the requirements on \p T.
+ * See \ref casil::TmplDev::DriverConf "DriverConf" for the requirements on \p T.
  *
  * \tparam T Type to be checked.
  */
@@ -189,7 +189,7 @@ concept ImplementsDriverConf = TmplDevImpl::ImplementsConfStruct<T, DriverConf> 
 /*!
  * \brief Check if type is a valid register configuration wrapper.
  *
- * See RegisterConf for the requirements on \p T.
+ * See \ref casil::TmplDev::RegisterConf "RegisterConf" for the requirements on \p T.
  *
  * \tparam T Type to be checked.
  */

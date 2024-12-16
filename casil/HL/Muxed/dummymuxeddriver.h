@@ -40,8 +40,6 @@ namespace HL
 
 /*!
  * \brief Dummy implementation of MuxedDriver without actual functionality.
- *
- * \todo Detailed doc
  */
 class DummyMuxedDriver final : public MuxedDriver
 {

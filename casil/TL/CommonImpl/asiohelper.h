@@ -98,15 +98,25 @@ void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t p
 /*!
  * \brief Wait for the future, get and return its value; cancel socket and throw an exception on timeout.
  *
- * \todo Detailed doc
+ * This function should be used to retrieve the result of an asynchronous operation (in terms of the return value of the
+ * equivalent synchronous call) on a socket \p pSocket using the built-in \c boost::asio::use_future handler when this very
+ * result is not needed anymore if the operation times out. After \p pTimeout with still unfinished operation \p pSocket
+ * will be cancelled. If the operation finishes before the timeout or during the cancelling of the socket, the result
+ * will be returned. Otherwise an exception is thrown, in which case \p pTimedOut will be set to true (if defined).
  *
- * \tparam ReturnT
- * \tparam SocketT
- * \param pFuture
- * \param pSocket
- * \param pTimeout
- * \param pTimedOut
- * \return
+ * Note that \p pTimedOut is always set to false in the beginning, if defined.
+ *
+ * \throws std::invalid_argument If \p pFuture does not refer to a shared state.
+ * \throws std::runtime_error If the operation timed out (\p pTimedOut set to true).
+ * \throws boost::system::system_error If the handler throwed such an exception (other than from cancelling after timeout).
+ *
+ * \tparam ReturnT Return type of the handled operation (which is wrapped in \p pFuture).
+ * \tparam SocketT Type of the socket (either %TCP or %UDP socket from the Boost %ASIO library).
+ * \param pFuture The future returned from initiating the async operation.
+ * \param pSocket The socket on which the operation is performed.
+ * \param pTimeout The timeout for the handled operation.
+ * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocket cancelled and thrown exception was because of the timeout).
+ * \return Result of \p pFuture / the operation.
  */
 template<typename ReturnT, typename SocketT>
     requires IsCancellableSocket<SocketT>
@@ -155,14 +165,23 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
 /*!
  * \brief Wait for the promised future, get and return its value; cancel the socket on timeout but return future's value anyway.
  *
- * \todo Detailed doc
+ * This function should be used to retrieve the number of transferred bytes of an asynchronous operation on a socket \p pSocket
+ * using readWriteHandler() as handler function when the bytes already transferred after a timeout must be processed in
+ * any case. After \p pTimeout with still unfinished operation \p pSocket will be cancelled. In this case the expected
+ * handler readWriteHandler() ensures that the number of already transferred bytes can still be obtained without
+ * an exception being thrown (in contrast to the built-in \c boost::asio::use_future handler). As soon as the
+ * handler completes by itself or after \p pTimeout the number of transferred bytes is returned.
  *
- * \tparam SocketT
- * \param pPromiseN
- * \param pSocket
- * \param pTimeout
- * \param pTimedOut
- * \return
+ * Note that \p pTimedOut is always set to false in the beginning, if defined, and set to true when the timeout happens.
+ *
+ * \throws std::invalid_argument If \p pPromiseN has no shared state or already stores a value/exception.
+ *
+ * \tparam SocketT Type of the socket (either %TCP or %UDP socket from the Boost %ASIO library).
+ * \param pPromiseN The transferred bytes promise from the handler readWriteHandler().
+ * \param pSocket The socket on which the operation is performed.
+ * \param pTimeout The timeout for the handled operation.
+ * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocket cancelled and transferred bytes maybe less than expected).
+ * \return Number of successfully transferred bytes.
  */
 template<typename SocketT>
     requires IsCancellableSocket<SocketT>

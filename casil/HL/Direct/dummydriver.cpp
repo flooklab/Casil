@@ -35,11 +35,9 @@ CASIL_REGISTER_DRIVER_CPP(DummyDriver)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
- *
- * \param pName
- * \param pInterface
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
  */
 DummyDriver::DummyDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     DirectDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig())
@@ -51,9 +49,9 @@ DummyDriver::DummyDriver(std::string pName, InterfaceBaseType& pInterface, Layer
 /*!
  * \copybrief DirectDriver::initImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyDriver::initImpl()
 {
@@ -64,9 +62,9 @@ bool DummyDriver::initImpl()
 /*!
  * \copybrief DirectDriver::closeImpl()
  *
- * \todo Detailed doc
+ * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return
+ * \return True.
  */
 bool DummyDriver::closeImpl()
 {

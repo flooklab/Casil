@@ -37,7 +37,7 @@ using casil::HL::MuxedDriver;
  * Initializes the internal muxed interface instance (for required access to TL) from \p pInterface.
  *
  * Gets the mandatory "base_addr" value from \p pConfig (unsigned integer value), which must be the bus address of the
- * corresponding firmware module instance. This "base address" is used to offset fixed module addresses according to
+ * corresponding firmware module instance. This \e base \e address is used to offset fixed module addresses according to
  * the instance bus address when calling MuxedInterface::read() / MuxedInterface::write() / MuxedInterface::query().
  * See also read() / write() / query() from this class.
  *
@@ -64,11 +64,11 @@ MuxedDriver::MuxedDriver(std::string pType, std::string pName, InterfaceBaseType
 /*!
  * \copybrief Driver::getData()
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  *
- * \param pSize
- * \param pAddrOffs
- * \return
+ * \param pSize Potentially number of bytes to get (implementation-defined).
+ * \param pAddrOffs Potentially data offset as number of bytes (implementation-defined).
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> MuxedDriver::getData(int, std::uint32_t)
 {
@@ -78,10 +78,9 @@ std::vector<std::uint8_t> MuxedDriver::getData(int, std::uint32_t)
 /*!
  * \copybrief Driver::setData()
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  *
- * \param pData
- * \param pAddrOffs
+ * \copydetails Driver::setData()
  */
 void MuxedDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 {
@@ -91,7 +90,7 @@ void MuxedDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 /*!
  * \copybrief Driver::exec()
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  */
 void MuxedDriver::exec()
 {
@@ -101,9 +100,9 @@ void MuxedDriver::exec()
 /*!
  * \copybrief Driver::isDone()
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  *
- * \return
+ * \return False.
  */
 bool MuxedDriver::isDone()
 {
@@ -115,11 +114,14 @@ bool MuxedDriver::isDone()
 /*!
  * \brief Read from the interface relative to the base address.
  *
- * \todo Detailed doc
+ * Calls TL::MuxedInterface::read() with \p pAddr being offset by the module instance's base address
+ * (component configuration parameter "base_addr").
  *
- * \param pAddr
- * \param pSize
- * \return
+ * \throws std::runtime_error If TL::MuxedInterface::read() throws \c std::runtime_error.
+ *
+ * \param pAddr Module-local address.
+ * \param pSize Number of bytes to read.
+ * \return Read bytes.
  */
 std::vector<std::uint8_t> MuxedDriver::read(const std::uint64_t pAddr, const int pSize) const
 {
@@ -137,10 +139,13 @@ std::vector<std::uint8_t> MuxedDriver::read(const std::uint64_t pAddr, const int
 /*!
  * \brief Write to the interface relative to the base address.
  *
- * \todo Detailed doc
+ * Calls TL::MuxedInterface::write() with \p pAddr being offset by the module instance's base address
+ * (component configuration parameter "base_addr").
  *
- * \param pAddr
- * \param pData
+ * \throws std::runtime_error If TL::MuxedInterface::write() throws \c std::runtime_error.
+ *
+ * \param pAddr Module-local address.
+ * \param pData Bytes to be written.
  */
 void MuxedDriver::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) const
 {
@@ -158,13 +163,16 @@ void MuxedDriver::write(const std::uint64_t pAddr, const std::vector<std::uint8_
 /*!
  * \brief Write a query to the interface and read the response, both relative to the base address.
  *
- * \todo Detailed doc
+ * Calls TL::MuxedInterface::query() with \p pAddr being offset by the module instance's base address
+ * (component configuration parameter "base_addr").
  *
- * \param pWriteAddr
- * \param pReadAddr
- * \param pData
- * \param pSize
- * \return
+ * \throws std::runtime_error If TL::MuxedInterface::query() throws \c std::runtime_error.
+ *
+ * \param pWriteAddr Module-local address to write to.
+ * \param pReadAddr Module-local address to read from.
+ * \param pData Query bytes to be written.
+ * \param pSize Number of response bytes to read.
+ * \return Read bytes.
  */
 std::vector<std::uint8_t> MuxedDriver::query(const std::uint64_t pWriteAddr, const std::uint64_t pReadAddr,
                                              const std::vector<std::uint8_t>& pData, const int pSize) const

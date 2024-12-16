@@ -38,8 +38,6 @@ namespace HL
 
 /*!
  * \brief Dummy implementation of DirectDriver without actual functionality.
- *
- * \todo Detailed doc
  */
 class DummyDriver final : public DirectDriver
 {

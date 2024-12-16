@@ -80,14 +80,14 @@ namespace HL
 /*!
  * \brief Specification for a register accessed via RegisterDriver.
  *
- * \todo Detailed doc
+ * Defines the essential properties of a typical firmware module register (such as size, alignment etc.) except its name.
  */
 struct RegisterDescr
 {
     /*!
      * \brief Data type modeled by the register.
      *
-     * \todo Detailed doc
+     * A single register can either represent a single number/value/variable or an array/sequence of a number of individual bytes.
      */
     enum class DataType : std::uint8_t
     {
@@ -96,8 +96,6 @@ struct RegisterDescr
     };
     /*!
      * \brief Defines read-/write-ability of the register.
-     *
-     * \todo Detailed doc
      */
     enum class AccessMode : std::uint8_t
     {
@@ -210,7 +208,7 @@ public:
     /*!
      * \brief Proxy class for accessing an individual RegisterDriver register.
      *
-     * \todo Detailed doc
+     * Provides convenient read/write access to a single register of a specific RegisterDriver instance.
      */
     class RegisterProxy                                                         // cppcheck-suppress noConstructor symbolName=RegisterProxy
     {

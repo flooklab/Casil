@@ -51,9 +51,9 @@ DirectDriver::DirectDriver(std::string pType, std::string pName, InterfaceBaseTy
 /*!
  * \brief Override not intended to be used (dummy implementation).
  *
- * \todo Detailed doc
+ * Does nothing.
  *
- * \return
+ * \return Empty vector.
  */
 std::vector<std::uint8_t> DirectDriver::getData(int, std::uint32_t)
 {
@@ -63,7 +63,7 @@ std::vector<std::uint8_t> DirectDriver::getData(int, std::uint32_t)
 /*!
  * \brief Override not intended to be used (dummy implementation).
  *
- * \todo Detailed doc
+ * Does nothing.
  */
 void DirectDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 {
@@ -73,7 +73,7 @@ void DirectDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 /*!
  * \brief Override not intended to be used (dummy implementation).
  *
- * \todo Detailed doc
+ * Does nothing.
  */
 void DirectDriver::exec()
 {
@@ -83,9 +83,9 @@ void DirectDriver::exec()
 /*!
  * \brief Override not intended to be used (dummy implementation).
  *
- * \todo Detailed doc
+ * Does nothing.
  *
- * \return
+ * \return False.
  */
 bool DirectDriver::isDone()
 {

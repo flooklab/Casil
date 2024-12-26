@@ -200,6 +200,10 @@ void UDPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::
     {
         throw std::runtime_error(std::string("Exception while writing to UDP socket: ") + exc.what());
     }
+    catch (const std::invalid_argument&)
+    {
+        throw std::runtime_error("Invalid future argument. THIS SHOULD NEVER HAPPEN!");
+    }
 }
 
 //
@@ -291,6 +295,10 @@ void UDPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
     catch (const std::runtime_error& exc)
     {
         throw std::runtime_error(std::string("Exception while connecting UDP socket: ") + exc.what());
+    }
+    catch (const std::invalid_argument&)
+    {
+        throw std::runtime_error("Invalid future argument. THIS SHOULD NEVER HAPPEN!");
     }
 }
 

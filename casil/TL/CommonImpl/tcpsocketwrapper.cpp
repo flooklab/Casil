@@ -419,6 +419,10 @@ void TCPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::
     {
         throw std::runtime_error(std::string("Exception while writing to TCP socket: ") + exc.what());
     }
+    catch (const std::invalid_argument&)
+    {
+        throw std::runtime_error("Invalid future argument. THIS SHOULD NEVER HAPPEN!");
+    }
 }
 
 //
@@ -528,6 +532,10 @@ void TCPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
     catch (const std::runtime_error& exc)
     {
         throw std::runtime_error(std::string("Exception while connecting TCP socket: ") + exc.what());
+    }
+    catch (const std::invalid_argument&)
+    {
+        throw std::runtime_error("Invalid future argument. THIS SHOULD NEVER HAPPEN!");
     }
 }
 

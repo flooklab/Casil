@@ -155,9 +155,9 @@ SiTCP::~SiTCP()
  *
  * What this function does depends on the value of \p pAddr:
  * - <tt>[0, \ref baseAddrDataLimit)</tt>: Reads \p pSize bytes from the basil bus at \p pAddr (uses RBCP messages over %UDP).
- * - <tt>[\ref baseAddrDataLimit, \ref baseAddrFIFOLimit)</tt>: Returns SiTcp FIFO data, see getFifoData() with \p pSize as argument.
+ * - <tt>[\ref baseAddrDataLimit, \ref baseAddrFIFOLimit)</tt>: Returns %SiTCP FIFO data, see getFifoData() with \p pSize as argument.
  * - <tt>baseAddrFIFOLimit</tt>: ... not implemented yet
- * - <tt>[baseAddrFIFOLimit, ...)</tt>: Returns SiTcp FIFO size (see getFifoSize()) as 4 byte long little endian sequence
+ * - <tt>[baseAddrFIFOLimit, ...)</tt>: Returns %SiTCP FIFO size (see getFifoSize()) as 4 byte long little endian sequence
  *                                      if \p pSize is 4 and \p pSize zeros otherwise.
  *
  * \todo update baseAddrFIFOLimit when implemented
@@ -172,7 +172,7 @@ std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize
     if (pAddr < baseAddrDataLimit)
     {
         if (pSize < 0)
-            throw std::runtime_error("Could not read from SiTcp socket \"" + name + "\": Requested read size is invalid in this context.");
+            throw std::runtime_error("Could not read from SiTCP socket \"" + name + "\": Requested read size is invalid in this context.");
 
         try
         {
@@ -198,7 +198,7 @@ std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize
         }
         catch (const std::runtime_error& exc)
         {
-            throw std::runtime_error("Could not read from SiTcp socket \"" + name + "\". Call to readSingle() failed: " + exc.what());
+            throw std::runtime_error("Could not read from SiTCP socket \"" + name + "\". Call to readSingle() failed: " + exc.what());
         }
     }
     else if (pAddr < baseAddrFIFOLimit)
@@ -236,7 +236,7 @@ std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize
  * - <tt>[0, \ref baseAddrDataLimit)</tt>: Writes \p pData to the basil bus at \p pAddr (uses RBCP messages over %UDP,
  *                                         or a "tcp_to_bus" message over %TCP if "tcp_to_bus" is enabled).
  * - <tt>[\ref baseAddrDataLimit, \ref baseAddrFIFOLimit)</tt>: Writes raw \p pData to the %TCP socket (e.g. writing
- *                                                              \p pData to the SiTcp FIFO if "tcp_to_bus" is \e not enabled).
+ *                                                              \p pData to the %SiTCP FIFO if "tcp_to_bus" is \e not enabled).
  * - <tt>baseAddrFIFOLimit</tt>: Calls resetFifo().
  *
  * \throws std::runtime_error If "tcp_to_bus" enabled and \p pData exceeds the maximum data length for %TCP bus writes (\c 0xFFF9u ),
@@ -256,7 +256,7 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
         if (useTcp && useTcpToBus)
         {
             if (pData.size() > 0xFFF9u)
-                throw std::runtime_error("Could not write to SiTcp socket \"" + name + "\": Data length exceeds maximum RBCP data length.");
+                throw std::runtime_error("Could not write to SiTCP socket \"" + name + "\": Data length exceeds maximum RBCP data length.");
 
             std::vector<std::uint8_t> sendData;
 
@@ -276,7 +276,7 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
             }
             catch (const std::runtime_error& exc)
             {
-                throw std::runtime_error("Could not write to SiTcp socket \"" + name + "\": " + exc.what());
+                throw std::runtime_error("Could not write to SiTCP socket \"" + name + "\": " + exc.what());
             }
         }
         else
@@ -301,7 +301,7 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
             }
             catch (const std::runtime_error& exc)
             {
-                throw std::runtime_error("Could not write to SiTcp socket \"" + name + "\". Call to writeSingle() failed: " + exc.what());
+                throw std::runtime_error("Could not write to SiTCP socket \"" + name + "\". Call to writeSingle() failed: " + exc.what());
             }
         }
     }
@@ -316,7 +316,7 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
         }
         catch (const std::runtime_error& exc)
         {
-            throw std::runtime_error("Could not write to SiTcp socket \"" + name + "\": " + exc.what());
+            throw std::runtime_error("Could not write to SiTCP socket \"" + name + "\": " + exc.what());
         }
     }
     else if (pAddr == baseAddrFIFOLimit)
@@ -342,7 +342,7 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
  */
 std::vector<std::uint8_t> SiTCP::query(std::uint64_t, std::uint64_t, const std::vector<std::uint8_t>&, int)
 {
-    Logger::logWarning("The query() function is not implemented for the SiTcp interface (does nothing).");
+    Logger::logWarning("The query() function is not implemented for the SiTCP interface (does nothing).");
     return {};
 }
 
@@ -363,7 +363,7 @@ bool SiTCP::readBufferEmpty() const
     }
     catch (const std::runtime_error& exc)
     {
-        throw std::runtime_error("Could not check UDP read buffer size of SiTcp socket \"" + name + "\": " + exc.what());
+        throw std::runtime_error("Could not check UDP read buffer size of SiTCP socket \"" + name + "\": " + exc.what());
     }
 }
 
@@ -380,7 +380,7 @@ void SiTCP::clearReadBuffer()
     }
     catch (const std::runtime_error& exc)
     {
-        throw std::runtime_error("Could not clear UDP read buffer of SiTcp socket \"" + name + "\": " + exc.what());
+        throw std::runtime_error("Could not clear UDP read buffer of SiTCP socket \"" + name + "\": " + exc.what());
     }
 }
 
@@ -412,7 +412,7 @@ void SiTCP::resetFifo()
         }
         catch (const std::runtime_error& exc)
         {
-            throw std::runtime_error("Could not properly clear FIFO of SiTcp socket \"" + name + "\": " + exc.what());
+            throw std::runtime_error("Could not properly clear FIFO of SiTCP socket \"" + name + "\": " + exc.what());
         }
     }
     {
@@ -426,7 +426,7 @@ void SiTCP::resetFifo()
 /*!
  * \brief Get the FIFO size in number of bytes.
  *
- * \return SiTcp FIFO size in bytes.
+ * \return %SiTCP FIFO size in bytes.
  */
 std::size_t SiTCP::getFifoSize() const
 {
@@ -440,10 +440,10 @@ std::size_t SiTCP::getFifoSize() const
  * \brief Extract the current FIFO content as sequence of bytes.
  *
  * The requested size \p pSize gets limited by the current FIFO size and then reduced by modulo 4 in order to
- * obtain only multiples of 4 bytes. Those multiples of 4 bytes are removed from the SiTcp FIFO and then returned.
+ * obtain only multiples of 4 bytes. Those multiples of 4 bytes are removed from the %SiTCP FIFO and then returned.
  *
  * \param pSize Number of FIFO bytes to get (automatically reduced by modulo 4).
- * \return Byte sequence from the SiTcp FIFO in multiples of 4 bytes, according to the smaller of \p pSize or FIFO size.
+ * \return Byte sequence from the %SiTCP FIFO in multiples of 4 bytes, according to the smaller of \p pSize or FIFO size.
  */
 std::vector<std::uint8_t> SiTCP::getFifoData(const int pSize)
 {
@@ -478,7 +478,7 @@ std::vector<std::uint8_t> SiTCP::getFifoData(const int pSize)
  * using the respective configured ports.
  *
  * If %TCP is enabled, resets the FIFO and starts a polling thread for the incoming FIFO data (see also pollFifo()).
- * Furthermore, if also "tcp_to_bus" is enabled, configures the SiTcp core accordingly by calling enableTcpToBus().
+ * Furthermore, if also "tcp_to_bus" is enabled, configures the %SiTCP core accordingly by calling enableTcpToBus().
  *
  * Note: There must be no FIFO thread already running before starting a new one (see also close() / closeImpl()).
  *
@@ -592,7 +592,7 @@ bool SiTCP::closeImpl()
 /*!
  * \brief Enable using %TCP protocol for normal bus writes.
  *
- * Configures the SiTcp core for receiving normal basil bus writes via %TCP (the "tcp_to_bus" feature)
+ * Configures the %SiTCP core for receiving normal basil bus writes via %TCP (the "tcp_to_bus" feature)
  * by writing the reset sequence <tt>{65535 * 0xFF + 6 * 0x00}</tt> (see SiTCP) to the %TCP socket.
  *
  * Returns immediately if "tcp_to_bus" is not enabled.
@@ -627,7 +627,7 @@ void SiTCP::enableTcpToBus()
 /*!
  * \brief Continuously poll the %TCP socket for new FIFO data (use as thread).
  *
- * Starts a loop to iteratively poll the SiTcp FIFO and to add new data to the FIFO buffer, if the %TCP connection
+ * Starts a loop to iteratively poll the %SiTCP FIFO and to add new data to the FIFO buffer, if the %TCP connection
  * is enabled (see SiTCP()) and FIFO polling was enabled (see init()). Otherwise returns immediately.
  *
  * The polling stops and the function returns when polling gets disabled explicitly (see close()) or automatically as soon
@@ -747,7 +747,7 @@ void SiTCP::writeSingle(const std::uint32_t pAddr, const std::vector<std::uint8_
 /*!
  * \brief Send a single RBCP read or write request to the bus and process the response message.
  *
- * Writes a single RBCP read \e or write message (depending on the type in \p pSizeOrData) to the SiTcp core.
+ * Writes a single RBCP read \e or write message (depending on the type in \p pSizeOrData) to the %SiTCP core.
  * This message initiates a read/write from/to the basil bus at bus address \p pAddr, respectively.
  * In case of "read mode", \p pSizeOrData specifies the number of bytes to read.
  * In case of "write mode", \p pSizeOrData specifies the byte sequence to be written.

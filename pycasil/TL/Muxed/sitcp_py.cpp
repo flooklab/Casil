@@ -28,7 +28,7 @@ using casil::TL::SiTCP;
 
 void bindTL_SiTCP(py::module& pM)
 {
-    py::class_<SiTCP, casil::TL::MuxedInterface>(pM, "SiTcp", "Interface to connect to the basil bus on an FPGA "
+    py::class_<SiTCP, casil::TL::MuxedInterface>(pM, "SiTCP", "Interface to connect to the basil bus on an FPGA "
                                                               "that runs the SiTCP library for communication.")
             .def(py::init<std::string, casil::LayerConfig>(), "Constructor.", py::arg("name"), py::arg("config"))
             .def("readBufferEmpty", &SiTCP::readBufferEmpty, "Check if the UDP read buffer is empty.")

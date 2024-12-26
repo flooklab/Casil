@@ -115,7 +115,7 @@ std::size_t SiTCPFifo::operator[](std::string_view pRegName)
     else if (pRegName == "FIFO_SIZE")
         return getFifoSize();
     else
-        throw std::invalid_argument("The register \"" + std::string(pRegName) + "\" is not available for SiTcp FIFO driver \"" + name + "\".");
+        throw std::invalid_argument("The register \"" + std::string(pRegName) + "\" is not available for SiTCP FIFO driver \"" + name + "\".");
 }
 
 //
@@ -135,7 +135,7 @@ void SiTCPFifo::reset()
     }
     catch (const std::runtime_error& exc)
     {
-        throw std::runtime_error("Could not clear FIFO from SiTcp FIFO driver \"" + name + "\": " + exc.what());
+        throw std::runtime_error("Could not clear FIFO from SiTCP FIFO driver \"" + name + "\": " + exc.what());
     }
 }
 
@@ -190,11 +190,11 @@ std::vector<std::uint32_t> SiTCPFifo::getFifoData() const
     }
     catch (const std::runtime_error& exc)
     {
-        throw std::runtime_error("SiTcp FIFO driver \"" + name + "\" could not get FIFO data: " + exc.what());
+        throw std::runtime_error("SiTCP FIFO driver \"" + name + "\" could not get FIFO data: " + exc.what());
     }
 
     if (rawData.size() != retSize * 4)
-        throw std::runtime_error("SiTcp interface returned wrong number of FIFO bytes.");
+        throw std::runtime_error("SiTCP interface returned wrong number of FIFO bytes.");
 
     std::vector<std::uint32_t> retVal;
     retVal.reserve(retSize);
@@ -235,7 +235,7 @@ void SiTCPFifo::setFifoData(const std::vector<std::uint32_t>& pData) const
     }
     catch (const std::runtime_error& exc)
     {
-        throw std::runtime_error("SiTcp FIFO driver \"" + name + "\" could not write FIFO data: " + exc.what());
+        throw std::runtime_error("SiTCP FIFO driver \"" + name + "\" could not write FIFO data: " + exc.what());
     }
 }
 

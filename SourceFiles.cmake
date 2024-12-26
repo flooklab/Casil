@@ -108,6 +108,8 @@ set(TESTS_FILE_NAMES
     components/HL/test_registerdriver/test_registerdriver.cpp
     components/HL/test_registerdriver/fakeinterface.cpp
     components/HL/test_registerdriver/fakeinterface.h
+    components/HL/test_registerdriver/invalidregdriver.cpp
+    components/HL/test_registerdriver/invalidregdriver.h
     components/HL/test_registerdriver/testregdriver.cpp
     components/HL/test_registerdriver/testregdriver.h
     components/HL/test_scpi/test_scpi.cpp

@@ -54,7 +54,82 @@ BOOST_FIXTURE_TEST_SUITE(Components_Tests, DataDirFixture)
 
 BOOST_AUTO_TEST_SUITE(RegisterDriver_Tests)
 
-BOOST_AUTO_TEST_CASE(Test1_initModuleCloseModule)
+BOOST_AUTO_TEST_CASE(Test1_invalidRegisterDefinitions)
+{
+    static constexpr int numFailureModes = 8;
+
+    int exceptionCtr = 0;
+
+    for (int i = -1; i < numFailureModes; ++i)
+    {
+        try
+        {
+            Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                      "hw_drivers: [{name: drv, type: InvalidRegDriver, interface: intf, base_addr: 0x0, failureMode: " +
+                      std::to_string(i) + "}], registers: []}");
+            (void)d;
+        }
+        catch (const std::runtime_error&)
+        {
+            ++exceptionCtr;
+        }
+    }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, numFailureModes);
+}
+
+BOOST_AUTO_TEST_CASE(Test2_invalidRegisterDefaultOverrides)
+{
+    int exceptionCtr = 0;
+
+    try
+    {
+        //No failure
+        Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
+                  "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
+                                "init: { FOOBAR: 0x313, OUTPUT: [0x11, 0x22, 0x44] }}],"
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Default type
+        Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
+                  "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
+                                "init: { OUTPUT: 0x313 }}],"
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Default type
+        Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
+                  "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
+                                "init: { FOOBAR: [0x11, 0x22, 0x44] }}],"
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Default length
+        Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
+                  "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
+                                "init: { OUTPUT: [0x11, 0x22] }}],"
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 3);
+}
+
+BOOST_AUTO_TEST_CASE(Test3_initModuleCloseModule)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -75,7 +150,7 @@ BOOST_AUTO_TEST_CASE(Test1_initModuleCloseModule)
     BOOST_CHECK_EQUAL(drv.close(true), false);
 }
 
-BOOST_AUTO_TEST_CASE(Test2_firmwareVersion)
+BOOST_AUTO_TEST_CASE(Test4_firmwareVersion)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -93,7 +168,7 @@ BOOST_AUTO_TEST_CASE(Test2_firmwareVersion)
     BOOST_CHECK_EQUAL(drv.init(true), false);
 }
 
-BOOST_AUTO_TEST_CASE(Test3_readDefaults)
+BOOST_AUTO_TEST_CASE(Test5_readDefaults)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -158,7 +233,7 @@ BOOST_AUTO_TEST_CASE(Test3_readDefaults)
     BOOST_CHECK(d2.close());
 }
 
-BOOST_AUTO_TEST_CASE(Test4_writeAndRead)
+BOOST_AUTO_TEST_CASE(Test6_writeAndRead)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -229,7 +304,7 @@ BOOST_AUTO_TEST_CASE(Test4_writeAndRead)
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_G"), 0);
 }
 
-BOOST_AUTO_TEST_CASE(Test5_genericGetSet)
+BOOST_AUTO_TEST_CASE(Test7_genericGetSet)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
              "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F, "
@@ -287,7 +362,7 @@ BOOST_AUTO_TEST_CASE(Test5_genericGetSet)
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_G")), 0x6EFCD1A87B1674F9u);
 }
 
-BOOST_AUTO_TEST_CASE(Test6_subscriptOperator)
+BOOST_AUTO_TEST_CASE(Test8_subscriptOperator)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
              "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F, "
@@ -350,7 +425,7 @@ BOOST_AUTO_TEST_CASE(Test6_subscriptOperator)
     BOOST_CHECK(true);
 }
 
-BOOST_AUTO_TEST_CASE(Test7_triggerWO)
+BOOST_AUTO_TEST_CASE(Test9_triggerWO)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -386,7 +461,7 @@ BOOST_AUTO_TEST_CASE(Test7_triggerWO)
     BOOST_CHECK(true);
 }
 
-BOOST_AUTO_TEST_CASE(Test8_typeModeSizeMismatch)
+BOOST_AUTO_TEST_CASE(Test10_typeModeSizeMismatch)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -446,7 +521,7 @@ BOOST_AUTO_TEST_CASE(Test8_typeModeSizeMismatch)
     BOOST_CHECK_EQUAL(exceptionCtr, 13);
 }
 
-BOOST_AUTO_TEST_CASE(Test9_wrongRegisterName)
+BOOST_AUTO_TEST_CASE(Test11_wrongRegisterName)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F}],"
@@ -487,7 +562,7 @@ BOOST_AUTO_TEST_CASE(Test9_wrongRegisterName)
     BOOST_CHECK_EQUAL(exceptionCtr, 8);
 }
 
-BOOST_AUTO_TEST_CASE(Test10_testRegisterName)
+BOOST_AUTO_TEST_CASE(Test12_testRegisterName)
 {
     Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
               "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x0}],"
@@ -522,7 +597,7 @@ BOOST_AUTO_TEST_CASE(Test10_testRegisterName)
     BOOST_CHECK_EQUAL(exceptionCtr, 2);
 }
 
-BOOST_AUTO_TEST_CASE(Test11_validRegisterNames)
+BOOST_AUTO_TEST_CASE(Test13_validRegisterNames)
 {
     std::string testChars;
     testChars.push_back('_');

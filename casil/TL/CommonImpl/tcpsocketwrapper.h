@@ -73,9 +73,9 @@ public:
     bool readBufferEmpty() const;                               ///< Check if the read buffer is empty (and no remaining data to be read).
     void clearReadBuffer();                                     ///< Read remaining data from the socket and then clear the read buffer contents.
     //
-    void init(std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
-              std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);    ///< Connect the %TCP socket.
-    void close();                                                                       ///< Disconnect the %TCP socket.
+    void init(std::chrono::milliseconds pConnectTimeout = std::chrono::milliseconds::zero(),
+              std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);            ///< Connect the %TCP socket.
+    void close();                                                                               ///< Disconnect the %TCP socket.
 
 private:
     const std::string hostName;                         ///< Host name of the remote endpoint.

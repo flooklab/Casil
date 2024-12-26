@@ -435,6 +435,10 @@ std::string SCPI::loadDeviceDescription(const std::string& pDeviceType)
             continue;
 
         filePath = std::move(tmpPath);
+
+        //Use the first found existing directory
+        if (std::filesystem::exists(filePath))
+            break;
     }
 
     if (!std::filesystem::exists(filePath))

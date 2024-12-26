@@ -140,6 +140,12 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
             throw std::runtime_error("Default value type does not match data type for register \"" + regName + "\" " +
                                      "of register driver \"" + name + "\".");
         }
+        if (std::holds_alternative<std::vector<std::uint8_t>>(regDescr.defaultValue) &&
+            std::get<std::vector<std::uint8_t>>(regDescr.defaultValue).size() != regDescr.size)
+        {
+            throw std::runtime_error("Default byte sequence length does not match register size for register \"" + regName + "\" "
+                                     "of register driver \"" + name + "\".");
+        }
 
         //Initialize register written value cache
         if (regDescr.mode != AccessMode::ReadOnly)

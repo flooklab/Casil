@@ -22,7 +22,7 @@
 
 cmake_minimum_required(VERSION 3.23)
 
-project(Casil VERSION 0.3.0 LANGUAGES CXX)
+project(Casil VERSION 0.4.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

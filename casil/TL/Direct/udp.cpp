@@ -36,10 +36,15 @@ CASIL_REGISTER_INTERFACE_CPP(UDP)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Initializes the host name to connect to from the mandatory "init.address" string in \p pConfig.
  *
- * \param pName
- * \param pConfig
+ * Initializes the network port for the communication from the mandatory "init.port" value (integer type) in \p pConfig.
+ *
+ * \throws std::runtime_error If "init.address" is empty.
+ * \throws std::runtime_error If "init.port" is out of range (must be in <tt>(0, 65535]</tt>).
+ *
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
  */
 UDP::UDP(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
@@ -60,10 +65,12 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
 /*!
  * \copybrief DirectInterface::read()
  *
- * \todo Detailed doc
+ * Receives and returns a single incoming datagram, ignoring \p pSize.
  *
- * \param pSize
- * \return
+ * \throws std::runtime_error If the read fails.
+ *
+ * \param pSize Ignored.
+ * \return Read bytes.
  */
 std::vector<std::uint8_t> UDP::read(const int pSize)
 {
@@ -82,9 +89,11 @@ std::vector<std::uint8_t> UDP::read(const int pSize)
 /*!
  * \copybrief DirectInterface::write()
  *
- * \todo Detailed doc
+ * Sends a single datagram with payload \p pData.
  *
- * \param pData
+ * \throws std::runtime_error If the write fails.
+ *
+ * \copydetails DirectInterface::write()
  */
 void UDP::write(const std::vector<std::uint8_t>& pData)
 {
@@ -101,11 +110,14 @@ void UDP::write(const std::vector<std::uint8_t>& pData)
 /*!
  * \copybrief DirectInterface::query()
  *
- * \todo Detailed doc
+ * Clears the read buffer if not empty, writes one datagram with \p pData, waits for a potential
+ * query delay (see Interface::Interface()) and reads one datagram (see also write() and read()).
  *
- * \param pData
- * \param pSize
- * \return
+ * \throws std::runtime_error If readBufferEmpty(), clearReadBuffer(), write() or read() throw \c std::runtime_error.
+ *
+ * \param pData Query bytes to be written.
+ * \param pSize Ignored.
+ * \return Read bytes.
  */
 std::vector<std::uint8_t> UDP::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
@@ -117,9 +129,9 @@ std::vector<std::uint8_t> UDP::query(const std::vector<std::uint8_t>& pData, con
 /*!
  * \copybrief DirectInterface::readBufferEmpty()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If checking the buffer size fails.
  *
- * \return
+ * \copydetails DirectInterface::readBufferEmpty()
  */
 bool UDP::readBufferEmpty() const
 {
@@ -136,7 +148,7 @@ bool UDP::readBufferEmpty() const
 /*!
  * \copybrief DirectInterface::clearReadBuffer()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If clearing the buffer fails.
  */
 void UDP::clearReadBuffer()
 {
@@ -155,9 +167,11 @@ void UDP::clearReadBuffer()
 /*!
  * \copybrief DirectInterface::initImpl()
  *
- * \todo Detailed doc
+ * Resolves the configured host name and connects the socket to this endpoint via the configured port.
  *
- * \return
+ * \note Requires IO context threads to be running already (see ASIO::ioContextThreadsRunning()).
+ *
+ * \return True if successful.
  */
 bool UDP::initImpl()
 {
@@ -177,9 +191,9 @@ bool UDP::initImpl()
 /*!
  * \copybrief DirectInterface::closeImpl()
  *
- * \todo Detailed doc
+ * Disconnects the socket.
  *
- * \return
+ * \return True if successful.
  */
 bool UDP::closeImpl()
 {

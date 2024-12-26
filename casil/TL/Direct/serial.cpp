@@ -39,10 +39,20 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Initializes the device name of the serial port to be opened from the mandatory "init.port" string in \p pConfig.
  *
- * \param pName
- * \param pConfig
+ * Initializes the baud rate setting for the serial communication from the mandatory "init.baudrate" value (integer type) in \p pConfig.
+ *
+ * Initializes the termination sequence for non-sized read operations from the mandatory "init.read_termination" string in \p pConfig.
+ *
+ * Initializes the termination sequence for write operations from the optional "init.write_termination" string in \p pConfig or,
+ * if not defined, to the same sequence as the read termination.
+ *
+ * \throws std::runtime_error If "init.port" is empty.
+ * \throws std::runtime_error If "init.baudrate" is zero or negative.
+ *
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
  */
 Serial::Serial(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
@@ -65,10 +75,11 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
 /*!
  * \copybrief DirectInterface::read()
  *
- * \todo Detailed doc
+ * Reads \p pSize bytes if \p pSize is positive and any number of bytes up
+ * to (but excluding) the configured read termination if \p pSize is -1.
+ * Other negative values return an empty sequence.
  *
- * \param pSize
- * \return
+ * \copydetails DirectInterface::read()
  */
 std::vector<std::uint8_t> Serial::read(const int pSize)
 {
@@ -78,9 +89,9 @@ std::vector<std::uint8_t> Serial::read(const int pSize)
 /*!
  * \copybrief DirectInterface::write()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If the write fails.
  *
- * \param pData
+ * \copydetails DirectInterface::write()
  */
 void Serial::write(const std::vector<std::uint8_t>& pData)
 {
@@ -97,11 +108,7 @@ void Serial::write(const std::vector<std::uint8_t>& pData)
 /*!
  * \copybrief DirectInterface::query()
  *
- * \todo Detailed doc
- *
- * \param pData
- * \param pSize
- * \return
+ * \copydetails DirectInterface::query()
  */
 std::vector<std::uint8_t> Serial::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
@@ -113,9 +120,7 @@ std::vector<std::uint8_t> Serial::query(const std::vector<std::uint8_t>& pData, 
 /*!
  * \copybrief DirectInterface::readBufferEmpty()
  *
- * \todo Detailed doc
- *
- * \return
+ * \copydetails DirectInterface::readBufferEmpty()
  */
 bool Serial::readBufferEmpty() const
 {
@@ -124,8 +129,6 @@ bool Serial::readBufferEmpty() const
 
 /*!
  * \copybrief DirectInterface::clearReadBuffer()
- *
- * \todo Detailed doc
  */
 void Serial::clearReadBuffer()
 {
@@ -137,9 +140,12 @@ void Serial::clearReadBuffer()
 /*!
  * \copybrief DirectInterface::initImpl()
  *
- * \todo Detailed doc
+ * Opens the serial port using the configured device name, sets the configured baud rate and starts
+ * continuous polling to fill the read buffer with incoming data (see also CommonImpl::SerialPortWrapper).
  *
- * \return
+ * \note Requires IO context threads to be running already (see ASIO::ioContextThreadsRunning()).
+ *
+ * \return True if successful.
  */
 bool Serial::initImpl()
 {
@@ -159,9 +165,9 @@ bool Serial::initImpl()
 /*!
  * \copybrief DirectInterface::closeImpl()
  *
- * \todo Detailed doc
+ * Stops read buffer polling started by init() (see also CommonImpl::SerialPortWrapper) and closes the port.
  *
- * \return
+ * \return True if successful.
  */
 bool Serial::closeImpl()
 {

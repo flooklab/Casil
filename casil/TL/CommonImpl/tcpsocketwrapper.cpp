@@ -46,12 +46,12 @@ using casil::Layers::TL::CommonImpl::TCPSocketWrapper;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Note: Initializes the socket using the IO context from ASIO::getIOContext().
  *
- * \param pHostName
- * \param pPort
- * \param pReadTermination
- * \param pWriteTermination
+ * \param pHostName Host name of the remote endpoint.
+ * \param pPort Network port to be used.
+ * \param pReadTermination Termination sequence for non-sized read operations.
+ * \param pWriteTermination Termination sequence to append for write operations.
  */
 TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
                                    std::string pReadTermination, const std::string& pWriteTermination) :
@@ -71,12 +71,22 @@ TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
 /*!
  * \brief Read an amount of bytes from the socket, or until read termination.
  *
- * \todo Detailed doc
+ * Reads and returns \p pSize bytes from the socket if \p pSize is positive and any number
+ * of bytes up to (but excluding) the configured read termination if \p pSize is -1.
+ * Other values for \p pSize are not useful (will then return an empty sequence).
  *
- * \param pSize
- * \param pTimeout
- * \param pTimedOut
- * \return
+ * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will be set to true (if defined)
+ * and the already read bytes will be returned. If reading until termination, ...
+ * \todo FIXME add description here after fixing timedout terminated read to not strip anything.
+ *
+ * Note: Tries to close() the socket on EOF error (\c boost::system::errc::no_such_file_or_directory),
+ * i.e. if the connection was terminated, in order to ensure proper error handling for \e successive
+ * async read calls. A \c std::runtime_error possibly thrown by close() is going to be ignored.
+ *
+ * \param pSize Number of bytes to read or -1.
+ * \param pTimeout The timeout for the read operation.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
+ * \return Byte sequence of requested length or up to (but excluding) termination.
  */
 std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chrono::milliseconds pTimeout,
                                                  const std::optional<std::reference_wrapper<bool>> pTimedOut)
@@ -219,12 +229,22 @@ std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chr
 /*!
  * \brief Read maximally some amount of bytes from the socket.
  *
- * \todo Detailed doc
+ * Reads and returns maximally \p pSize bytes from the socket. Returns an empty sequence for negative \p pSize.
  *
- * \param pSize
- * \param pTimeout
- * \param pTimedOut
- * \return
+ * If the buffer already/still contains some data, no read will performed on the socket
+ * and instead maximally \p pSize bytes will be directly returned from the buffer.
+ *
+ * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will
+ * be set to true (if defined) and the already read bytes will be returned.
+ *
+ * Note: Tries to close() the socket on EOF error (\c boost::system::errc::no_such_file_or_directory),
+ * i.e. if the connection was terminated, in order to ensure proper error handling for \e successive
+ * async read calls. A \c std::runtime_error possibly thrown by close() is going to be ignored.
+ *
+ * \param pSize Maximum number of bytes to read.
+ * \param pTimeout The timeout for the read operation.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
+ * \return Maximally \p pSize bytes long byte sequence.
  */
 std::vector<std::uint8_t> TCPSocketWrapper::readMax(const int pSize, const std::chrono::milliseconds pTimeout,
                                                     const std::optional<std::reference_wrapper<bool>> pTimedOut)
@@ -318,11 +338,16 @@ std::vector<std::uint8_t> TCPSocketWrapper::readMax(const int pSize, const std::
 /*!
  * \brief Write data to the socket (automatically terminated).
  *
- * \todo Detailed doc
+ * Writes \p pData to the socket, automatically followed by the configured write termination.
+ * If \p pTimeout is non-zero, it is used as timeout for the write attempt.
+ * If the timeout is reached, \p pTimedOut will be set to true (if defined) and an exception is thrown.
  *
- * \param pData
- * \param pTimeout
- * \param pTimedOut
+ * \throws std::runtime_error On timeout.
+ * \throws std::runtime_error If writing to the socket fails.
+ *
+ * \param pData Data to be written (excluding termination).
+ * \param pTimeout The timeout for the write operation.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
  */
 void TCPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::chrono::milliseconds pTimeout,
                              const std::optional<std::reference_wrapper<bool>> pTimedOut)
@@ -373,9 +398,9 @@ void TCPSocketWrapper::write(const std::vector<std::uint8_t>& pData, const std::
 /*!
  * \brief Check if the read buffer is empty (and no remaining data to be read).
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If accessing the socket fails.
  *
- * \return
+ * \return True if no data is available to be read.
  */
 bool TCPSocketWrapper::readBufferEmpty() const
 {
@@ -397,7 +422,9 @@ bool TCPSocketWrapper::readBufferEmpty() const
 /*!
  * \brief Read remaining data from the socket and then clear the read buffer contents.
  *
- * \todo Detailed doc
+ * Reads all available data from the socket and clears the read buffer.
+ *
+ * \throws std::runtime_error If accessing the socket fails.
  */
 void TCPSocketWrapper::clearReadBuffer()
 {
@@ -434,10 +461,16 @@ void TCPSocketWrapper::clearReadBuffer()
 /*!
  * \brief Connect the %TCP socket.
  *
- * \todo Detailed doc
+ * Resolves the configured host name and connects the socket to this endpoint via the configured port.
+ * If \p pConnectTimeout is non-zero, it is used as timeout for the connection attempt.
+ * If the timeout is reached, \p pTimedOut will be set to true (if defined) and an exception is thrown.
  *
- * \param pConnectTimeout
- * \param pTimedOut
+ * \throws std::runtime_error If no IO context threads are running (see ASIO::ioContextThreadsRunning()).
+ * \throws std::runtime_error On timeout.
+ * \throws std::runtime_error If resolving the host name or connecting the socket fails.
+ *
+ * \param pConnectTimeout The timeout for the connection attempt.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
  */
 void TCPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
@@ -473,7 +506,9 @@ void TCPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
 /*!
  * \brief Disconnect the %TCP socket.
  *
- * \todo Detailed doc
+ * Shuts down send/receive operations and closes the connection.
+ *
+ * \throws std::runtime_error If shutting down or closing the socket fails.
  */
 void TCPSocketWrapper::close()
 {

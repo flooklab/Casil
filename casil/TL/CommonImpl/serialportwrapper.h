@@ -46,7 +46,8 @@ namespace CommonImpl
 /*!
  * \brief Wrapper class around the serial port interface of the Boost %ASIO library.
  *
- * \todo Detailed doc
+ * Wraps the serial port by providing basic synchronous read/write functionality,
+ * abstracting internal <em>a</em>synchronous calls etc.
  */
 class SerialPortWrapper
 {
@@ -67,8 +68,8 @@ public:
     bool readBufferEmpty() const;                               ///< Check if the read buffer is empty.
     void clearReadBuffer();                                     ///< Clear the current contents of the read buffer.
     //
-    void init();                                                ///< Open the serial port and start a read buffer polling thread.
-    void close();                                               ///< Stop the read buffer polling thread and close the serial port.
+    void init();                                                ///< Open the serial port and start continuous read buffer polling.
+    void close();                                               ///< Stop the continuous read buffer polling and close the serial port.
 
 private:
     void pollReadBuffer();                                                                      ///< \brief Issue an async read to poll the

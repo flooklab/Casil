@@ -75,11 +75,11 @@ CASIL_REGISTER_DRIVER_ALIAS("sitcp_fifo")
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * \throws std::bad_cast If \p pInterface is not TL::SiTCP.
  *
- * \param pName
- * \param pInterface
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
  */
 SiTCPFifo::SiTCPFifo(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     MuxedDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig()),
@@ -92,10 +92,16 @@ SiTCPFifo::SiTCPFifo(std::string pName, InterfaceBaseType& pInterface, LayerConf
 /*!
  * \brief Register-like access to some functions.
  *
- * \todo Detailed doc
+ * If \p pRegName is
+ * - "RESET": calls reset() and returns 0.
+ * - "VERSION": returns getVersion().
+ * - "FIFO_SIZE": returns getFifoSize().
  *
- * \param pRegName
- * \return
+ * \throws std::invalid_argument If \p pRegName is neither of "RESET", "VERSION" or "FIFO_SIZE".
+ * \throws std::runtime_error If reset() throws \c std::runtime_error.
+ *
+ * \param pRegName One of the pseudo registers "RESET", "VERSION" or "FIFO_SIZE".
+ * \return A value depending on the action for \p pRegName, see above.
  */
 std::size_t SiTCPFifo::operator[](std::string_view pRegName)
 {
@@ -117,7 +123,9 @@ std::size_t SiTCPFifo::operator[](std::string_view pRegName)
 /*!
  * \brief Reset the FIFO.
  *
- * \todo Detailed doc
+ * See TL::SiTCP::resetFifo().
+ *
+ * \throws std::runtime_error If TL::SiTCP::resetFifo() throws \c std::runtime_error.
  */
 void SiTCPFifo::reset()
 {
@@ -136,9 +144,7 @@ void SiTCPFifo::reset()
 /*!
  * \brief Get the pseudo FIFO module version.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return Faked version of the non-existent firmware module.
  */
 std::uint8_t SiTCPFifo::getVersion() const
 {
@@ -150,9 +156,9 @@ std::uint8_t SiTCPFifo::getVersion() const
 /*!
  * \brief Get the FIFO size in number of bytes.
  *
- * \todo Detailed doc
+ * See TL::SiTCP::getFifoSize().
  *
- * \return
+ * \return Current size of the \e %SiTCP FIFO.
  */
 std::size_t SiTCPFifo::getFifoSize() const
 {
@@ -162,9 +168,16 @@ std::size_t SiTCPFifo::getFifoSize() const
 /*!
  * \brief Read the FIFO content as sequence of 32 bit unsigned integers.
  *
- * \todo Detailed doc
+ * Extracts/removes the currently longest possible sequence of \c 4*N bytes from the FIFO,
+ * from which it generates and then returns a sequence of \c N 32 bit unsigned integers,
+ * assuming a little endian byte order.
  *
- * \return
+ * See also TL::SiTCP::getFifoData().
+ *
+ * \throws std::runtime_error If TL::SiTCP::getFifoData() or TL::SiTCP::getFifoSize() throw \c std::runtime_error.
+ * \throws std::runtime_error If TL::SiTCP::getFifoData() fails to exactly return a multiple of 4 bytes (should not really happen).
+ *
+ * \return Longest sequence of 32 bit unsigned integers currently in the \e %SiTCP FIFO.
  */
 std::vector<std::uint32_t> SiTCPFifo::getFifoData() const
 {
@@ -195,9 +208,15 @@ std::vector<std::uint32_t> SiTCPFifo::getFifoData() const
 /*!
  * \brief Write a sequence of 32 bit unsigned integers to the FIFO.
  *
- * \todo Detailed doc
+ * Creates a sequence of \c 4*N bytes from the \c N elements of \p pData and writes this sequence to
+ * the FIFO by calling TL::SiTCP::write() using the special address TL::SiTCP::baseAddrDataLimit.
+ * Each 32 bit unsigned integer will be represented as 4 bytes in little endian byte order.
  *
- * \param pData
+ * See also TL::SiTCP::getFifoData().
+ *
+ * \throws std::runtime_error If TL::SiTCP::write() throws \c std::runtime_error.
+ *
+ * \param pData Sequence of 32 bit unsigned integers to write to the \e %SiTCP FIFO as bytes.
  */
 void SiTCPFifo::setFifoData(const std::vector<std::uint32_t>& pData) const
 {
@@ -225,9 +244,7 @@ void SiTCPFifo::setFifoData(const std::vector<std::uint32_t>& pData) const
 /*!
  * \brief Initialize the driver by doing nothing.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return True.
  */
 bool SiTCPFifo::initImpl()
 {
@@ -237,9 +254,7 @@ bool SiTCPFifo::initImpl()
 /*!
  * \brief Close the driver by doing nothing.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return True.
  */
 bool SiTCPFifo::closeImpl()
 {

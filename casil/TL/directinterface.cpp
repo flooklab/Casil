@@ -52,7 +52,7 @@ DirectInterface::DirectInterface(std::string pType, std::string pName, LayerConf
  * \brief Write a query to the interface and read the response.
  *
  * Clears the read buffer if not empty, writes \p pData, waits for a potential query delay
- * (see Interface::Interface()) and reads \p pSize bytes.
+ * (see Interface::Interface()) and reads \p pSize bytes (see also write() and read()).
  *
  * \throws std::runtime_error If readBufferEmpty(), clearReadBuffer(), write() or read() throw \c std::runtime_error.
  *

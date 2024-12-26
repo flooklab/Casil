@@ -82,8 +82,8 @@ CASIL_REGISTER_INTERFACE_ALIAS("SiTcp")
  *
  * \todo Detailed doc
  *
- * \param pName
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
  */
 SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
     MuxedInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(

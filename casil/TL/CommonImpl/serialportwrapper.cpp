@@ -45,12 +45,12 @@ using casil::Layers::TL::CommonImpl::SerialPortWrapper;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Note: Initializes the serial port using the IO context from ASIO::getIOContext().
  *
- * \param pPort
- * \param pReadTermination
- * \param pWriteTermination
- * \param pBaudRate
+ * \param pPort Device name of the serial port to be used.
+ * \param pReadTermination Termination sequence for non-sized read operations.
+ * \param pWriteTermination Termination sequence to append for write operations.
+ * \param pBaudRate Baud rate to be used for the serial connection.
  */
 SerialPortWrapper::SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination,
                                      const int pBaudRate) :
@@ -75,7 +75,9 @@ SerialPortWrapper::SerialPortWrapper(std::string pPort, const std::string& pRead
 /*!
  * \brief Destructor.
  *
- * \todo Detailed doc
+ * Calls close() if read data polling (see init()) was not stopped yet (i.e. close() not called yet).
+ *
+ * Note: Returns silently even if close() fails by throwing \c std::runtime_error.
  */
 SerialPortWrapper::~SerialPortWrapper()
 {
@@ -96,10 +98,12 @@ SerialPortWrapper::~SerialPortWrapper()
 /*!
  * \brief Read an amount of bytes from the read buffer, or until read termination.
  *
- * \todo Detailed doc
+ * Reads and returns \p pSize bytes from the read buffer if \p pSize is positive and any
+ * number of bytes up to (but excluding) the configured read termination if \p pSize is -1.
+ * Other values for \p pSize are not useful (will then return an empty sequence).
  *
- * \param pSize
- * \return
+ * \param pSize Number of bytes to read or -1.
+ * \return Byte sequence of requested length or up to (but excluding) termination.
  */
 std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
 {
@@ -157,10 +161,10 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
 /*!
  * \brief Read maximally some amount of bytes from the read buffer.
  *
- * \todo Detailed doc
+ * Reads and returns maximally \p pSize bytes from the read buffer. Returns an empty sequence for negative \p pSize.
  *
- * \param pSize
- * \return
+ * \param pSize Maximum number of bytes to read.
+ * \return Maximally \p pSize bytes long byte sequence.
  */
 std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
 {
@@ -204,9 +208,11 @@ std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
 /*!
  * \brief Write data to the port (automatically terminated).
  *
- * \todo Detailed doc
+ * Writes \p pData to the serial port, automatically followed by the configured write termination.
  *
- * \param pData
+ * \throws std::runtime_error If accessing the serial port fails.
+ *
+ * \param pData Data to be written (excluding termination).
  */
 void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData)
 {
@@ -226,9 +232,7 @@ void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData)
 /*!
  * \brief Check if the read buffer is empty.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return True if no data is available to be read.
  */
 bool SerialPortWrapper::readBufferEmpty() const
 {
@@ -240,8 +244,6 @@ bool SerialPortWrapper::readBufferEmpty() const
 
 /*!
  * \brief Clear the current contents of the read buffer.
- *
- * \todo Detailed doc
  */
 void SerialPortWrapper::clearReadBuffer()
 {
@@ -254,9 +256,13 @@ void SerialPortWrapper::clearReadBuffer()
 //
 
 /*!
- * \brief Open the serial port and start a read buffer polling thread.
+ * \brief Open the serial port and start continuous read buffer polling.
  *
- * \todo Detailed doc
+ * Opens the serial port using the configured device name, sets the configured baud rate
+ * and enables continuous read buffer polling and starts it by calling pollReadBuffer().
+ *
+ * \throws std::runtime_error If no IO context threads are running (see ASIO::ioContextThreadsRunning()).
+ * \throws std::runtime_error If opening the serial port or setting the baud rate fails.
  */
 void SerialPortWrapper::init()
 {
@@ -289,9 +295,12 @@ void SerialPortWrapper::init()
 }
 
 /*!
- * \brief Stop the read buffer polling thread and close the serial port.
+ * \brief Stop the continuous read buffer polling and close the serial port.
  *
- * \todo Detailed doc
+ * Disables continuous read buffer polling started by init() and waits until it has stopped.
+ * Cancels pending asynchronous operations and closes the port.
+ *
+ * \throws std::runtime_error If cancelling or closing the serial port fails.
  */
 void SerialPortWrapper::close()
 {
@@ -317,7 +326,8 @@ void SerialPortWrapper::close()
 /*!
  * \brief Issue an async read to poll the serial port (handler is handleAsyncRead()).
  *
- * \todo Detailed doc
+ * Starts an asynchronous operation to read at least one byte from the serial port
+ * into an intermediate buffer and process those read bytes by handleAsyncRead().
  */
 void SerialPortWrapper::pollReadBuffer()
 {
@@ -328,10 +338,16 @@ void SerialPortWrapper::pollReadBuffer()
 /*!
  * \brief Fill read buffer from single poll by pollReadBuffer() and issue next poll.
  *
- * \todo Detailed doc
+ * Appends the \p pNumBytes bytes read into the intermediate read buffer (see pollReadBuffer()) to the (actual) read buffer.
  *
- * \param pErrorCode
- * \param pNumBytes
+ * If continuous polling is enabled (see init() / close()), initiates the next asynchronous read by calling pollReadBuffer().
+ *
+ * If \p pErrorCode signals an error (other than the socket being cancelled), the error gets logged (see Logger)
+ * and the current polling error count gets incremented. Continuous polling gets disabled automatically
+ * as soon as this error count exceeds a fixed maximum threshold.
+ *
+ * \param pErrorCode Result/error code of the handled async read.
+ * \param pNumBytes Number of successfully transferred bytes.
  */
 void SerialPortWrapper::handleAsyncRead(const boost::system::error_code& pErrorCode, const std::size_t pNumBytes)
 {

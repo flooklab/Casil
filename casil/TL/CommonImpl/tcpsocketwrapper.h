@@ -45,7 +45,8 @@ namespace CommonImpl
 /*!
  * \brief Wrapper class around the %TCP network socket of the Boost %ASIO library.
  *
- * \todo Detailed doc
+ * Wraps the %TCP socket by providing basic synchronous connect/read/write functionality with
+ * the option to use timeouts (abstracting necessary internal <em>a</em>synchronous calls etc.).
  */
 class TCPSocketWrapper
 {

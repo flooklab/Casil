@@ -76,11 +76,14 @@ CASIL_REGISTER_DRIVER_ALIAS("gpio")
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Gets the mandatory "size" value from \p pConfig (unsigned integer value), which defines the number of
+ * IO bits of the controlled firmware module, and configures the registers (see GPIO) according to that value.
  *
- * \param pName
- * \param pInterface
- * \param pConfig
+ * \throws std::runtime_error If "size" is set to zero.
+ *
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
  */
 GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig::fromYAML("{size: uint}"), getRegisterDescrs(pConfig)),
@@ -96,11 +99,11 @@ GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig
 /*!
  * \brief Get the \c INPUT register.
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If reading the value fails.
  *
- * \param pSize
- * \param pAddrOffs
- * \return
+ * \param pSize Ignored.
+ * \param pAddrOffs Ignored.
+ * \return Current input states of the IO pins (contiguous bits as register byte sequence).
  */
 std::vector<std::uint8_t> GPIO::getData(int, std::uint32_t)
 {
@@ -110,10 +113,10 @@ std::vector<std::uint8_t> GPIO::getData(int, std::uint32_t)
 /*!
  * \brief Set the \c OUTPUT register.
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If writing the sequence fails.
  *
- * \param pData
- * \param pAddrOffs
+ * \param pData New output states for the IO pins (contiguous bits as register byte sequence).
+ * \param pAddrOffs Ignored.
  */
 void GPIO::setData(const std::vector<std::uint8_t>& pData, std::uint32_t)
 {
@@ -125,9 +128,7 @@ void GPIO::setData(const std::vector<std::uint8_t>& pData, std::uint32_t)
 /*!
  * \brief Get the number of IO bits.
  *
- * \todo Detailed doc
- *
- * \return
+ * \return Number of configured IO bits.
  */
 std::uint64_t GPIO::getSize() const
 {
@@ -139,9 +140,9 @@ std::uint64_t GPIO::getSize() const
 /*!
  * \brief Get the \c OUTPUT_EN register.
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If reading the value fails.
  *
- * \return
+ * \return Current direction settings of the IO pins (contiguous bits as register byte sequence).
  */
 std::vector<std::uint8_t> GPIO::getOutputEn()
 {
@@ -151,9 +152,9 @@ std::vector<std::uint8_t> GPIO::getOutputEn()
 /*!
  * \brief Set the \c OUTPUT_EN register.
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If writing the sequence fails.
  *
- * \param pEnable
+ * \param pEnable New direction settings for the IO pins (contiguous bits as register byte sequence).
  */
 void GPIO::setOutputEn(const std::vector<std::uint8_t>& pEnable)
 {
@@ -209,9 +210,10 @@ std::vector<std::uint8_t> GPIO::bytesFromBitset(const boost::dynamic_bitset<>& p
 /*!
  * \copybrief RegisterDriver::initModule()
  *
- * \todo Detailed doc
+ * Warns if unsupported "init.output_en" is present in the component configuration
+ * (direct default override via "init.OUTPUT_EN" must be used).
  *
- * \return
+ * \return True
  */
 bool GPIO::initModule()
 {
@@ -229,7 +231,9 @@ bool GPIO::initModule()
 /*!
  * \copybrief RegisterDriver::resetImpl()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If writing the value fails.
+ *
+ * Sets the \c RESET register to 0.
  */
 void GPIO::resetImpl()
 {
@@ -241,9 +245,7 @@ void GPIO::resetImpl()
 /*!
  * \copybrief RegisterDriver::getModuleSoftwareVersion()
  *
- * \todo Detailed doc
- *
- * \return
+ * \copydetails RegisterDriver::getModuleSoftwareVersion()
  */
 std::uint8_t GPIO::getModuleSoftwareVersion() const
 {
@@ -253,9 +255,11 @@ std::uint8_t GPIO::getModuleSoftwareVersion() const
 /*!
  * \copybrief RegisterDriver::getModuleFirmwareVersion()
  *
- * \todo Detailed doc
+ * Reads the \c VERSION register.
  *
- * \return
+ * \throws std::runtime_error If reading the value fails.
+ *
+ * \copydetails RegisterDriver::getModuleFirmwareVersion()
  */
 std::uint8_t GPIO::getModuleFirmwareVersion()
 {
@@ -267,10 +271,11 @@ std::uint8_t GPIO::getModuleFirmwareVersion()
 /*!
  * \brief Generate the map of registers depending on the configured bit count.
  *
- * \todo Detailed doc
+ * Returns the driver registers for GPIO::GPIO() as mentioned in GPIO according to the "size" value from \p pConfig
+ * (unsigned integer value, default: 8), which defines the number of IO bits of the controlled firmware module.
  *
- * \param pConfig
- * \return
+ * \param pConfig Component configuration.
+ * \return Map of register specifications with their names as keys.
  */
 std::map<std::string, casil::HL::RegisterDescr, std::less<>> GPIO::getRegisterDescrs(const LayerConfig& pConfig)
 {

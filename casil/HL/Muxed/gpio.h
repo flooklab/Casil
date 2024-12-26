@@ -82,6 +82,20 @@ namespace Layers::HL
  * \brief %Driver for the \e gpio firmware module.
  *
  * \todo Detailed doc
+ *
+ * Registers:
+ *
+ * <table>
+ * <tr><th>Name</th><th>\ref RegisterDescr::DataType "DataType"</th><th>\ref RegisterDescr::AccessMode "AccessMode"</th>
+ * <th>Size</th><th>Description</th></tr>
+ * <tr><td>\c RESET</td>    <td>Value</td>    <td>WriteOnly</td><td>8</td>          <td>Soft reset active on write to address.</td></tr>
+ * <tr><td>\c VERSION</td>  <td>Value</td>    <td>ReadOnly</td> <td>8</td>          <td>Firmware module version.</td></tr>
+ * <tr><td>\c INPUT</td>    <td>ByteArray</td><td>ReadOnly</td> <td>\c IO_BYTES</td><td>Read input state of IO pins.</td></tr>
+ * <tr><td>\c OUTPUT</td>   <td>ByteArray</td><td>ReadWrite</td><td>\c IO_BYTES</td><td>Assigned output state of IO pins.</td></tr>
+ * <tr><td>\c OUTPUT_EN</td><td>ByteArray</td><td>ReadWrite</td><td>\c IO_BYTES</td><td>Direction of IO pins (0: input, 1: output).</td></tr>
+ * </table>
+ *
+ * Here \c IO_BYTES is the number of full register bytes occupied by the configured IO bits (see "size" in GPIO::GPIO()).
  */
 class GPIO final : public RegisterDriver
 {

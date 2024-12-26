@@ -52,7 +52,7 @@ MuxedInterface::MuxedInterface(std::string pType, std::string pName, LayerConfig
  * \brief Write a query to the interface and read the response.
  *
  * Clears the read buffer if not empty, writes \p pData to \p pWriteAddr, waits for a potential query delay
- * (see Interface::Interface()) and reads \p pSize bytes from \p pReadAddr.
+ * (see Interface::Interface()) and reads \p pSize bytes from \p pReadAddr (see also write() and read()).
  *
  * \throws std::runtime_error If readBufferEmpty(), clearReadBuffer(), write() or read() throw \c std::runtime_error.
  *

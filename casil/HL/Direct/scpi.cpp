@@ -82,11 +82,15 @@ CASIL_REGISTER_DRIVER_ALIAS("scpi")
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Gets the mandatory "init.device" string from \p pConfig and loads the according device description file,
+ * which defines the available commands and channels for the specific %SCPI device. Its file name is obtained by
+ * converting that "init.device" string to lowercase, replacing spaces by underscores and appending the ".yaml" suffix.
+ * Search paths for those directories are taken from the \c CASIL_DEV_DESC_DIRS environment variable (see Env::getEnv()).
+ * The device description will be loaded from the first of these directories that contains such file.
  *
- * \param pName
- * \param pInterface
- * \param pConfig
+ * \param pName Component instance name.
+ * \param pInterface %Interface instance to be used.
+ * \param pConfig Component configuration.
  */
 SCPI::SCPI(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     DirectDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig::fromYAML(
@@ -104,12 +108,7 @@ SCPI::SCPI(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig
 /*!
  * \brief Execute a command (either write or query).
  *
- * \todo Detailed doc
- *
- * \param pCmd
- * \param pChannel
- * \param pValue
- * \return
+ * \copydetails command()
  */
 std::optional<std::string> SCPI::operator()(const std::string_view pCmd, const std::optional<int> pChannel, VariantValueType pValue) const
 {
@@ -121,11 +120,23 @@ std::optional<std::string> SCPI::operator()(const std::string_view pCmd, const s
 /*!
  * \brief Execute a write command.
  *
- * \todo Detailed doc
+ * Writes to the interface using the command with name \p pCmd for channel \p pChannel. If \p pCmd
+ * is a \e setter, \p pValue must have a value. The value is then formatted as string and as such
+ * appended to the basic command (separated by a space) before writing the full command at once.
+ * A command name is considered a setter if \p pCmd starts with "set_".
  *
- * \param pCmd
- * \param pChannel
- * \param pValue
+ * Warns if \p pCmd is not a setter (i.e. a command without argument) but \p pValue is set (\p pValue will be discarded).
+ *
+ * Note: The conversion between string and byte sequence (for TL::DirectInterface)
+ * is done via Bytes::byteVecFromStr() / Bytes::strFromByteVec(), respectively.
+ *
+ * \throws std::invalid_argument If \p pCmd is not available for the configured device and channel \p pChannel.
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ * \throws std::invalid_argument If \p pCmd is a setter but \p pValue is not set.
+ *
+ * \param pCmd The command name.
+ * \param pChannel %Device's channel number, if applicable (no value or -1 for no channel).
+ * \param pValue The value argument for \p pCmd.
  */
 void SCPI::writeCommand(const std::string_view pCmd, const std::optional<int> pChannel, VariantValueType pValue) const
 {
@@ -167,11 +178,17 @@ void SCPI::writeCommand(const std::string_view pCmd, const std::optional<int> pC
 /*!
  * \brief Execute a query command.
  *
- * \todo Detailed doc
+ * Queries the interface using the command with name \p pCmd for channel \p pChannel and returns the received result.
  *
- * \param pCmd
- * \param pChannel
- * \return
+ * Note: The conversion between string and byte sequence (for TL::DirectInterface)
+ * is done via Bytes::byteVecFromStr() / Bytes::strFromByteVec(), respectively.
+ *
+ * \throws std::invalid_argument If \p pCmd is not available for the configured device and channel \p pChannel.
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ *
+ * \param pCmd The command name.
+ * \param pChannel %Device's channel number, if applicable (no value or -1 for no channel).
+ * \return %Device's query response.
  */
 std::string SCPI::queryCommand(const std::string_view pCmd, const std::optional<int> pChannel) const
 {
@@ -183,12 +200,16 @@ std::string SCPI::queryCommand(const std::string_view pCmd, const std::optional<
 /*!
  * \brief Execute a command (either write or query).
  *
- * \todo Detailed doc
+ * Calls queryCommand() if \p pCmd is a query command and writeCommand() if \p pCmd is a write command (see there).
  *
- * \param pCmd
- * \param pChannel
- * \param pValue
- * \return
+ * Warns if \p pCmd is a query command but \p pValue is set (\p pValue will be discarded).
+ *
+ * \throws std::invalid_argument If queryCommand() or writeCommand() throw \c std::invalid_argument.
+ *
+ * \param pCmd The command name.
+ * \param pChannel %Device's channel number, if applicable (no value or -1 for no channel).
+ * \param pValue The value argument for a write command (see writeCommand()).
+ * \return Return value of queryCommand() for query commands and no value for write commands.
  */
 std::optional<std::string> SCPI::command(const std::string_view pCmd, const std::optional<int> pChannel, VariantValueType pValue) const
 {
@@ -216,9 +237,11 @@ std::optional<std::string> SCPI::command(const std::string_view pCmd, const std:
 /*!
  * \copybrief DirectDriver::initImpl()
  *
- * \todo Detailed doc
+ * Queries the device identifier from the device using the standard command \c *IDN? and compares it to the identifier
+ * configured in the device description file in order to check that the configured device equals the connected device.
+ * The function returns false on mismatch.
  *
- * \return
+ * \return True if successful.
  */
 bool SCPI::initImpl()
 {
@@ -251,9 +274,9 @@ bool SCPI::initImpl()
 /*!
  * \copybrief DirectDriver::closeImpl()
  *
- * \todo Detailed doc
+ * Does nothing.
  *
- * \return
+ * \return True.
  */
 bool SCPI::closeImpl()
 {
@@ -265,11 +288,13 @@ bool SCPI::closeImpl()
 /*!
  * \brief Check if command is query command.
  *
- * \todo Detailed doc
+ * Checks if \p pCmd is a \e query command that is available for the configured device and channel \p pChannel.
  *
- * \param pCmd
- * \param pChannel
- * \return
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ *
+ * \param pCmd The command name.
+ * \param pChannel The channel number (-1 for no channel).
+ * \return True if \p pCmd names a query command for \p pChannel.
  */
 bool SCPI::isQueryCommand(const std::string_view pCmd, const int pChannel) const
 {
@@ -281,11 +306,14 @@ bool SCPI::isQueryCommand(const std::string_view pCmd, const int pChannel) const
 /*!
  * \brief Get a write command from its name.
  *
- * \todo Detailed doc
+ * Returns the actual write command byte sequence for command name \p pCmd and channel number \p pChannel.
  *
- * \param pCmd
- * \param pChannel
- * \return
+ * \throws std::invalid_argument If \p pCmd is not available for the configured device and channel \p pChannel.
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ *
+ * \param pCmd The command name.
+ * \param pChannel The channel number (-1 for no channel).
+ * \return Command byte sequence.
  */
 const std::vector<std::uint8_t>& SCPI::getWriteCommand(const std::string_view pCmd, const int pChannel) const
 {
@@ -302,11 +330,14 @@ const std::vector<std::uint8_t>& SCPI::getWriteCommand(const std::string_view pC
 /*!
  * \brief Get a query command from its name.
  *
- * \todo Detailed doc
+ * Returns the actual query command byte sequence for command name \p pCmd and channel number \p pChannel.
  *
- * \param pCmd
- * \param pChannel
- * \return
+ * \throws std::invalid_argument If \p pCmd is not available for the configured device and channel \p pChannel.
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ *
+ * \param pCmd The command name.
+ * \param pChannel The channel number (-1 for no channel).
+ * \return Command byte sequence.
  */
 const std::vector<std::uint8_t>& SCPI::getQueryCommand(const std::string_view pCmd, const int pChannel) const
 {
@@ -325,10 +356,13 @@ const std::vector<std::uint8_t>& SCPI::getQueryCommand(const std::string_view pC
 /*!
  * \brief Get the write commands for a certain channel.
  *
- * \todo Detailed doc
+ * Returns all write commands (as byte sequences for TL::DirectInterface::write())
+ * available for the configured device and channel number \p pChannel.
  *
- * \param pChannel
- * \return
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ *
+ * \param pChannel The channel number (-1 for no channel).
+ * \return Map of available write commands for \p pChannel with command names as keys.
  */
 const SCPI::CommandMapType& SCPI::getWriteCommandMap(const int pChannel) const
 {
@@ -343,10 +377,13 @@ const SCPI::CommandMapType& SCPI::getWriteCommandMap(const int pChannel) const
 /*!
  * \brief Get the query commands for a certain channel.
  *
- * \todo Detailed doc
+ * Returns all query commands (as byte sequences for TL::DirectInterface::write())
+ * available for the configured device and channel number \p pChannel.
  *
- * \param pChannel
- * \return
+ * \throws std::invalid_argument If \p pChannel is not available for the configured device.
+ *
+ * \param pChannel The channel number (-1 for no channel).
+ * \return Map of available query commands for \p pChannel with command names as keys.
  */
 const SCPI::CommandMapType& SCPI::getQueryCommandMap(const int pChannel) const
 {
@@ -363,10 +400,15 @@ const SCPI::CommandMapType& SCPI::getQueryCommandMap(const int pChannel) const
 /*!
  * \brief Read the device description file for some device type.
  *
- * \todo Detailed doc
+ * Takes \p pDeviceType, converts it to lowercase, replaces spaces by underscores and appends ".yaml" to it.
+ * This is treated as a file name for an %SCPI device description file. A file with such a name is searched
+ * for in directories that are taken from the \c CASIL_DEV_DESC_DIRS environment variable (see Env::getEnv()).
+ * Starting with the first of these directories, the content of the first found file is read and returned.
  *
- * \param pDeviceType
- * \return
+ * \throws std::runtime_error If no such file can be found or reading the file fails.
+ *
+ * \param pDeviceType SCPI device type as used in YAML configurations for Device.
+ * \return Loaded file contents of a found device description file for device type \p pDeviceType.
  */
 std::string SCPI::loadDeviceDescription(const std::string& pDeviceType)
 {
@@ -434,10 +476,24 @@ std::string SCPI::loadDeviceDescription(const std::string& pDeviceType)
 /*!
  * \brief Generate a map of general and channel-specific write commands from a device description.
  *
- * \todo Detailed doc
+ * Extracts all write commands defined in \p pDeviceDescription, creates a separate map of command byte sequences vs.
+ * command name keys for each available device channel and returns a map of those maps with the channel numbers as keys.
+ * Top-level write commands, which do not belong to a \e channel, are treated as commands for channel number \c -1.
  *
- * \param pDeviceDescription
- * \return
+ * The following top-level write commands are mandatory by the \c IEEE \c 488.2
+ * standard and are therefore automatically added to the top-level commands map:
+ * - <tt>{"clear", "*CLS"}</tt>
+ * - <tt>{"reset", "*RST"}</tt>
+ * - <tt>{"trigger", "*TRG"}</tt>
+ *
+ * Note: The ASCII representation of the commands is converted to a byte sequence (for TL::DirectInterface) via Bytes::byteVecFromStr().
+ *
+ * See parseCommands() for more details on the parsing of \p pDeviceDescription.
+ *
+ * \throws std::runtime_error If parseCommands() throws \c std::runtime_error.
+ *
+ * \param pDeviceDescription %SCPI device description.
+ * \return All write commands in \p pDeviceDescription plus mandatory ones as per-channel map of command maps.
  */
 std::map<int, SCPI::CommandMapType> SCPI::parseWriteCommands(const boost::property_tree::ptree& pDeviceDescription)
 {
@@ -452,10 +508,22 @@ std::map<int, SCPI::CommandMapType> SCPI::parseWriteCommands(const boost::proper
 /*!
  * \brief Generate a map of general and channel-specific query commands from a device description.
  *
- * \todo Detailed doc
+ * Extracts all query commands defined in \p pDeviceDescription, creates a separate map of command byte sequences vs.
+ * command name keys for each available device channel and returns a map of those maps with the channel numbers as keys.
+ * Top-level query commands, which do not belong to a \e channel, are treated as commands for channel number \c -1.
  *
- * \param pDeviceDescription
- * \return
+ * The following top-level query commands are mandatory by the \c IEEE \c 488.2
+ * standard and are therefore automatically added to the top-level commands map:
+ * - <tt>{"get_name", "*IDN?"}</tt>
+ *
+ * Note: The ASCII representation of the commands is converted to a byte sequence (for TL::DirectInterface) via Bytes::byteVecFromStr().
+ *
+ * See parseCommands() for more details on the parsing of \p pDeviceDescription.
+ *
+ * \throws std::runtime_error If parseCommands() throws \c std::runtime_error.
+ *
+ * \param pDeviceDescription %SCPI device description.
+ * \return All query commands in \p pDeviceDescription plus mandatory ones as per-channel map of command maps.
  */
 std::map<int, SCPI::CommandMapType> SCPI::parseQueryCommands(const boost::property_tree::ptree& pDeviceDescription)
 {
@@ -468,12 +536,31 @@ std::map<int, SCPI::CommandMapType> SCPI::parseQueryCommands(const boost::proper
 /*!
  * \brief Generate a map of general and channel-specific commands from a device description (either query or write commands).
  *
- * \todo Detailed doc
+ * Extracts all write/query (depends on \p pQueryCommands) commands defined in \p pDeviceDescription, creates a separate map
+ * of command byte sequences vs. command name keys for each available device channel and returns a map of those maps with the
+ * channel numbers as keys. Top-level write/query commands, which do not belong to a \e channel, are treated as commands
+ * for channel number \c -1. Commands passed as \p pIEEECmds are automatically added to the top-level commands map.
  *
- * \param pDeviceDescription
- * \param pQueryCommands
- * \param pIEEECmds
- * \return
+ * Query commands are distinguished from write commands by checking the last byte/character
+ * of each command, which must be a question mark ('?') for %SCPI query commands.
+ *
+ * The \e command \e name / \e command pairs are taken from the key / value pairs in the \p pDeviceDescription tree.
+ * Top-level commands are read from the top level of the tree, while channel-specific commands are read from
+ * sub-trees at keys <tt>"channel N"</tt> with \c N being the channel number (which must be positive).
+ *
+ * The top-level key "identifier" will be ignored as is does not define
+ * a command but the device identifier (see also parseDeviceIdentifier()).
+ *
+ * Note: The ASCII representation of the commands is converted to a byte sequence (for TL::DirectInterface) via Bytes::byteVecFromStr().
+ *
+ * \throws std::runtime_error If the channel number from <tt>"channel N"</tt> is not a parsable non-negative integer.
+ * \throws std::runtime_error If a command value in \p pDeviceDescription is empty.
+ *
+ * \param pDeviceDescription %SCPI device description.
+ * \param pQueryCommands Return the query commands if true or the write commands else.
+ * \param pIEEECmds Mandatory commands to be automatically added as top-level commands (channel -1).
+ * \return All write/query (depends on \p pQueryCommands) commands in \p pDeviceDescription
+ *         plus mandatory ones from \p pIEEECmds as per-channel map of command maps.
  */
 std::map<int, SCPI::CommandMapType> SCPI::parseCommands(const boost::property_tree::ptree& pDeviceDescription, bool pQueryCommands,
                                                         const std::vector<std::pair<std::string, std::string>>& pIEEECmds)
@@ -573,10 +660,13 @@ std::map<int, SCPI::CommandMapType> SCPI::parseCommands(const boost::property_tr
 /*!
  * \brief Get the device identifier string.
  *
- * \todo Detailed doc
+ * Returns the value for the key "identifier" out of the device configuration tree \p pDeviceDescription
+ * (as obtained by Auxil::propertyTreeFromYAML() from a device description YAML document).
  *
- * \param pDeviceDescription
- * \return
+ * \throws std::runtime_error If \p pDeviceDescription has no "identifier" key.
+ *
+ * \param pDeviceDescription %SCPI device description.
+ * \return The %SCPI device identifier.
  */
 std::string SCPI::parseDeviceIdentifier(const boost::property_tree::ptree& pDeviceDescription)
 {
@@ -593,10 +683,14 @@ std::string SCPI::parseDeviceIdentifier(const boost::property_tree::ptree& pDevi
 /*!
  * \brief Convert a value to string with fixed formatting.
  *
- * \todo Detailed doc
+ * Returns a formatted string corresponding to the value represented by the variant \p pValue:
+ * - \c std::string: No formatting is performed.
+ * - \c double: <tt>{: <-#E}</tt>
+ * - \c int: <tt>{: <-d}</tt>
+ * - \c No value (\c std::monostate ): Empty string is returned.
  *
- * \param pValue
- * \return
+ * \param pValue Value to be formatted.
+ * \return Formatted value.
  */
 std::string SCPI::getValueStr(VariantValueType&& pValue)
 {
@@ -613,10 +707,10 @@ std::string SCPI::getValueStr(VariantValueType&& pValue)
 /*!
  * \brief Check if a command name identifies it as setter.
  *
- * \todo Detailed doc
+ * Setters are command names starting with "set_".
  *
- * \param pCmd
- * \return
+ * \param pCmd Command name to check.
+ * \return True if \p pCmd is a setter.
  */
 bool SCPI::isSetter(const std::string_view pCmd)
 {

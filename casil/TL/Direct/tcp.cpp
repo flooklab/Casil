@@ -37,10 +37,20 @@ CASIL_REGISTER_INTERFACE_ALIAS("Socket")
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Initializes the host name to connect to from the mandatory "init.address" string in \p pConfig.
  *
- * \param pName
- * \param pConfig
+ * Initializes the network port for the connection from the mandatory "init.port" value (integer type) in \p pConfig.
+ *
+ * Initializes the termination sequence for non-sized read operations from the mandatory "init.read_termination" string in \p pConfig.
+ *
+ * Initializes the termination sequence for write operations from the optional "init.write_termination" string in \p pConfig or,
+ * if not defined, to the same sequence as the read termination.
+ *
+ * \throws std::runtime_error If "init.address" is empty.
+ * \throws std::runtime_error If "init.port" is out of range (must be in <tt>(0, 65535]</tt>).
+ *
+ * \param pName Component instance name.
+ * \param pConfig Component configuration.
  */
 TCP::TCP(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
@@ -63,10 +73,13 @@ TCP::TCP(std::string pName, LayerConfig pConfig) :
 /*!
  * \copybrief DirectInterface::read()
  *
- * \todo Detailed doc
+ * Reads \p pSize bytes if \p pSize is positive and any number of bytes up
+ * to (but excluding) the configured read termination if \p pSize is -1.
+ * Other negative values return an empty sequence.
  *
- * \param pSize
- * \return
+ * \throws std::runtime_error If the read fails.
+ *
+ * \copydetails DirectInterface::read()
  */
 std::vector<std::uint8_t> TCP::read(const int pSize)
 {
@@ -83,9 +96,9 @@ std::vector<std::uint8_t> TCP::read(const int pSize)
 /*!
  * \copybrief DirectInterface::write()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If the write fails.
  *
- * \param pData
+ * \copydetails DirectInterface::write()
  */
 void TCP::write(const std::vector<std::uint8_t>& pData)
 {
@@ -102,11 +115,7 @@ void TCP::write(const std::vector<std::uint8_t>& pData)
 /*!
  * \copybrief DirectInterface::query()
  *
- * \todo Detailed doc
- *
- * \param pData
- * \param pSize
- * \return
+ * \copydetails DirectInterface::query()
  */
 std::vector<std::uint8_t> TCP::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
@@ -118,9 +127,9 @@ std::vector<std::uint8_t> TCP::query(const std::vector<std::uint8_t>& pData, con
 /*!
  * \copybrief DirectInterface::readBufferEmpty()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If checking the buffer size fails.
  *
- * \return
+ * \copydetails DirectInterface::readBufferEmpty()
  */
 bool TCP::readBufferEmpty() const
 {
@@ -137,7 +146,7 @@ bool TCP::readBufferEmpty() const
 /*!
  * \copybrief DirectInterface::clearReadBuffer()
  *
- * \todo Detailed doc
+ * \throws std::runtime_error If clearing the buffer fails.
  */
 void TCP::clearReadBuffer()
 {
@@ -156,9 +165,11 @@ void TCP::clearReadBuffer()
 /*!
  * \copybrief DirectInterface::initImpl()
  *
- * \todo Detailed doc
+ * Resolves the configured host name and connects the socket to this endpoint via the configured port.
  *
- * \return
+ * \note Requires IO context threads to be running already (see ASIO::ioContextThreadsRunning()).
+ *
+ * \return True if successful.
  */
 bool TCP::initImpl()
 {
@@ -178,9 +189,9 @@ bool TCP::initImpl()
 /*!
  * \copybrief DirectInterface::closeImpl()
  *
- * \todo Detailed doc
+ * Disconnects the socket.
  *
- * \return
+ * \return True if successful.
  */
 bool TCP::closeImpl()
 {

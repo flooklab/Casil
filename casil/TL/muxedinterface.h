@@ -63,7 +63,7 @@ public:
      * \brief Write to the interface.
      *
      * \param pAddr Bus address.
-     * \param pData Bytes to be written.
+     * \param pData %Bytes to be written.
      */
     virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;
     virtual std::vector<std::uint8_t> query(std::uint64_t pWriteAddr, std::uint64_t pReadAddr,

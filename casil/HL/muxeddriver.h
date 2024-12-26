@@ -70,8 +70,18 @@ protected:
                                                                                                     ///  to the base address.
 
 private:
-    bool initImpl() override = 0;           ///< Initialize the firmware module.
-    bool closeImpl() override = 0;          ///< Close the firmware module.
+    /*!
+     * \brief Initialize the firmware module.
+     *
+     * \copydetails Driver::initImpl()
+     */
+    bool initImpl() override = 0;
+    /*!
+     * \brief Close the firmware module.
+     *
+     * \copydetails Driver::closeImpl()
+     */
+    bool closeImpl() override = 0;
 
 protected:
     InterfaceBaseType& interface;           ///< The interface instance to be used for required access to the transfer layer.

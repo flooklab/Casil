@@ -689,8 +689,8 @@ std::string SCPI::parseDeviceIdentifier(const boost::property_tree::ptree& pDevi
  *
  * Returns a formatted string corresponding to the value represented by the variant \p pValue:
  * - \c std::string: No formatting is performed.
- * - \c double: <tt>{: <-#E}</tt>
- * - \c int: <tt>{: <-d}</tt>
+ * - \c double: `{: <-#E}`
+ * - \c int: `{: <-d}`
  * - \c No value (\c std::monostate ): Empty string is returned.
  *
  * \param pValue Value to be formatted.

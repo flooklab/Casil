@@ -145,7 +145,7 @@ std::vector<std::uint8_t> MuxedDriver::read(const std::uint64_t pAddr, const int
  * \throws std::runtime_error If TL::MuxedInterface::write() throws \c std::runtime_error.
  *
  * \param pAddr Module-local address.
- * \param pData Bytes to be written.
+ * \param pData %Bytes to be written.
  */
 void MuxedDriver::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) const
 {

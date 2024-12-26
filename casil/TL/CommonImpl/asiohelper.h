@@ -57,7 +57,7 @@ namespace ASIOHelper
 /*!
  * \brief Check if type is either a Boost %ASIO %TCP socket or a Boost %ASIO %UDP socket.
  *
- * \tparam SocketT
+ * \tparam SocketT Type to be checked.
  */
 template<typename SocketT>
 concept IsSocket = (std::same_as<SocketT, boost::asio::ip::tcp::socket> || std::same_as<SocketT, boost::asio::ip::udp::socket>);
@@ -65,7 +65,7 @@ concept IsSocket = (std::same_as<SocketT, boost::asio::ip::tcp::socket> || std::
 /*!
  * \brief Check if a Boost %ASIO %TCP or %UDP socket has a \c cancel() function with \c void return type.
  *
- * \tparam SocketT
+ * \tparam SocketT Type to be checked.
  */
 template<typename SocketT>
 concept IsCancellableSocket = IsSocket<SocketT> && requires(SocketT sock)

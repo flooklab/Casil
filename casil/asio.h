@@ -58,6 +58,7 @@ public:
 
 private:
     using WorkGuard = boost::asio::executor_work_guard<boost::asio::io_context::executor_type>;
+                                                                    ///< "Work guard" for IO context threads (see the \e Boost documentation).
     static WorkGuard& getWorkGuard();                               ///< Get the "work guard" object for the IO context object.
 
 private:

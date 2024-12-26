@@ -47,7 +47,7 @@ using casil::Layers::TL::CommonImpl::SerialPortWrapper;
  *
  * Note: Initializes the serial port using the IO context from ASIO::getIOContext().
  *
- * \param pPort Device name of the serial port to be used.
+ * \param pPort %Device name of the serial port to be used.
  * \param pReadTermination Termination sequence for non-sized read operations.
  * \param pWriteTermination Termination sequence to append for write operations.
  * \param pBaudRate Baud rate to be used for the serial connection.
@@ -344,7 +344,7 @@ void SerialPortWrapper::pollReadBuffer()
  *
  * If \p pErrorCode signals an error (other than the socket being cancelled), the error gets logged (see Logger)
  * and the current polling error count gets incremented. Continuous polling gets disabled automatically
- * as soon as this error count exceeds a fixed maximum threshold.
+ * as soon as this error count exceeds a fixed maximum threshold (see \ref maxBufferErrorCount).
  *
  * \param pErrorCode Result/error code of the handled async read.
  * \param pNumBytes Number of successfully transferred bytes.

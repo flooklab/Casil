@@ -60,11 +60,30 @@ namespace TmplDev
  */
 namespace TmplDevImpl
 {
-
+    /*!
+     * \brief Common top-level base class for TmplDev component configuration wrappers.
+     *
+     * Declares a deleted constructor as the wrappers are supposed to work without instantiation.
+     */
     struct ComponentConfBase { ComponentConfBase() = delete; };
 
+    /*!
+     * \brief Trivial differentiation of ComponentConfBase for only interface components.
+     *
+     * Used as base class for TmplDev::InterfaceConf.
+     */
     struct InterfaceConfBase : public ComponentConfBase {};
+    /*!
+     * \brief Trivial differentiation of ComponentConfBase for only driver components.
+     *
+     * Used as base class for TmplDev::DriverConf.
+     */
     struct DriverConfBase : public ComponentConfBase {};
+    /*!
+     * \brief Trivial differentiation of ComponentConfBase for only register components.
+     *
+     * Used as base class for TmplDev::RegisterConf.
+     */
     struct RegisterConfBase : public ComponentConfBase {};
 
 } // namespace TmplDevImpl
@@ -146,12 +165,33 @@ struct RegisterConf : public TmplDevImpl::RegisterConfBase
 
 namespace TmplDevImpl
 {
-
+    /*!
+     * \brief Check if type is derived from a component configuration wrapper.
+     *
+     * Checks if \p T is derived from \p U, assuming that \p U is one of \ref casil::TmplDev::InterfaceConf "TmplDev::InterfaceConf",
+     * \ref casil::TmplDev::DriverConf "TmplDev::DriverConf" or \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf".
+     *
+     * \tparam T Type to be checked.
+     * \tparam U Component configuration wrapper struct that \p T should be derived from.
+     */
     template<typename T, template<typename> typename U>
     concept DerivedFromConfStruct = requires { typename T::Type; } &&
                                     std::is_base_of_v<U<typename T::Type>, T> &&
                                     !std::is_same_v<U<typename T::Type>, T>;
 
+    /*!
+     * \brief Check if type properly implements a component configuration wrapper.
+     *
+     * Checks if \p T
+     * - (a) is derived from \p U, assuming that \p U is one of \ref casil::TmplDev::InterfaceConf "TmplDev::InterfaceConf",
+     *       \ref casil::TmplDev::DriverConf "TmplDev::DriverConf" or \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf", and
+     * - (b) further defines two member variables that every component configuration wrapper must have:
+     *   - `static constexpr char name[] = "name_of_interface";`
+     *   - `static constexpr char conf[] = "possibly: empty, rest: of, yaml: configuration";`
+     *
+     * \tparam T Type to be checked.
+     * \tparam U Component configuration wrapper struct that \p T should be derived from.
+     */
     template<typename T, template<typename> typename U>
     concept ImplementsConfStruct = DerivedFromConfStruct<T, U> && requires
     {

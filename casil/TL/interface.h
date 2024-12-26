@@ -71,8 +71,18 @@ public:
     virtual void clearReadBuffer() = 0;         ///< Clear the current contents of the read buffer.
 
 private:
-    bool initImpl() override = 0;               ///< Perform interface-specific initialization logic for init().
-    bool closeImpl() override = 0;              ///< Perform interface-specific closing logic for init().
+    /*!
+     * \brief Perform interface-specific initialization logic for init().
+     *
+     * \copydetails LayerBase::initImpl()
+     */
+    bool initImpl() override = 0;
+    /*!
+     * \brief Perform interface-specific closing logic for init().
+     *
+     * \copydetails LayerBase::closeImpl()
+     */
+    bool closeImpl() override = 0;
 
 protected:
     const double queryDelay;                    ///< Configured delay value for query operations (between write and read) in milliseconds.

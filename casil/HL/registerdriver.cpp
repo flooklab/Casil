@@ -188,10 +188,10 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
 /*!
  * \brief Access a register via the proxy class.
  *
- * \todo Detailed doc
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
  *
- * \param pRegName
- * \return
+ * \param pRegName Name of the register.
+ * \return Proxy class instance for register \p pRegName.
  */
 const RegisterDriver::RegisterProxy& RegisterDriver::operator[](const std::string_view pRegName) const
 {
@@ -211,7 +211,10 @@ const RegisterDriver::RegisterProxy& RegisterDriver::operator[](const std::strin
 /*!
  * \brief Reset the firmware module.
  *
- * \todo Detailed doc
+ * Performs a driver-specific reset sequence for the module.
+ *
+ * Then, if "clear_cache_after_reset" was enabled in the component configuration, the
+ * cache for previously written register values will be cleared (see RegisterDriver()).
  */
 void RegisterDriver::reset()
 {
@@ -229,7 +232,9 @@ void RegisterDriver::reset()
 /*!
  * \brief Write configured default values to all appropriate registers.
  *
- * \todo Detailed doc
+ * The default value/sequence will be written to every writable register that has a default, which can be either
+ * from its definition (see RegisterDriver(), RegisterDescr) or from the possible "init.REG_NAME" overrides in
+ * the component configuration (see RegisterDriver()). If the latter is present, it will be used, by preference.
  */
 void RegisterDriver::applyDefaults()
 {
@@ -260,10 +265,18 @@ void RegisterDriver::applyDefaults()
 /*!
  * \brief Read the data from a byte array register.
  *
- * \todo Detailed doc
+ * Reads the byte sequence for register \p pRegName from the firmware module.
  *
- * \param pRegName
- * \return
+ * Silently redirects to trigger() (and returns an empty sequence) if \p pRegName is a write-only register.
+ *
+ * Note: Warns via Logger if the read bytes do not match the corresponding sequence from the written values cache.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \p pRegName is a \e value register.
+ * \throws std::runtime_error If the read (or (trigger-)write if write-only) fails.
+ *
+ * \param pRegName Name of the register.
+ * \return Byte sequence stored in the register (or empty vector if write-only).
  */
 std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegName)
 {
@@ -319,10 +332,18 @@ std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegNa
 /*!
  * \brief Write data to a byte array register.
  *
- * \todo Detailed doc
+ * Writes \p pData to the register \p pRegName in the firmware module.
  *
- * \param pRegName
- * \param pData
+ * Saves \p pData in the written value cache on success.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \p pRegName is a \e value register.
+ * \throws std::invalid_argument If \p pRegName is read-only.
+ * \throws std::invalid_argument If size of \p pData does not match size of \p pRegName.
+ * \throws std::runtime_error If the write fails.
+ *
+ * \param pRegName Name of the register.
+ * \param pData Byte sequence to be written.
  */
 void RegisterDriver::setBytes(const std::string_view pRegName, const std::vector<std::uint8_t>& pData)
 {
@@ -362,10 +383,18 @@ void RegisterDriver::setBytes(const std::string_view pRegName, const std::vector
 /*!
  * \brief Read the value from a value register.
  *
- * \todo Detailed doc
+ * Reads the unsigned integer value stored by register \p pRegName from the firmware module.
  *
- * \param pRegName
- * \return
+ * Silently redirects to trigger() (and returns zero) if \p pRegName is a write-only register.
+ *
+ * Note: Warns via Logger if the read value does not match the corresponding value from the written values cache.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \p pRegName is a \e byte \e array register.
+ * \throws std::runtime_error If the read (or (trigger-)write if write-only) fails.
+ *
+ * \param pRegName Name of the register.
+ * \return Value stored in the register (or zero if write-only).
  */
 std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
 {
@@ -421,10 +450,17 @@ std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
 /*!
  * \brief Write a value to a value register.
  *
- * \todo Detailed doc
+ * Writes \p pValue to the register \p pRegName in the firmware module.
  *
- * \param pRegName
- * \param pValue
+ * Saves \p pValue in the written value cache on success.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \p pRegName is a \e byte \e array register.
+ * \throws std::invalid_argument If \p pRegName is read-only.
+ * \throws std::runtime_error If the write fails.
+ *
+ * \param pRegName Name of the register.
+ * \param pValue Value to be written.
  */
 void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64_t pValue)
 {
@@ -467,10 +503,13 @@ void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64
 /*!
  * \brief Read an integer or byte sequence from a register, according to its data type.
  *
- * \todo Detailed doc
+ * See getValue() and getBytes().
  *
- * \param pRegName
- * \return
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::runtime_error If getValue() or getBytes() throw \c std::runtime_error.
+ *
+ * \param pRegName Name of the register.
+ * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of \p pRegName.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const std::string_view pRegName)
 {
@@ -493,10 +532,13 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const
 /*!
  * \brief Write a value to a value register.
  *
- * \todo Detailed doc
+ * See setValue().
  *
- * \param pRegName
- * \param pValue
+ * \throws std::invalid_argument If setValue() throws \c std::invalid_argument.
+ * \throws std::runtime_error If setValue() throws \c std::runtime_error.
+ *
+ * \param pRegName Name of the register.
+ * \param pValue Value to be written.
  */
 void RegisterDriver::set(const std::string_view pRegName, const std::uint64_t pValue)
 {
@@ -506,10 +548,12 @@ void RegisterDriver::set(const std::string_view pRegName, const std::uint64_t pV
 /*!
  * \brief Write data to a byte array register.
  *
- * \todo Detailed doc
+ * See setBytes().
  *
- * \param pRegName
- * \param pBytes
+ * \throws std::invalid_argument If setBytes() throws \c std::invalid_argument.
+ *
+ * \param pRegName Name of the register.
+ * \param pBytes Byte sequence to be written.
  */
 void RegisterDriver::set(const std::string_view pRegName, const std::vector<std::uint8_t>& pBytes)
 {
@@ -521,9 +565,17 @@ void RegisterDriver::set(const std::string_view pRegName, const std::vector<std:
 /*!
  * \brief "Trigger" a write-only register by writing configured default or zero.
  *
- * \todo Detailed doc
+ * Calls setValue() or setBytes(), depending on the data type of \p pRegName, in order to write the register's default
+ * value/sequence, which can be either from its definition (see RegisterDriver(), RegisterDescr) or from the possible
+ * "init.REG_NAME" override in the component configuration (see RegisterDriver()). If the latter is present, it will be
+ * used, by preference. If there is none of those two, the value zero or a byte sequence consisting of zeros will be written.
  *
- * \param pRegName
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \ref RegisterDescr::AccessMode "AccessMode" of \p pRegName
+ *         is \e not \ref RegisterDescr::AccessMode::WriteOnly "WriteOnly".
+ * \throws std::runtime_error If setValue() or setBytes() throw \c std::runtime_error.
+ *
+ * \param pRegName Name of the register.
  */
 void RegisterDriver::trigger(const std::string_view pRegName)
 {
@@ -573,10 +625,10 @@ void RegisterDriver::trigger(const std::string_view pRegName)
 /*!
  * \brief Check if a register exists or throw an exception else.
  *
- * \todo Detailed doc
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
  *
- * \param pRegName
- * \return
+ * \param pRegName Name of the register.
+ * \return True.
  */
 bool RegisterDriver::testRegisterName(const std::string_view pRegName) const
 {
@@ -591,10 +643,10 @@ bool RegisterDriver::testRegisterName(const std::string_view pRegName) const
 /*!
  * \brief Check if a string could be a valid register name.
  *
- * \todo Detailed doc
+ * Allowed characters are uppercase letters and underscores.
  *
- * \param pRegName
- * \return
+ * \param pRegName Potential name of a register.
+ * \return True if \p pRegName has a valid register name format.
  */
 bool RegisterDriver::isValidRegisterName(const std::string_view pRegName)
 {
@@ -611,9 +663,10 @@ bool RegisterDriver::isValidRegisterName(const std::string_view pRegName)
 /*!
  * \copybrief MuxedDriver::initImpl()
  *
- * \todo Detailed doc
+ * Resets the firmware module (see reset()), checks the driver's compatibility with the module (see checkVersionRequirement()),
+ * write register defaults (see applyDefaults()) and performs further module-specific initialization steps (see initModule()).
  *
- * \return
+ * \return True if successful.
  */
 bool RegisterDriver::initImpl()
 {
@@ -670,9 +723,9 @@ bool RegisterDriver::initImpl()
 /*!
  * \copybrief MuxedDriver::closeImpl()
  *
- * \todo Detailed doc
+ * Calls closeModule() and returns accordingly.
  *
- * \return
+ * \return True if successful.
  */
 bool RegisterDriver::closeImpl()
 {
@@ -687,9 +740,9 @@ bool RegisterDriver::closeImpl()
 /*!
  * \brief Perform module-specific initialization steps.
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  *
- * \return
+ * \return True.
  */
 bool RegisterDriver::initModule()
 {
@@ -699,9 +752,9 @@ bool RegisterDriver::initModule()
 /*!
  * \brief Perform module-specific closing steps.
  *
- * \todo Detailed doc
+ * Does nothing (override for specific drivers if needed).
  *
- * \return
+ * \return True.
  */
 bool RegisterDriver::closeModule()
 {
@@ -713,11 +766,11 @@ bool RegisterDriver::closeModule()
 /*!
  * \brief Check if software version is compatible with firmware version.
  *
- * \todo Detailed doc
+ * Checks for \e equality of \p pSoftwareVersion and \p pFirmwareVersion.
  *
- * \param pSoftwareVersion
- * \param pFirmwareVersion
- * \return
+ * \param pSoftwareVersion %Driver software version (as from getModuleSoftwareVersion()).
+ * \param pFirmwareVersion Firmware module version (as from getModuleFirmwareVersion()).
+ * \return If versions are compatible.
  */
 bool RegisterDriver::checkVersionRequirement(const std::uint8_t pSoftwareVersion, const std::uint8_t pFirmwareVersion)
 {
@@ -727,9 +780,10 @@ bool RegisterDriver::checkVersionRequirement(const std::uint8_t pSoftwareVersion
 /*!
  * \copybrief checkVersionRequirement(std::uint8_t, std::uint8_t)
  *
- * \todo Detailed doc
+ * This is a shortcut for checkVersionRequirement(std::uint8_t, std::uint8_t)
+ * being called with getModuleSoftwareVersion() and getModuleFirmwareVersion().
  *
- * \return
+ * \return If versions are compatible according to checkVersionRequirement(std::uint8_t, std::uint8_t).
  */
 bool RegisterDriver::checkVersionRequirement()
 {
@@ -741,11 +795,13 @@ bool RegisterDriver::checkVersionRequirement()
 /*!
  * \brief Read a byte sequence from a register address.
  *
- * \todo Detailed doc
+ * Reads \p pRegSize bytes at register address \p pRegAddr via read().
  *
- * \param pRegAddr
- * \param pRegSize
- * \return
+ * \throws std::runtime_error If read() fails or the number of received bytes differs from \p pRegSize.
+ *
+ * \param pRegAddr Module-local register address.
+ * \param pRegSize Register size in bytes.
+ * \return Read bytes.
  */
 std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAddr, const std::uint32_t pRegSize) const
 {
@@ -760,10 +816,12 @@ std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAd
 /*!
  * \brief Write a byte sequence to a register address.
  *
- * \todo Detailed doc
+ * Writes \p pData to register address \p pRegAddr via write().
  *
- * \param pRegAddr
- * \param pData
+ * \throws std::runtime_error If write() fails.
+ *
+ * \param pRegAddr Module-local register address.
+ * \param pData Byte sequence to be written.
  */
 void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const std::vector<std::uint8_t>& pData) const
 {
@@ -775,12 +833,15 @@ void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const std::vector
 /*!
  * \brief Read an integer value from a register address.
  *
- * \todo Detailed doc
+ * Reads \c N full bytes at register address \p pRegAddr via read(), with \c N such that the contained integer
+ * value at bit offset \p pRegOffs and with bit size \p pRegSize can be determined. This value will be returned.
  *
- * \param pRegAddr
- * \param pRegSize
- * \param pRegOffs
- * \return
+ * \throws std::runtime_error If read() fails or the number of received bytes differs from \c N.
+ *
+ * \param pRegAddr Module-local register address (in bytes).
+ * \param pRegSize Register size in bits (i.e. bit length of stored value).
+ * \param pRegOffs Register offset in bits (i.e. bit offset of stored value with respect to \p pRegAddr).
+ * \return Read value.
  */
 std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize, const std::uint32_t pRegOffs) const
 {
@@ -860,12 +921,20 @@ std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const st
 /*!
  * \brief Write an integer value to a register address.
  *
- * \todo Detailed doc
+ * If the register only covers \e full bytes (i.e. \p pRegSize and \p pRegOffs each a multiple of 8), writes the new value
+ * \p pValue to the register at address \p pRegAddr, with bit offset \p pRegOffs and bit size \p pRegSize using write().
  *
- * \param pRegAddr
- * \param pRegSize
- * \param pRegOffs
- * \param pValue
+ * Otherwise, first \e reads the \c N covered bytes using read() (similar to getRegValue()),
+ * modifies only the bits in <tt>[pRegOffs, pRegOffs+pRegSize)</tt>, which represent the stored
+ * value, and then writes back the partially modified byte sequence to \p pRegAddr using write().
+ *
+ * \throws std::runtime_error If the potential read() fails or the number of received bytes differs from \c N.
+ * \throws std::runtime_error If write() fails.
+ *
+ * \param pRegAddr Module-local register address (in bytes).
+ * \param pRegSize Register size in bits (i.e. bit length of stored value).
+ * \param pRegOffs Register offset in bits (i.e. bit offset of stored value with respect to \p pRegAddr).
+ * \param pValue Value to be written.
  */
 void RegisterDriver::setRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize,
                                  const std::uint32_t pRegOffs, const std::uint64_t pValue) const
@@ -971,10 +1040,10 @@ using RegisterProxy = RegisterDriver::RegisterProxy;
 /*!
  * \brief Constructor.
  *
- * \todo Detailed doc
+ * Binds the register access functions to the register \p pRegName of driver \p pRegDriver.
  *
- * \param pRegDriver
- * \param pRegName
+ * \param pRegDriver The driver instance for the register to be controlled.
+ * \param pRegName Name of the register.
  */
 RegisterProxy::RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName) :
     regDriver(pRegDriver),
@@ -985,10 +1054,13 @@ RegisterProxy::RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName) :
 /*!
  * \brief Write an integer value to the register.
  *
- * \todo Detailed doc
+ * Writes \p pValue to the register via RegisterDriver::setValue().
  *
- * \param pValue
- * \return
+ * \throws std::invalid_argument See RegisterDriver::setValue().
+ * \throws std::runtime_error See RegisterDriver::setValue().
+ *
+ * \param pValue Value to be written.
+ * \return \p pValue.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
 std::uint64_t RegisterProxy::operator=(/*const */std::uint64_t pValue) const
@@ -1003,10 +1075,13 @@ std::uint64_t RegisterProxy::operator=(const std::uint64_t pValue) const
 /*!
  * \brief Write a byte sequence to the register.
  *
- * \todo Detailed doc
+ * Writes \p pBytes to the register via RegisterDriver::setBytes().
  *
- * \param pBytes
- * \return
+ * \throws std::invalid_argument See RegisterDriver::setBytes().
+ * \throws std::runtime_error See RegisterDriver::setBytes().
+ *
+ * \param pBytes Byte sequence to be written.
+ * \return \p pBytes.
  */
 const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std::uint8_t>& pBytes) const
 {
@@ -1019,7 +1094,12 @@ const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std:
 /*!
  * \brief Read an integer value from the register.
  *
- * \todo Detailed doc
+ * Reads the unsigned integer value stored by the register via RegisterDriver::getValue().
+ *
+ * \throws std::invalid_argument See RegisterDriver::getValue().
+ * \throws std::runtime_error See RegisterDriver::getValue().
+ *
+ * \return Value stored in the register (or zero if write-only).
  */
 RegisterProxy::operator std::uint64_t() const
 {
@@ -1027,9 +1107,15 @@ RegisterProxy::operator std::uint64_t() const
 }
 
 /*!
+ * \fn RegisterProxy::operator std::vector<std::uint8_t>()
  * \brief Read a byte sequence from the register.
  *
- * \todo Detailed doc
+ * Reads the byte sequence of the register via RegisterDriver::getBytes().
+ *
+ * \throws std::invalid_argument See RegisterDriver::getBytes().
+ * \throws std::runtime_error See RegisterDriver::getBytes().
+ *
+ * \return Byte sequence stored in the register (or empty vector if write-only).
  */
 RegisterProxy::operator std::vector<std::uint8_t>() const
 {
@@ -1041,9 +1127,12 @@ RegisterProxy::operator std::vector<std::uint8_t>() const
 /*!
  * \brief Read an integer or byte sequence from the register, according to its data type.
  *
- * \todo Detailed doc
+ * Reads the value/sequence stored by the register via RegisterDriver::get().
  *
- * \return
+ * \throws std::invalid_argument See RegisterDriver::get().
+ * \throws std::runtime_error See RegisterDriver::get().
+ *
+ * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of the register.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() const
 {
@@ -1055,7 +1144,10 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() cons
 /*!
  * \brief "Trigger" the (write-only) register by writing configured default or zero.
  *
- * \todo Detailed doc
+ * Triggers the register via RegisterDriver::trigger().
+ *
+ * \throws std::invalid_argument See RegisterDriver::trigger().
+ * \throws std::runtime_error See RegisterDriver::trigger().
  */
 void RegisterProxy::trigger() const
 {

@@ -61,7 +61,7 @@ public:
     /*!
      * \brief Write to the interface.
      *
-     * \param pData Bytes to be written.
+     * \param pData %Bytes to be written.
      */
     virtual void write(const std::vector<std::uint8_t>& pData) = 0;
     virtual std::vector<std::uint8_t> query(const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;    ///< \brief Write a query to the

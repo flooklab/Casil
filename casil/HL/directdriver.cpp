@@ -53,6 +53,8 @@ DirectDriver::DirectDriver(std::string pType, std::string pName, InterfaceBaseTy
  *
  * Does nothing.
  *
+ * \param pSize Ignored.
+ * \param pAddrOffs Ignored.
  * \return Empty vector.
  */
 std::vector<std::uint8_t> DirectDriver::getData(int, std::uint32_t)
@@ -64,6 +66,9 @@ std::vector<std::uint8_t> DirectDriver::getData(int, std::uint32_t)
  * \brief Override not intended to be used (dummy implementation).
  *
  * Does nothing.
+ *
+ * \param pData Ignored.
+ * \param pAddrOffs Ignored.
  */
 void DirectDriver::setData(const std::vector<std::uint8_t>&, std::uint32_t)
 {

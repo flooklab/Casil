@@ -58,8 +58,18 @@ public:
     ~Register() override = default;     ///< Default destructor.
 
 private:
-    bool initImpl() override = 0;       ///< Perform register-specific initialization logic for init().
-    bool closeImpl() override = 0;      ///< Perform register-specific closing logic for init().
+    /*!
+     * \brief Perform register-specific initialization logic for init().
+     *
+     * \copydetails LayerBase::initImpl()
+     */
+    bool initImpl() override = 0;
+    /*!
+     * \brief Perform register-specific closing logic for init().
+     *
+     * \copydetails LayerBase::closeImpl()
+     */
+    bool closeImpl() override = 0;
 
 protected:
     HL::Driver& driver;                 ///< The driver instance to be used for required access to the hardware layer.

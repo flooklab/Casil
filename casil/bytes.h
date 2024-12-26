@@ -223,6 +223,15 @@ constexpr std::vector<std::uint8_t> composeByteVec(const bool pBigEndian, Ts... 
 namespace BytesImpl
 {
 
+/*!
+ * \brief Check if type is a fixed width (16/32/64 bits) unsigned integer with a specific width.
+ *
+ * \p T must be equivalent to one of the \c std::uintX_t types with \c X one of <tt>{16, 32, 64}</tt>
+ * and <tt>N*8</tt> must match that value of \c X.
+ *
+ * \tparam T Type to be checked.
+ * \tparam N Wanted width of \p T in number of bytes.
+ */
 template<typename T, std::size_t N>
 concept TypeMatchesByteLength = (std::is_same_v<std::integral_constant<std::size_t, 2>, std::integral_constant<std::size_t, N>> &&
                                  std::is_same_v<T, std::uint16_t>) ||
@@ -231,6 +240,21 @@ concept TypeMatchesByteLength = (std::is_same_v<std::integral_constant<std::size
                                 (std::is_same_v<std::integral_constant<std::size_t, 8>, std::integral_constant<std::size_t, N>> &&
                                  std::is_same_v<T, std::uint64_t>);
 
+/*!
+ * \brief Create an unsigned integer of specific type from a matching byte sequence of a certain endianness.
+ *
+ * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * - <tt>{pBytes[0], ..., pBytes[N-1]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
+ * - <tt>{pBytes[N-1], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
+ *
+ * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ *
+ * \tparam T Unsigned integer type equivalent to one of \c std::uint16_t, \c std::uint32_t or \c std::uint64_t.
+ * \tparam N Length of \p pBytes, which must equal the byte width of \p T.
+ * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
+ * \param pBytes The \p N byte long sequence representing the value to be returned as \p N byte wide unsigned integer.
+ * \return The interpreted unsigned integer number.
+ */
 template<typename T, std::size_t N>
     requires (IsUnsignedIntNType<T> && !std::is_same_v<T, std::uint8_t> && TypeMatchesByteLength<T, N>)
 constexpr T composeUInt(const bool pBigEndian, const std::span<const std::uint8_t, N> pBytes)

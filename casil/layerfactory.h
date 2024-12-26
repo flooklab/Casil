@@ -52,9 +52,9 @@ namespace Layers { namespace RL { class Register; } }
 class LayerFactory
 {
 private:
-    using Interface = Layers::TL::Interface;
-    using Driver = Layers::HL::Driver;
-    using Register = Layers::RL::Register;
+    using Interface = Layers::TL::Interface;    ///< \copybrief Layers::TL::Interface
+    using Driver = Layers::HL::Driver;          ///< \copybrief Layers::HL::Driver
+    using Register = Layers::RL::Register;      ///< \copybrief Layers::RL::Register
 
 public:
     typedef std::function<std::unique_ptr<Interface>(std::string, LayerConfig)> TLGeneratorFunction;

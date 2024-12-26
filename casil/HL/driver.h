@@ -92,8 +92,18 @@ public:
     //TODO could something be added here to enable direct C++ FunctionalRegister-functionality without python wrapper in between?
 
 private:
-    bool initImpl() override = 0;       ///< Perform driver-specific initialization logic for init().
-    bool closeImpl() override = 0;      ///< Perform driver-specific closing logic for init().
+    /*!
+     * \brief Perform driver-specific initialization logic for init().
+     *
+     * \copydetails LayerBase::initImpl()
+     */
+    bool initImpl() override = 0;
+    /*!
+     * \brief Perform driver-specific closing logic for init().
+     *
+     * \copydetails LayerBase::closeImpl()
+     */
+    bool closeImpl() override = 0;
 };
 
 } // namespace HL

@@ -69,7 +69,7 @@ std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, c
  * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
  * \param pAddr Bus address (ignored).
- * \param pData Bytes to be written (ignored).
+ * \param pData %Bytes to be written (ignored).
  */
 void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData)
 {

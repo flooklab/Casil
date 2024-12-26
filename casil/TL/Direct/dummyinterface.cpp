@@ -65,7 +65,7 @@ std::vector<std::uint8_t> DummyInterface::read(const int pSize)
  *
  * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
- * \param pData Bytes to be written (ignored).
+ * \param pData %Bytes to be written (ignored).
  */
 void DummyInterface::write(const std::vector<std::uint8_t>& pData)
 {

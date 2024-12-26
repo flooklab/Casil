@@ -94,8 +94,9 @@ std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chr
 {
     if (pSize == -1)
     {
-        //Assign optional reference if was not passed by caller, because need to know whether timed out to properly handle termination below
-        bool tTimedOutFallback = false;
+        //Assign optional reference if was not passed by caller, because need
+        //to know whether timed out to properly handle termination below
+        bool tTimedOutFallback = false;                                     // cppcheck-suppress variableScope symbolName=tTimedOutFallback
         if (!pTimedOut.has_value())
             pTimedOut = std::ref(tTimedOutFallback);
 

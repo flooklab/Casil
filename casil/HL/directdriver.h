@@ -44,7 +44,11 @@ namespace HL
 /*!
  * \brief Base class to derive from for driver components that control \e independent hardware devices connected via a TL::DirectInterface.
  *
- * \todo Detailed doc
+ * Use this class as base class for implementing a "direct" driver, i.e. a driver which controls independent/stand-alone
+ * hardware (not using the basil bus), which in turn is connected to via a "direct" interface.
+ *
+ * Note: This is in contrast to MuxedDriver, which should be used for firmware modules running
+ * on FPGA hardware that is based on the basil bus and connected to via a "muxed" interface.
  */
 class DirectDriver : public Driver
 {

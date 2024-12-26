@@ -66,6 +66,8 @@ UDPSocketWrapper::UDPSocketWrapper(std::string pHostName, const int pPort) :
  * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will
  * be set to true (if defined) and the already read bytes will be returned.
  *
+ * \throws std::runtime_error If reading from the socket fails.
+ *
  * \param pTimeout The timeout for the read operation.
  * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
  * \return Payload byte sequence of requested datagram.
@@ -113,6 +115,8 @@ std::vector<std::uint8_t> UDPSocketWrapper::read(const std::chrono::milliseconds
  *
  * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will
  * be set to true (if defined) and the already read bytes will be returned.
+ *
+ * \throws std::runtime_error If reading from the socket fails.
  *
  * \param pSize Maximum number of bytes to read from the datagram.
  * \param pTimeout The timeout for the read operation.

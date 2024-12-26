@@ -81,9 +81,9 @@ namespace Layers::HL
 /*!
  * \brief %Driver for the \e gpio firmware module.
  *
- * \todo Detailed doc
+ * Enables to configure/set/read the state of the individual General Purpose Input/Output (%GPIO) pins/wires of the firmware module.
  *
- * Registers:
+ * Available registers:
  *
  * <table>
  * <tr><th>Name</th><th>\ref RegisterDescr::DataType "DataType"</th><th>\ref RegisterDescr::AccessMode "AccessMode"</th>

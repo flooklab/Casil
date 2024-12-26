@@ -38,8 +38,6 @@ using casil::Layers::TL::Interface;
  *
  * \throws std::runtime_error If "init.query_delay" is set to a negative value.
  *
- * Configured delay value for query operations (between write and read) in milliseconds.
- *
  * \param pType Registered component type name.
  * \param pName Component instance name.
  * \param pConfig Component configuration.

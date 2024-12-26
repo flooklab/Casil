@@ -88,6 +88,10 @@ CASIL_REGISTER_DRIVER_ALIAS("scpi")
  * Search paths for those directories are taken from the \c CASIL_DEV_DESC_DIRS environment variable (see Env::getEnv()).
  * The device description will be loaded from the first of these directories that contains such file.
  *
+ * \throws std::runtime_error If "init.device" is not defined.
+ * \throws std::runtime_error If the device description file can not be found or reading the file fails.
+ * \throws std::runtime_error If parsing of the device description.
+ *
  * \param pName Component instance name.
  * \param pInterface %Interface instance to be used.
  * \param pConfig Component configuration.

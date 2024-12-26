@@ -42,7 +42,7 @@ namespace Layers::TL
 /*!
  * \brief %Interface for communication via a serial port.
  *
- * \todo Detailed doc
+ * Use this interface for direct serial (i.e. \c RS-232 ) connections.
  */
 class Serial final : public DirectInterface
 {

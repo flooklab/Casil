@@ -43,7 +43,11 @@ namespace TL
 /*!
  * \brief Base class to derive from for interface components that \e directly connect to an \e independent hardware device.
  *
- * \todo Detailed doc
+ * Use this class as base class for implementing a "direct" interface, i.e. an interface which connects to some stand-alone hardware
+ * device that can work independently of other used hardware devices and that is usually only contolled by a single HL::Driver component.
+ *
+ * Note: This is in contrast to MuxedInterface, which should be used for FPGA hardware based on the basil bus,
+ * as there will usually be \e multiple drivers controlling \e multiple firmware modules over the \e same interface.
  */
 class DirectInterface : public Interface
 {

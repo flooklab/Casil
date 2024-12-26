@@ -48,6 +48,8 @@ namespace casil::Auxil
  * - Scalar elements are represented as a sub-tree with a value (see \c boost::property_tree::ptree::data() ) and no childs.
  * - Elements of sequence/map type are recursively parsed sub-trees.
  *
+ * \throws std::runtime_error If parsing of the YAML document \p pYAMLString fails.
+ *
  * \param pYAMLString The YAML document to be parsed.
  * \return Property Tree representing the YAML document structure/content.
  */
@@ -121,6 +123,9 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
  * Assumes that \p pYAMLString is a YAML document with a single top node of type sequence (or map)
  * with only scalar elements of type unsigned integer. The document is parsed by propertyTreeFromYAML()
  * and then the unsigned integer elements are collected in declaration order and returned as a vector.
+ *
+ * \throws std::runtime_error If parsing of \p pYAMLString fails.
+ * \throws std::runtime_error If the sequence contains an invalid value (any value other than unsigned integer).
  *
  * \param pYAMLString The unsigned integer sequence as YAML sequence/map.
  * \return A vector filled with the parsed numbers (in declaration order).

@@ -131,6 +131,8 @@ public:
      * \brief Constructor.
      *
      * Starts the \p numThreads IO context threads.
+     *
+     * \throw std::runtime_error If the threads could not be started.
      */
     AsyncIORunner()
     {

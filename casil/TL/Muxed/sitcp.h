@@ -89,11 +89,19 @@ namespace Layers::TL
 /*!
  * \brief %Interface to connect to the basil bus on an FPGA that runs the \e %SiTCP library for communication.
  *
- * ...
+ * This interface connects to the %SiTCP library on an FPGA via %TCP/IP (uses %TCP and %UDP protocols; typically connected
+ * through Ethernet), assuming that the %SiTCP library forwards to the "basil bus" with multiple basil firmware modules
+ * connected to the bus. Different firmware modules can be controlled by different drivers from the HL by individually
+ * addressing them on the bus (see also MuxedInterface).
+ *
+ * Below follows a brief summary of the communication protocol used for the %SiTCP library.
+ * For more information on %SiTCP you may see their website: https://www.bbtech.co.jp/en/products/sitcp-library/
+ *
+ * ---
  *
  * Protocol information:
  *
- * %UDP (RBCP) Header+Data
+ * \c RBCP message over %UDP (Header + Data):
  *
  * \code{.unparsed}
  *
@@ -128,7 +136,7 @@ namespace Layers::TL
  *
  * \endcode
  *
- * CMD Field
+ * \c CMD field:
  *
  * \code{.unparsed}
  *
@@ -146,7 +154,7 @@ namespace Layers::TL
  *
  * \endcode
  *
- * FLAG Field
+ * \c FLAG field:
  *
  * \code{.unparsed}
  *
@@ -165,7 +173,7 @@ namespace Layers::TL
  *
  * \endcode
  *
- * %TCP to BUS Header+Data
+ * "tcp_to_bus" message (see SiTCP()) over %TCP (Header + Data):
  *
  * \code{.unparsed}
  *
@@ -196,9 +204,13 @@ namespace Layers::TL
  *
  * \endcode
  *
- * %TCP to BUS reset sequence (in case of status invalid): 65535 * 0xFF + 6 * 0x00
+ * "tcp_to_bus" reset sequence (over %TCP):
  *
- * \todo Detailed doc
+ * \code{.unparsed}
+ *
+ * 65535 * 0xFF + 6 * 0x00
+ *
+ * \endcode
  */
 class SiTCP final : public MuxedInterface
 {

@@ -86,6 +86,8 @@ TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
  * Note: Tries to close() the socket on EOF error (\c boost::system::errc::no_such_file_or_directory),
  * i.e. if the connection was terminated, in order to ensure proper error handling for \e successive async read calls.
  *
+ * \throws std::runtime_error If reading from the socket fails.
+ *
  * \param pSize Number of bytes to read or -1.
  * \param pTimeout The timeout for the read operation.
  * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
@@ -264,6 +266,8 @@ std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chr
  *
  * Note: Tries to close() the socket on EOF error (\c boost::system::errc::no_such_file_or_directory),
  * i.e. if the connection was terminated, in order to ensure proper error handling for \e successive async read calls.
+ *
+ * \throws std::runtime_error If reading from the socket fails.
  *
  * \param pSize Maximum number of bytes to read.
  * \param pTimeout The timeout for the read operation.

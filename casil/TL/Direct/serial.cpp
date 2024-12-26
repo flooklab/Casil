@@ -50,6 +50,7 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  *
  * \throws std::runtime_error If "init.port" is empty.
  * \throws std::runtime_error If "init.baudrate" is zero or negative.
+ * \throws std::runtime_error If "init.read_termination" is not defined.
  *
  * \param pName Component instance name.
  * \param pConfig Component configuration.

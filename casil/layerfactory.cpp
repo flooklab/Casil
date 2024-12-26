@@ -46,6 +46,9 @@ using casil::RL::Register;
  *
  * Returns \c nullptr if \p pType is not a registered interface type name.
  *
+ * \throws std::runtime_error If the class constructor or the generator function itself throw \c std::runtime_error
+ *         (it is expcected that they always only throw this type).
+ *
  * \param pType Registered type name (or alias) of the requested interface type.
  * \param pName Instance name for the new interface component.
  * \param pConfig Configuration for the new interface component.
@@ -79,6 +82,9 @@ std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pTyp
  * with forwarded \p pName, \p pInterface and \p pConfig arguments and returns a pointer to the generated \ref Layers::HL::Driver "HL::Driver".
  *
  * Returns \c nullptr if \p pType is not a registered driver type name.
+ *
+ * \throws std::runtime_error If the class constructor or the generator function itself throw \c std::runtime_error
+ *         (it is expcected that they always only throw this type).
  *
  * \param pType Registered type name (or alias) of the requested driver type.
  * \param pName Instance name for the new driver component.
@@ -114,6 +120,9 @@ std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std
  * forwarded \p pName, \p pDriver and \p pConfig arguments and returns a pointer to the generated \ref Layers::RL::Register "RL::Register".
  *
  * Returns \c nullptr if \p pType is not a registered register type name.
+ *
+ * \throws std::runtime_error If the class constructor or the generator function itself throw \c std::runtime_error
+ *         (it is expcected that they always only throw this type).
  *
  * \param pType Registered type name (or alias) of the requested register type.
  * \param pName Instance name for the new register component.

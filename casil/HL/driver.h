@@ -40,7 +40,20 @@ namespace Layers
 /*!
  * \brief Hardware layer: Drivers that control the connected devices/components.
  *
- * \todo Detailed doc
+ * This is the second layer, which provides Driver components as the next higher-level abstraction
+ * as compared to the interfaces in the transfer layer (TL). The drivers define and abstract protocols
+ * needed for actually \e controlling the devices/components that are connected via the transfer layer.
+ *
+ * The drivers do not deal with the details of the transmission of those protocols, which is already taken care of by TL.
+ * The idea is that the protocols can in principle be sent over any configured interface component, at least if the used
+ * hardware can be connected to the host via different interfaces and no "special" functionality is needed. Another (obvious)
+ * contraint is that only "direct"/"muxed" interfaces can be used for "direct"/"muxed" drivers (see Driver and TL::Interface).
+ *
+ * An even higher level abstraction is available for e.g. "muxed" drivers that expose access to \e hardware \e registers
+ * of the respective firmware modules or any drivers that provide other functionality that can be operated on as if it
+ * was a hardware register. This abstraction for individual such registers is provided by the register layer (RL).
+ *
+ * Note that hardware register access is also possible from the hardware layer using "register drivers" (see RegisterDriver).
  */
 namespace HL
 {

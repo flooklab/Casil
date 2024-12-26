@@ -48,6 +48,7 @@ CASIL_REGISTER_INTERFACE_ALIAS("Socket")
  *
  * \throws std::runtime_error If "init.address" is empty.
  * \throws std::runtime_error If "init.port" is out of range (must be in <tt>(0, 65535]</tt>).
+ * \throws std::runtime_error If "init.read_termination" is not defined.
  *
  * \param pName Component instance name.
  * \param pConfig Component configuration.

@@ -87,7 +87,17 @@ using casil::Layers::HL::RegisterDriver;
  * Also gets any optional default values "init.REG_NAME" for these registers (which override any defaults
  * from \p pRegisters) from \p pConfig (unsigned integers or byte sequences, depending on RegisterDescr::DataType).
  *
- * \todo Throws for all the failure modes
+ * \throws std::runtime_error If an invalid name is set for one of the registers.
+ * \throws std::runtime_error If the size is set to zero for one of the registers.
+ * \throws std::runtime_error If the size is larger than 64 bit for one of the value registers.
+ * \throws std::runtime_error If the offset is non-zero for one of the byte array registers.
+ * \throws std::runtime_error If a default value is set for one of the read-only registers.
+ * \throws std::runtime_error If the type of the default value does not match the register's data type for one of the registers.
+ * \throws std::runtime_error If the length of the default byte sequence does not match the register size for one of the byte array registers.
+ * \throws std::runtime_error If the type of the init value (default override) from \p pConfig
+ *                            does not match the register's data type for one of the registers.
+ * \throws std::runtime_error If the length of the init byte sequence (default override) from \p pConfig
+ *                            does not match the register size for one of the byte array registers.
  *
  * \param pType Registered component type name.
  * \param pName Component instance name.

@@ -42,7 +42,7 @@ namespace Layers::TL
 /*!
  * \brief %Interface for network communication using the \e Transmission \e Control \e Protocol (%TCP).
  *
- * \todo Detailed doc
+ * Use this interface for network connections (typically over Ethernet) to hardware using the %TCP protocol.
  */
 class TCP final : public DirectInterface
 {

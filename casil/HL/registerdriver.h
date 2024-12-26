@@ -121,7 +121,15 @@ struct RegisterDescr
 /*!
  * \brief Specialization for principally MuxedDriver components that will mainly control their firmware module via register operations.
  *
- * \todo Detailed doc
+ * Use this class as base class for implementing a "register-dominated" "muxed" driver, i.e. a driver
+ * which controls a "register-dominated" firmware module running on FPGA hardware based on the basil bus,
+ * which in turn is connected to via a "muxed" interface. Here, "register-dominated" means that controlling
+ * the firmware module from the driver happens (mostly) via standardized reading/writing to/from \e registers.
+ *
+ * Consider to instead use the simpler MuxedDriver as base class if such register operations are not needed.
+ *
+ * Note: This class and MuxedDriver are both in contrast to DirectDriver, which should be
+ * used for independent/stand-alone hardware that is connected to via a "direct" interface.
  */
 class RegisterDriver : public MuxedDriver
 {

@@ -79,7 +79,7 @@ CASIL_REGISTER_DRIVER_ALIAS("gpio")
  * Gets the mandatory "size" value from \p pConfig (unsigned integer value), which defines the number of
  * IO bits of the controlled firmware module, and configures the registers (see GPIO) according to that value.
  *
- * \throws std::runtime_error If "size" is set to zero.
+ * \throws std::runtime_error If "size" is not defined or set to zero.
  *
  * \param pName Component instance name.
  * \param pInterface %Interface instance to be used.

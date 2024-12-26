@@ -39,7 +39,14 @@ namespace Layers
 /*!
  * \brief Transfer layer: Interfaces that connect the Casil host to its devices/components.
  *
- * \todo Detailed doc
+ * This is the first, most low-level layer, which provides Interface components as a means of abstracting access to / providing
+ * \e communication with the hardware in question. Actual protocols for \e controlling the connected devices/components are
+ * not included in this layer, just the low-level protocols needed for the plain communication (e.g. Serial, SiTCP, etc.).
+ *
+ * The idea is that the next layer (hardware layer (HL)) provides such "controlling protocols" and can in principle be
+ * configured and used independently of the transfer layer components configured for communication, at least if the used
+ * hardware can be connected to the host via different interfaces and no "special" functionality is needed. Another (obvious)
+ * contraint is that only "direct"/"muxed" interfaces can be used for "direct"/"muxed" drivers (see Interface and HL::Driver).
  */
 namespace TL
 {

@@ -43,7 +43,12 @@ namespace TL
 /*!
  * \brief Base class to derive from for interface components that connect to an FPGA endpoint running the basil bus and firmware modules.
  *
- * \todo Detailed doc
+ * Use this class as base class for implementing a "muxed" interface, i.e. an interface which enables to control different
+ * \e addressable parts of the same hardware device. This would typically be an interface to connect to FPGA hardware based
+ * on the basil bus, which allows multiple drivers to control multiple (dependent) firmware modules at different bus addresses.
+ *
+ * Note: This is in contrast to DirectInterface, which should be used for hardware that can work \e independently
+ * of other used hardware devices and that is usually only contolled by a single HL::Driver component.
  */
 class MuxedInterface : public Interface
 {

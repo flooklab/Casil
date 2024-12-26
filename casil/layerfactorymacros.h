@@ -149,6 +149,11 @@ namespace RegistryImpl\
  *
  * \note You can only register one class per translation unit (this macro utilizes the unnamed namespace of the translation unit).
  *
+ * \note The defined generator function for \ref casil::LayerFactory "LayerFactory" catches all potential \c std::bad_cast
+ *       exceptions from the class constructor and in that case throws \c std::runtime_error instead. This also
+ *       applies to the attempted conversion of the interface instance that is passed to the constructor/factory,
+ *       i.e. if the interface type has a wrong base type (direct vs. muxed), the generator throws \c std::runtime_error.
+ *
  * \param TYPE_CLASS The class type to register to the factory.
  */
 #define CASIL_REGISTER_DRIVER_CPP(TYPE_CLASS) \

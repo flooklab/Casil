@@ -44,7 +44,15 @@ namespace HL
 /*!
  * \brief Base class to derive from for driver components that control firmware modules on a basil bus connected via a TL::MuxedInterface.
  *
- * \todo Detailed doc
+ * Use this class as base class for implementing a "muxed" driver, i.e. a driver which controls one
+ * (dependent) \e addressable \e part of a hardware device, such as a firmware module running on FPGA
+ * hardware based on the basil bus. In turn, this hardware must be connected to via a "muxed" interface.
+ *
+ * Consider to instead use the further specialized RegisterDriver as base class for muxed
+ * drivers that can/must mainly control the firmware module using register operations.
+ *
+ * Note: This class is in contrast to DirectDriver, which should be used for
+ * independent/stand-alone hardware that is connected to via a "direct" interface.
  */
 class MuxedDriver : public Driver
 {

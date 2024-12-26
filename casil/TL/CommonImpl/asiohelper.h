@@ -42,6 +42,7 @@ namespace casil
 namespace Layers::TL
 {
 
+/// \cond INTERNAL
 /*!
  * \brief Common implementations for the different Interface classes.
  */
@@ -226,6 +227,7 @@ std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPr
 } // namespace ASIOHelper
 
 } // namespace CommonImpl
+/// \endcond INTERNAL
 
 } // namespace Layers::TL
 

@@ -38,6 +38,8 @@
 #include <stdexcept>
 #include <utility>
 
+/// \cond INTERNAL
+
 using casil::Layers::TL::CommonImpl::SerialPortWrapper;
 
 //
@@ -386,3 +388,5 @@ void SerialPortWrapper::handleAsyncRead(const boost::system::error_code& pErrorC
         pollDataStopped.notify_one();
     }
 }
+
+/// \endcond INTERNAL

@@ -55,6 +55,7 @@ namespace casil
 namespace TmplDev
 {
 
+/// \cond INTERNAL
 /*!
  * \brief Implementation details for TmplDev.
  */
@@ -87,6 +88,7 @@ namespace TmplDevImpl
     struct RegisterConfBase : public ComponentConfBase {};
 
 } // namespace TmplDevImpl
+/// \endcond INTERNAL
 
 //
 
@@ -163,6 +165,7 @@ struct RegisterConf : public TmplDevImpl::RegisterConfBase
 
 //
 
+/// \cond INTERNAL
 namespace TmplDevImpl
 {
     /*!
@@ -204,6 +207,7 @@ namespace TmplDevImpl
     };
 
 } // namespace TmplDevImpl
+/// \endcond INTERNAL
 
 //
 

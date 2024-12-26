@@ -39,6 +39,8 @@
 #include <stdexcept>
 #include <utility>
 
+/// \cond INTERNAL
+
 using casil::Layers::TL::CommonImpl::TCPSocketWrapper;
 
 //
@@ -553,3 +555,5 @@ void TCPSocketWrapper::close()
         throw std::runtime_error(std::string("Exception while closing TCP socket: ") + exc.what());
     }
 }
+
+/// \endcond INTERNAL

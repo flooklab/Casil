@@ -40,6 +40,7 @@ namespace casil
 namespace Layers::TL
 {
 
+/// \cond INTERNAL
 namespace CommonImpl
 {
 
@@ -101,6 +102,7 @@ private:
 };
 
 } // namespace CommonImpl
+/// \endcond INTERNAL
 
 } // namespace Layers::TL
 

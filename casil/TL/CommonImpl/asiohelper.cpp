@@ -24,6 +24,8 @@
 
 #include <boost/system/system_error.hpp>
 
+/// \cond INTERNAL
+
 namespace casil::Layers::TL::CommonImpl::ASIOHelper
 {
 
@@ -72,3 +74,5 @@ void readWriteHandler(const boost::system::error_code& pErrorCode, const std::si
 }
 
 } // namespace casil::TL::CommonImpl::ASIOHelper
+
+/// \endcond INTERNAL

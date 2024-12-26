@@ -85,6 +85,7 @@ set(CASIL_CMAKE_DATADIR "${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_PROJECT_NAME}"
     CACHE PATH "Install path for general project data (relative to CMAKE_INSTALL_PREFIX).")
 
 set(CASIL_BUILD_DOCUMENTATION OFF CACHE BOOL "Build library documentation with Doxygen.")
+set(CASIL_BUILD_DOCUMENTATION_INTERNAL OFF CACHE BOOL "Include implementation details in the library documentation.")
 
 #Configure source code macros
 
@@ -272,6 +273,15 @@ if(CASIL_BUILD_DOCUMENTATION AND DOXYGEN_FOUND)
     set(CASIL_DOXYFILE "${PROJECT_BINARY_DIR}/doc/casil/Doxyfile")
     set(CASIL_DOXYGEN_TEMPLATE_DIR "${PROJECT_SOURCE_DIR}/doc/casil/template")
     set(CASIL_DOXYGEN_SOURCES_DIR "${PROJECT_SOURCE_DIR}/casil")
+    if(CASIL_BUILD_DOCUMENTATION_INTERNAL)
+        set(CASIL_DOXYGEN_EXTRACT_PRIVATE "YES")
+        set(CASIL_DOXYGEN_INTERNAL_DOCS "YES")
+        set(CASIL_DOXYGEN_ENABLED_SECTIONS "INTERNAL")
+    else()
+        set(CASIL_DOXYGEN_EXTRACT_PRIVATE "NO")
+        set(CASIL_DOXYGEN_INTERNAL_DOCS "NO")
+        set(CASIL_DOXYGEN_ENABLED_SECTIONS "")
+    endif()
     configure_file("${CASIL_DOXYFILE_IN}" "${CASIL_DOXYFILE}" @ONLY)
     add_custom_target(Documentation ALL ${DOXYGEN_EXECUTABLE} "${CASIL_DOXYFILE}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/doc/casil" VERBATIM)
 endif()

@@ -217,6 +217,7 @@ constexpr std::vector<std::uint8_t> composeByteVec(const bool pBigEndian, Ts... 
     return retVal;
 }
 
+/// \cond INTERNAL
 /*!
  * \brief Implementation details for Bytes.
  */
@@ -301,6 +302,7 @@ constexpr T composeUInt(const bool pBigEndian, const std::span<const std::uint8_
 }
 
 } // namespace BytesImpl
+/// \endcond INTERNAL
 
 /*!
  * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.

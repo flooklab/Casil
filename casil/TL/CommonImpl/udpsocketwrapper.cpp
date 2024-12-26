@@ -34,6 +34,8 @@
 #include <stdexcept>
 #include <utility>
 
+/// \cond INTERNAL
+
 using casil::Layers::TL::CommonImpl::UDPSocketWrapper;
 
 //
@@ -307,3 +309,5 @@ void UDPSocketWrapper::close()
         throw std::runtime_error(std::string("Exception while closing UDP socket: ") + exc.what());
     }
 }
+
+/// \endcond INTERNAL

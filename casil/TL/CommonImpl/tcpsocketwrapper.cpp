@@ -57,8 +57,9 @@ TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
                                    std::string pReadTermination, const std::string& pWriteTermination) :
     hostName(std::move(pHostName)),
     port(pPort),
-    readTermination(std::move(pReadTermination)),
-    readTerminationLength(readTermination.length()),
+    readTerminationStr(std::move(pReadTermination)),
+    readTermination(Bytes::byteVecFromStr(readTerminationStr)),
+    readTerminationLength(readTermination.size()),
     writeTermination(Bytes::byteVecFromStr(pWriteTermination)),
     writeTerminationLength(writeTermination.size()),
     socket(ASIO::getIOContext()),
@@ -76,8 +77,9 @@ TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
  * Other values for \p pSize are not useful (will then return an empty sequence).
  *
  * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will be set to true (if defined)
- * and the already read bytes will be returned. If reading until termination, ...
- * \todo FIXME add description here after fixing timedout terminated read to not strip anything.
+ * and the \e already read bytes will be returned. Note that, if reading until termination (\p pSize equal -1)
+ * in such a case, the read termination will \e only be excluded from the returned sequence if it was \e fully
+ * read into the buffer (which is unlikely but can actually happen). Otherwise \e nothing will be stripped off.
  *
  * Note: Tries to close() the socket on EOF error (\c boost::system::errc::no_such_file_or_directory),
  * i.e. if the connection was terminated, in order to ensure proper error handling for \e successive
@@ -89,21 +91,26 @@ TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
  * \return Byte sequence of requested length or up to (but excluding) termination.
  */
 std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chrono::milliseconds pTimeout,
-                                                 const std::optional<std::reference_wrapper<bool>> pTimedOut)
+                                                 std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (pSize == -1)
     {
+        //Assign optional reference if was not passed by caller, because need to know whether timed out to properly handle termination below
+        bool tTimedOutFallback = false;
+        if (!pTimedOut.has_value())
+            pTimedOut = std::ref(tTimedOutFallback);
+
         std::size_t n = 0;
 
         try
         {
             if (pTimeout <= std::chrono::milliseconds::zero())
-                n = boost::asio::read_until(socket, boost::asio::dynamic_buffer(readBuffer), readTermination);
+                n = boost::asio::read_until(socket, boost::asio::dynamic_buffer(readBuffer), readTerminationStr);
             else
             {
                 std::promise<std::size_t> promiseN;
 
-                boost::asio::async_read_until(socket, boost::asio::dynamic_buffer(readBuffer), readTermination,
+                boost::asio::async_read_until(socket, boost::asio::dynamic_buffer(readBuffer), readTerminationStr,
                                               std::bind(&ASIOHelper::readWriteHandler,
                                                         std::placeholders::_1, std::placeholders::_2, std::ref(promiseN)));
 
@@ -135,18 +142,34 @@ std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chr
             throw std::runtime_error("Invalid promise argument. THIS SHOULD NEVER HAPPEN!");
         }
 
-        if (n < readTerminationLength)  //According to Boost documentation this should not even happen; check anyway because of timeout
+        //Return the read bytes without trailing termination, if the read was complete;
+        //if termination is missing/incomplete (in case of timeout), return without stripping anything off
+
+        if (std::search(readBuffer.begin(), readBuffer.end(), readTermination.begin(), readTermination.end()) != readBuffer.end())
         {
+            //Buffer properly terminated: return all read bytes excluding the trailing termination
+            std::vector<std::uint8_t> retVal(readBuffer.begin(), readBuffer.begin() + n - readTerminationLength);
             readBuffer.erase(readBuffer.begin(), readBuffer.begin() + n);
-
-            throw std::runtime_error("Error while reading from TCP socket: Did not read until read termination.");
+            return retVal;
         }
+        else    //No termination found in the buffer
+        {
+            if (!pTimedOut.has_value())
+                throw std::runtime_error("Not set optional. THIS SHOULD NEVER HAPPEN!");    //Assigned above if not passed by caller
 
-        std::vector<std::uint8_t> retVal(readBuffer.begin(), readBuffer.begin() + n - readTerminationLength);
-
-        readBuffer.erase(readBuffer.begin(), readBuffer.begin() + n);
-
-        return retVal;
+            if (pTimedOut->get() == true)
+            {
+                //Return all read bytes without trying to strip off any termination fragments
+                std::vector<std::uint8_t> retVal(readBuffer.begin(), readBuffer.begin() + n);
+                readBuffer.erase(readBuffer.begin(), readBuffer.begin() + n);
+                return retVal;
+            }
+            else    //According to Boost documentation this should not even happen, but handle anyway
+            {
+                readBuffer.erase(readBuffer.begin(), readBuffer.begin() + n);
+                throw std::runtime_error("Error while reading from TCP socket: Did not read until read termination.");
+            }
+        }
     }
     else if (pSize > 0)
     {

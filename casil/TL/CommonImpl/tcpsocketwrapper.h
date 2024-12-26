@@ -80,8 +80,9 @@ public:
 private:
     const std::string hostName;                         ///< Host name of the remote endpoint.
     const int port;                                     ///< Used network port.
-    const std::string readTermination;                  ///< Read termination to detect end of read data stream.
-    const std::size_t readTerminationLength;            ///< Number of read termination characters.
+    const std::string readTerminationStr;               ///< Read termination to detect end of read data stream (as string).
+    const std::vector<std::uint8_t> readTermination;    ///< Read termination to detect end of read data stream (as byte sequence).
+    const std::size_t readTerminationLength;            ///< Number of read termination characters/bytes.
     const std::vector<std::uint8_t> writeTermination;   ///< Write termination to append to written data.
     const std::size_t writeTerminationLength;           ///< Number of read termination characters/bytes.
     //

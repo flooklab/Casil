@@ -255,7 +255,6 @@ private:
     std::mutex tcpSocketMutex;              ///< Mutex for the %TCP socket (for concurrently used \e reading parts only).
     std::atomic_flag wantLockTCPSocket;     ///< Used for triggering FIFO thread to 'yield()' to enable "fairer" access to tcpSocketMutex.
     std::atomic_bool pollFIFO;              ///< Flag to control/stop the FIFO polling thread.
-    std::atomic_size_t fifoErrorCount;      ///< Current error count of the FIFO polling thread.
     //
     std::uint8_t rbcpId;                    ///< Last used/sent RBCP message ID.
 

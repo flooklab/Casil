@@ -123,7 +123,6 @@ SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
     tcpSocketMutex(),
     wantLockTCPSocket(ATOMIC_FLAG_INIT),
     pollFIFO(false),
-    fifoErrorCount(0),
     rbcpId(0)
 {
     if (hostName == "")
@@ -515,7 +514,6 @@ bool SiTCP::initImpl()
             resetFifo();
 
             pollFIFO.store(true);
-            fifoErrorCount.store(0);
 
             fifoThread = std::thread(&SiTCP::pollFifo, this);
         }
@@ -647,6 +645,8 @@ void SiTCP::pollFifo()
 
     std::vector<std::uint8_t> tmpBuffer;
 
+    std::size_t errorCount = 0;
+
     auto lastTime = std::chrono::steady_clock::now();
 
     while (pollFIFO.load())
@@ -666,7 +666,7 @@ void SiTCP::pollFifo()
             {
                 Logger::logError("Error while polling FIFO of " + getSelfDescription() + ": " + exc.what());
 
-                if (++fifoErrorCount > maxFIFOErrorCount)
+                if (++errorCount > maxFIFOErrorCount)
                 {
                     pollFIFO.store(false);
                     Logger::logCritical("Exceeded maximum error count while polling FIFO of " + getSelfDescription() + ". Stopping...");

@@ -24,7 +24,7 @@ cmake_minimum_required(VERSION 3.23)
 
 if(NOT DEFINED CACHE{CMAKE_BUILD_TYPE})
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+endif()
 
 #Tweak CMake defaults for compiler flags
 
@@ -205,7 +205,7 @@ foreach(fileName ${HEADER_FILE_NAMES})
     else()
         set(HEADER_FILES "${HEADER_FILES}" "casil/${fileName}")
     endif()
-endforeach(fileName)
+endforeach()
 
 foreach(fileName ${SOURCE_FILE_NAMES})
     if(NOT SOURCE_FILES)
@@ -218,7 +218,7 @@ foreach(fileName ${SOURCE_FILE_NAMES})
     else()
         set(PYBIND_SOURCE_FILES "${PYBIND_SOURCE_FILES}" "pycasil/${fileName}_py.cpp")
     endif()
-endforeach(fileName)
+endforeach()
 
 foreach(fileName ${TESTS_FILE_NAMES})
     if(NOT TESTS_FILES)
@@ -226,7 +226,7 @@ foreach(fileName ${TESTS_FILE_NAMES})
     else()
         set(TESTS_FILES "${TESTS_FILES}" "tests/stand-alone/casil/${fileName}")
     endif()
-endforeach(fileName)
+endforeach()
 
 #External libraries
 

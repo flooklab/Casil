@@ -338,7 +338,7 @@ if(CASIL_BUILD_DOCUMENTATION)
         set(CASIL_DOXYGEN_ENABLED_SECTIONS "")
     endif()
     configure_file("${CASIL_DOXYFILE_IN}" "${CASIL_DOXYFILE}" @ONLY)
-    add_custom_target(Documentation ALL ${DOXYGEN_EXECUTABLE} "${CASIL_DOXYFILE}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/doc/casil" VERBATIM)
+    add_custom_target(Documentation ALL Doxygen::doxygen "${CASIL_DOXYFILE}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/doc/casil" VERBATIM)
 endif()
 
 #Configure additional files

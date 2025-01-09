@@ -22,6 +22,44 @@
 
 cmake_minimum_required(VERSION 3.23)
 
+if(NOT DEFINED CACHE{CMAKE_BUILD_TYPE})
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+#Tweak CMake defaults for compiler flags
+
+if(NOT MSVC)
+    set(DEFAULT_FLAGS "")
+    set(DEFAULT_FLAGS_DEBUG "-g -Og")
+    set(DEFAULT_FLAGS_MINSIZEREL "-Os -DNDEBUG")
+    set(DEFAULT_FLAGS_RELEASE "-O2 -DNDEBUG")
+    set(DEFAULT_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
+else()
+    #Those MSVC flags are probably not tested
+    set(DEFAULT_FLAGS_DEBUG "/MDd /Zi /Ob0 /Od /RTC1")
+    set(DEFAULT_FLAGS_MINSIZEREL "/MD /O1 /Ob1 /DNDEBUG")
+    set(DEFAULT_FLAGS_RELEASE "/MD /O2 /Ob2 /DNDEBUG")
+    set(DEFAULT_FLAGS_RELWITHDEBINFO "/MD /Zi /O2 /Ob1 /DNDEBUG")
+endif()
+
+if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS})
+    if(NOT MSVC)
+        set(CMAKE_CXX_FLAGS "${DEFAULT_FLAGS}" CACHE STRING "Flags used by the CXX compiler during all build types." FORCE)
+    endif()
+endif()
+if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_DEBUG})
+    set(CMAKE_CXX_FLAGS_DEBUG "${DEFAULT_FLAGS_DEBUG}" CACHE STRING "Flags used by the CXX compiler during DEBUG builds." FORCE)
+endif()
+if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_MINSIZEREL})
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${DEFAULT_FLAGS_MINSIZEREL}" CACHE STRING "Flags used by the CXX compiler during MINSIZEREL builds." FORCE)
+endif()
+if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_RELEASE})
+    set(CMAKE_CXX_FLAGS_RELEASE "${DEFAULT_FLAGS_RELEASE}" CACHE STRING "Flags used by the CXX compiler during RELEASE builds." FORCE)
+endif()
+if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${DEFAULT_FLAGS_RELWITHDEBINFO}" CACHE STRING "Flags used by the CXX compiler during RELWITHDEBINFO builds." FORCE)
+endif()
+
 project(Casil VERSION 0.4.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -32,14 +70,27 @@ include(GNUInstallDirs)
 
 #Configure options
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+if(NOT MSVC)
+    string(CONCAT TMP_CXX_FLAGS "-Wall;-Wextra;-Wshadow;-pedantic-errors;"
+                                "-pipe;-march=x86-64;-mtune=generic;-Wp,-D_FORTIFY_SOURCE=3;-Wp,-D_GLIBCXX_ASSERTIONS;"
+                                "-fno-plt;-fstack-protector-strong;-fstack-clash-protection;-fcf-protection=full;-flto=auto")
+    set(CASIL_CXX_FLAGS "${TMP_CXX_FLAGS}" CACHE STRING "Additional compiler flags.")
+    set(CASIL_LINK_FLAGS "-Wl,--sort-common;-Wl,--as-needed;-Wl,-z,defs;-Wl,-z,relro;-Wl,-z,now;-Wl,-z,pack-relative-relocs"
+        CACHE STRING "Additional linker flags.")
+    set(CASIL_LINK_FLAGS_DEBUG "" CACHE STRING "Additional linker flags to add for DEBUG builds.")
+    set(CASIL_LINK_FLAGS_RELEASE "-Wl,-O1" CACHE STRING "Additional linker flags to add for non-DEBUG builds.")
+else()
+    #Those MSVC flags are probably not tested
+    string(CONCAT TMP_CXX_FLAGS "/W4;/permissive-;"
+                                "/GL;/GS;/guard:cf;/guard:ehcont")
+    set(CASIL_CXX_FLAGS "${TMP_CXX_FLAGS}" CACHE STRING "Additional compiler flags.")
+    set(CASIL_LINK_FLAGS "/CETCOMPAT;/DYNAMICBASE;/OPT;/LTCG" CACHE STRING "Additional linker flags.")
+    set(CASIL_LINK_FLAGS_DEBUG "/DEBUG" CACHE STRING "Additional linker flags to add for DEBUG builds.")
+    set(CASIL_LINK_FLAGS_RELEASE "" CACHE STRING "Additional linker flags to add for non-DEBUG builds.")
+endif()
 
 if(NOT MSVC)
-    set(CASIL_CXX_FLAGS "-Wall;-Wextra;-Wshadow;-pedantic-errors" CACHE STRING "Additional compiler flags.")
-else()
-    set(CASIL_CXX_FLAGS "/W4;/permissive-" CACHE STRING "Additional compiler flags.")
+    set(CASIL_ENABLE_GLIBCXX_DEBUG_MODE OFF CACHE BOOL "Add compiler flags to enable the debug mode of libstdc++.")
 endif()
 
 set(CASIL_BUILD_STATIC ON CACHE BOOL "Build static Casil library.")
@@ -118,6 +169,22 @@ if(CASIL_DEFINE_TEST_DATA_DIR AND (NOT CASIL_TEST_DATA_DIR))
     set(CASIL_TEST_DATA_DIR "${PROJECT_SOURCE_DIR}/tests/stand-alone/casil")
 endif()
 
+#Configure compiler/linker flags
+
+add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:${CASIL_CXX_FLAGS}>")
+
+if((NOT MSVC) AND CASIL_ENABLE_GLIBCXX_DEBUG_MODE)
+    add_compile_options(-Wp,-D_GLIBCXX_DEBUG -Wp,-D_GLIBCXX_DEBUG_PEDANTIC)
+endif()
+
+add_link_options("$<$<LINK_LANGUAGE:CXX>:${CASIL_LINK_FLAGS}>")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_link_options("$<$<LINK_LANGUAGE:CXX>:${CASIL_LINK_FLAGS_DEBUG}>")
+else()
+    add_link_options("$<$<LINK_LANGUAGE:CXX>:${CASIL_LINK_FLAGS_RELEASE}>")
+endif()
+
 #Sources
 
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
@@ -167,7 +234,7 @@ if(CASIL_LINK_STATIC_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
 
-set(BUILD_TESTING OFF CACHE BOOL "")
+set(BUILD_TESTING OFF CACHE BOOL "")    #Disable Boost tests
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
@@ -219,8 +286,6 @@ endif()
 
 #Targets
 
-add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:${CASIL_CXX_FLAGS}>")
-
 add_library(CasilObjLib OBJECT ${SOURCE_FILES} ${HEADER_FILES})
 set_target_properties(CasilObjLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 if(CASIL_DEV_DESC_DIRS)
@@ -254,6 +319,11 @@ if(CASIL_BUILD_BINDING)
     set_target_properties(CasilPython PROPERTIES OUTPUT_NAME PyCasil)
     target_link_libraries(CasilPython PRIVATE CasilObjLib)
     target_link_libraries(CasilPython PRIVATE yaml-cpp)
+    if(NOT MSVC)
+        target_link_options(CasilPython PRIVATE -Wl,-z,undefs)  #Workaround: pybind11 fails to link when using 'defs' linker option
+    else()
+        #Don't know if need workaround here too... (probably "/FORCE:UNRESOLVED" then?)
+    endif()
 endif()
 
 if(CASIL_BUILD_TESTS)

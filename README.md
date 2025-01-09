@@ -53,7 +53,7 @@ Optional packages:
 
 ## License Information
 
-Copyright (C) 2024 M. Frohne and contributors  
+Copyright (C) 2024–2025 M. Frohne and contributors  
 Copyright (C) 2011–2024 SiLab, Institute of Physics, University of Bonn  
 
 Casil is free software: you can redistribute it and/or modify it

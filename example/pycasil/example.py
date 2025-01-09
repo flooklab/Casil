@@ -1,7 +1,7 @@
 ##################################################################################################
 #
 # This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
-# Copyright (C) 2024 M. Frohne
+# Copyright (C) 2024–2025 M. Frohne
 #
 # Casil is free software: you can redistribute it and/or modify it
 # under the terms of the GNU Affero General Public License as published

@@ -23,10 +23,10 @@
 #ifndef CASIL_ASIO_H
 #define CASIL_ASIO_H
 
-#include <boost/asio/io_context.hpp>
-
 #include <thread>
 #include <vector>
+
+namespace boost { namespace asio { class io_context; } }
 
 namespace casil
 {

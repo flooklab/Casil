@@ -87,6 +87,7 @@ bool ASIO::startRunIOContext(const unsigned int pNumThreads)
         try
         {
             boost::asio::io_context *const ioContextPtr = &ioContextRef;    //Need to be pedantic and capture pointer by value
+
             ioContextThreads.emplace_back(
                         [ioContextPtr]()
                         {

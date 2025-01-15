@@ -24,10 +24,42 @@
 
 #include <casil/logger.h>
 
+#include <boost/asio/executor_work_guard.hpp>
+
 #include <memory>
 #include <sstream>
 #include <string>
 #include <system_error>
+
+namespace
+{
+
+using WorkGuard = boost::asio::executor_work_guard<boost::asio::io_context::executor_type>;
+
+/*
+ * Creates a static "work guard" for the IO context object (from getIOContext()) and always returns that one,
+ * except if reset() was called on the work guard before; then a new work guard instance will be assigned.
+ *
+ * This guard is used to keep the threads from startRunIOContext() running all the time until explicitly stopped by stopRunIOContext().
+ */
+WorkGuard& getWorkGuard()
+{
+    static std::unique_ptr<WorkGuard> work;
+
+    //Create a new work guard if it was not yet created or if it was reset before
+    if (!work || !(work->owns_work()))
+    {
+        if (work)
+            work->reset();
+
+        work.reset();
+        work = std::make_unique<WorkGuard>(boost::asio::make_work_guard(casil::ASIO::getIOContext()));
+    }
+
+    return *work;
+}
+
+} // namespace
 
 using casil::ASIO;
 
@@ -57,8 +89,8 @@ boost::asio::io_context& ASIO::getIOContext()
  * \brief Start threads that continuously execute/run the IO context.
  *
  * Starts \p pNumThreads processing threads that are responsible for executing async IO handlers for respective
- * async requests made to the Boost %ASIO library. Sets up a "work guard" (see getWorkGuard()) to keep the threads
- * running even if no handlers are scheduled at some time. Hence stopping the threads is achieved with stopRunIOContext().
+ * async requests made to the Boost %ASIO library. Sets up a "work guard" to keep the threads running even if
+ * no handlers are scheduled at some time. Hence stopping the threads is achieved with stopRunIOContext().
  *
  * See also Auxil::AsyncIORunner for a RAII approach of running these threads.
  *
@@ -80,7 +112,7 @@ bool ASIO::startRunIOContext(const unsigned int pNumThreads)
     boost::asio::io_context& ioContextRef = getIOContext();
     ioContextRef.restart();
 
-    getWorkGuard(); //Set up "work guard"
+    ::getWorkGuard();   //Set up "work guard"
 
     for (unsigned int i = 0; i < pNumThreads; ++i)
     {
@@ -128,7 +160,7 @@ void ASIO::stopRunIOContext()
 {
     Logger::logInfo("Stopping all IO context threads...");
 
-    getWorkGuard().reset();
+    ::getWorkGuard().reset();
 
     for (auto& thread : ioContextThreads)
     {
@@ -161,35 +193,4 @@ void ASIO::stopRunIOContext()
 bool ASIO::ioContextThreadsRunning()
 {
     return ioContextRunning;
-}
-
-//Private
-
-/*!
- * \brief Get the "work guard" object for the IO context object.
- *
- * Creates a static "work guard" for the IO context object (from getIOContext()) and always returns that one,
- * except if \c reset() was called on the work guard before; then a new work guard instance will be assigned.
- *
- * This guard is used to keep the threads from startRunIOContext() running all the time until explicitly stopped by stopRunIOContext().
- *
- * See also the \e Boost documentation for \c boost::asio::make_work_guard.
- *
- * \return The work guard object.
- */
-ASIO::WorkGuard& ASIO::getWorkGuard()
-{
-    static std::unique_ptr<WorkGuard> work;
-
-    //Create a new work guard if it was not yet created or if it was reset before
-    if (!work || !(work->owns_work()))
-    {
-        if (work)
-            work->reset();
-
-        work.reset();
-        work = std::make_unique<WorkGuard>(boost::asio::make_work_guard(getIOContext()));
-    }
-
-    return *work;
 }

@@ -23,7 +23,6 @@
 #ifndef CASIL_ASIO_H
 #define CASIL_ASIO_H
 
-#include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/io_context.hpp>
 
 #include <thread>
@@ -55,11 +54,6 @@ public:
     static void stopRunIOContext();                                 ///< Stop all running IO context threads.
     //
     static bool ioContextThreadsRunning();                          ///< Check if any IO context threads are currently running.
-
-private:
-    using WorkGuard = boost::asio::executor_work_guard<boost::asio::io_context::executor_type>;
-                                                                    ///< "Work guard" for IO context threads (see the \e Boost documentation).
-    static WorkGuard& getWorkGuard();                               ///< Get the "work guard" object for the IO context object.
 
 private:
     static bool ioContextRunning;                                   ///< Flags whether IO context threads were started and not stopped yet.

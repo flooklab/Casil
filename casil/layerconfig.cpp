@@ -342,8 +342,7 @@ double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
  * \param pDefault Default value to return on error.
  * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
-std::string LayerConfig::getStr(const std::string& pKey,
-                                const std::string pDefault) const   // cppcheck-suppress passedByValue symbolName=pDefault
+std::string LayerConfig::getStr(const std::string& pKey, const std::string& pDefault) const
 {
     return tree.get<std::string>(pKey, pDefault);
 }

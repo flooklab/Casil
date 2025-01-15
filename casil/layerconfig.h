@@ -58,7 +58,7 @@ public:
     int getInt(const std::string& pKey, int pDefault = 0) const;                            ///< Get a (signed) integer configuration value.
     std::uint64_t getUInt(const std::string& pKey, std::uint64_t pDefault = 0x0u) const;    ///< Get an unsigned integer configuration value.
     double getDbl(const std::string& pKey, double pDefault = 0.0) const;                    ///< Get a floating point configuration value.
-    std::string getStr(const std::string& pKey, std::string pDefault = "") const;           ///< Get a string-type configuration value.
+    std::string getStr(const std::string& pKey, const std::string& pDefault = "") const;    ///< Get a string-type configuration value.
     //
     std::vector<std::uint8_t> getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault = {}) const;
                                                                                             ///< \brief Get an 8 bit unsigned integer sequence

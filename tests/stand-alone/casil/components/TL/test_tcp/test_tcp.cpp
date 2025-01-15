@@ -34,6 +34,7 @@
 #include <boost/system/error_code.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <thread>
@@ -322,11 +323,14 @@ BOOST_AUTO_TEST_CASE(Test5_requireIOContextThreads)
               "hw_drivers: [], registers: []}");
 
     std::atomic_bool handlerError(false);
+    std::atomic_bool handlerCalled(false);
 
-    auto handleAccept = [&handlerError](const boost::system::error_code& pErrorCode)
+    auto handleAccept = [&handlerError, &handlerCalled](const boost::system::error_code& pErrorCode)
     {
         if (pErrorCode.value() != boost::system::errc::success)
             handlerError.store(true);
+
+        handlerCalled.store(true);
     };
 
     using boost::asio::ip::tcp;
@@ -340,7 +344,27 @@ BOOST_AUTO_TEST_CASE(Test5_requireIOContextThreads)
 
     acceptor.cancel();
 
-    BOOST_REQUIRE(handlerError.load() == false);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    BOOST_CHECK(handlerError.load() == false);
+    BOOST_CHECK(handlerCalled.load() == false);
+
+    //Despite previous cancelling, handler will be called from future IO context threads;
+    //hence need to make it being called now to prevent crashes in other tests
+
+    casil::Auxil::AsyncIORunner<1> ioRunner;
+    (void)ioRunner;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        if (handlerCalled.load())
+            break;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    BOOST_CHECK(handlerError.load() == true);
+    BOOST_CHECK(handlerCalled.load() == true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

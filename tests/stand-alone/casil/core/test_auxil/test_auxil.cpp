@@ -182,6 +182,8 @@ BOOST_AUTO_TEST_CASE(Test5_asioRunner)
     Auxil::AsyncIORunner<2> ioRunner;
     (void)ioRunner;
 
+    BOOST_REQUIRE(casil::ASIO::ioContextThreadsRunning());
+
     bool secondRunnerFailed = false;
 
     try

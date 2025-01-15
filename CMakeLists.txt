@@ -201,6 +201,9 @@ set(PYBIND_SOURCE_FILES pycasil/pycasil.cpp
 
 foreach(fileName ${HEADER_FILE_NAMES})
     list(APPEND HEADER_FILES "casil/${fileName}")
+    if(NOT ("${fileName}" IN_LIST HEADER_FILE_NAMES_EXCLUDE_INSTALL))
+        list(APPEND HEADER_FILES_INSTALL "casil/${fileName}")
+    endif()
 endforeach()
 
 foreach(fileName ${SOURCE_FILE_NAMES})
@@ -280,7 +283,7 @@ set_target_properties(CasilObjLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 if(CASIL_DEV_DESC_DIRS)
     target_compile_definitions(CasilObjLib PRIVATE "CASIL_DEV_DESC_DIRS=${CASIL_DEV_DESC_DIRS}")
 endif()
-target_sources(CasilObjLib PUBLIC FILE_SET HEADERS BASE_DIRS "${PROJECT_SOURCE_DIR}" FILES "${HEADER_FILES}")
+target_sources(CasilObjLib PUBLIC FILE_SET HEADERS BASE_DIRS "${PROJECT_SOURCE_DIR}" FILES "${HEADER_FILES_INSTALL}")
 
 if(CASIL_BUILD_SHARED)
     add_library(CasilLibShared SHARED $<TARGET_OBJECTS:CasilObjLib>)

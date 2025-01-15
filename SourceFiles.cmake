@@ -62,6 +62,13 @@ set(HEADER_FILE_NAMES
     TL/Muxed/sitcp.h
 )
 
+set(HEADER_FILE_NAMES_EXCLUDE_INSTALL
+    TL/CommonImpl/asiohelper.h
+    TL/CommonImpl/serialportwrapper.h
+    TL/CommonImpl/tcpsocketwrapper.h
+    TL/CommonImpl/udpsocketwrapper.h
+)
+
 set(SOURCE_FILE_NAMES
     asio
     assert

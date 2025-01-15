@@ -355,12 +355,12 @@ BOOST_AUTO_TEST_CASE(Test5_requireIOContextThreads)
     casil::Auxil::AsyncIORunner<1> ioRunner;
     (void)ioRunner;
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 20; ++i)
     {
         if (handlerCalled.load())
             break;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     BOOST_CHECK(handlerError.load() == true);

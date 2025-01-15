@@ -33,6 +33,10 @@
 namespace
 {
 
+/*
+ * Outputs \p pVec to \p pOstream as <tt>"{S1, S2, ..., SN}"</tt> with each \c Si being an integer
+ * of type \p T as formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>.
+ */
 template<typename T>
     requires std::is_integral_v<T>
 std::ostream& ostreamOperator(std::ostream& pOstream, const std::vector<T>& pVec)
@@ -54,6 +58,9 @@ std::ostream& ostreamOperator(std::ostream& pOstream, const std::vector<T>& pVec
     return pOstream;
 }
 
+/*
+ * Returns \p pVec as string formatted using ostreamOperator<T>().
+ */
 template<typename T>
     requires std::is_integral_v<T>
 std::string formatUIntVec(const std::vector<T>& pVec)
@@ -194,7 +201,7 @@ void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uin
  * \brief Output a vector of 8 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
  *
  * Outputs \p pVec to \p pOstream as <tt>"{S1, S2, ..., SN}"</tt> with each \c Si being
- * formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>
+ * formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>.
  *
  * \param pOstream The stream to output to.
  * \param pVec The vector to be formatted/outputted.
@@ -239,7 +246,7 @@ std::ostream& operator<<(std::ostream& pOstream, const std::vector<std::uint64_t
  * \brief Format a vector of 8 bit unsigned integers as brace-enclosed sequence of hexadecimal literals.
  *
  * Returns a string showing \p pVec as <tt>"{S1, S2, ..., SN}"</tt> with each \c Si being
- * formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>
+ * formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>.
  *
  * \param pVec The vector to be formatted.
  * \return The formatted string.

@@ -39,6 +39,12 @@ namespace
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_bad_path;
 
+/*
+ * Parses and returns the value sequence stored in the configuration tree \p pTree
+ * at branch location \p pKey with sequence elements converted to integer type \p T.
+ *
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ */
 template<typename T>
     requires std::is_integral_v<T>
 std::vector<T> geTSeq(const ptree& pTree, const std::string& pKey, std::vector<T>&& pDefault)

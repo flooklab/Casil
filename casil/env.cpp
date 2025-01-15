@@ -35,6 +35,13 @@
 namespace
 {
 
+/*
+ * Generates and returns a map that contains configured/determined value sets for every supported
+ * environment variable. A value set is filled by reading set environment variables and then
+ * adding compiled macro defaults; filesystem paths get split and added as individual elements.
+ *
+ * A value set will be empty if neither the variable is set at runtime nor a default is defined during compilation.
+ */
 std::map<std::string, std::set<std::string>, std::less<>> readEnv()
 {
 #if BOOST_OS_WINDOWS != 0

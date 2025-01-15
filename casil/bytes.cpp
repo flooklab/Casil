@@ -34,8 +34,8 @@ namespace
 {
 
 /*
- * Outputs \p pVec to \p pOstream as <tt>"{S1, S2, ..., SN}"</tt> with each \c Si being an integer
- * of type \p T as formatted by formatHex() without zero-padding and where <tt>Si = pVec[i-1]</tt>.
+ * Outputs 'pVec' to 'pOstream' as "{S1, S2, ..., SN}" with each Si being an integer of
+ * type 'T' as formatted by formatHex() without zero-padding and where Si = pVec[i-1].
  */
 template<typename T>
     requires std::is_integral_v<T>
@@ -59,7 +59,7 @@ std::ostream& ostreamOperator(std::ostream& pOstream, const std::vector<T>& pVec
 }
 
 /*
- * Returns \p pVec as string formatted using ostreamOperator<T>().
+ * Returns 'pVec' as string formatted using ostreamOperator<T>().
  */
 template<typename T>
     requires std::is_integral_v<T>

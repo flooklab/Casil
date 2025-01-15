@@ -40,10 +40,10 @@ using boost::property_tree::ptree;
 using boost::property_tree::ptree_bad_path;
 
 /*
- * Parses and returns the value sequence stored in the configuration tree \p pTree
- * at branch location \p pKey with sequence elements converted to integer type \p T.
+ * Parses and returns the value sequence stored in the configuration tree 'pTree'
+ * at branch location 'pKey' with sequence elements converted to integer type 'T'.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns 'pDefault' if the conversion fails or if 'pKey' is not found.
  */
 template<typename T>
     requires std::is_integral_v<T>

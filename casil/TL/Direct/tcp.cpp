@@ -23,6 +23,7 @@
 #include <casil/TL/Direct/tcp.h>
 
 #include <casil/logger.h>
+#include <casil/TL/CommonImpl/tcpsocketwrapper.h>
 
 #include <stdexcept>
 #include <utility>
@@ -61,13 +62,18 @@ TCP::TCP(std::string pName, LayerConfig pConfig) :
     port(config.getInt("init.port", 1)),
     readTermination(config.getStr("init.read_termination", "\r\n")),
     writeTermination(config.getStr("init.write_termination", readTermination)),
-    socketWrapper(hostName, port, readTermination, writeTermination)
+    socketWrapperPtr(std::make_unique<CommonImpl::TCPSocketWrapper>(hostName, port, readTermination, writeTermination))
 {
     if (hostName == "")
         throw std::runtime_error("No address/hostname set for " + getSelfDescription() + ".");
     if (port <= 0 || port > 65535)
         throw std::runtime_error("Invalid port number set for " + getSelfDescription() + ".");
 }
+
+/*!
+ * \brief Default destructor.
+ */
+TCP::~TCP() = default;
 
 //Public
 
@@ -86,7 +92,7 @@ std::vector<std::uint8_t> TCP::read(const int pSize)
 {
     try
     {
-        return socketWrapper.read(pSize);
+        return socketWrapperPtr->read(pSize);
     }
     catch (const std::runtime_error& exc)
     {
@@ -105,7 +111,7 @@ void TCP::write(const std::vector<std::uint8_t>& pData)
 {
     try
     {
-        socketWrapper.write(pData);
+        socketWrapperPtr->write(pData);
     }
     catch (const std::runtime_error& exc)
     {
@@ -136,7 +142,7 @@ bool TCP::readBufferEmpty() const
 {
     try
     {
-        return socketWrapper.readBufferEmpty();
+        return socketWrapperPtr->readBufferEmpty();
     }
     catch (const std::runtime_error& exc)
     {
@@ -153,7 +159,7 @@ void TCP::clearReadBuffer()
 {
     try
     {
-        socketWrapper.clearReadBuffer();
+        socketWrapperPtr->clearReadBuffer();
     }
     catch (const std::runtime_error& exc)
     {
@@ -176,7 +182,7 @@ bool TCP::initImpl()
 {
     try
     {
-        socketWrapper.init();
+        socketWrapperPtr->init();
     }
     catch (const std::runtime_error& exc)
     {
@@ -198,7 +204,7 @@ bool TCP::closeImpl()
 {
     try
     {
-        socketWrapper.close();
+        socketWrapperPtr->close();
     }
     catch (const std::runtime_error& exc)
     {

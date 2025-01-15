@@ -60,6 +60,8 @@
 
 #include <casil/bytes.h>
 #include <casil/logger.h>
+#include <casil/TL/CommonImpl/tcpsocketwrapper.h>
+#include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
 #include <algorithm>
 #include <bitset>
@@ -115,7 +117,7 @@ SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
     useTcpToBus(config.getBool("init.tcp_to_bus", false)),
     connectTimeoutSecs(config.getDbl("init.connect_timeout", 5.0)),
     connectTimeout(Auxil::getChronoMilliSecs(connectTimeoutSecs)),
-    udpSocketWrapper(hostName, udpPort),
+    udpSocketWrapperPtr(std::make_unique<CommonImpl::UDPSocketWrapper>(hostName, udpPort)),
     tcpSocketWrapperPtr(useTcp ? std::make_unique<CommonImpl::TCPSocketWrapper>(hostName, tcpPort, "", "") : nullptr),
     fifoThread(),
     fifoBuffer(),
@@ -359,7 +361,7 @@ bool SiTCP::readBufferEmpty() const
 {
     try
     {
-        return udpSocketWrapper.readBufferEmpty();
+        return udpSocketWrapperPtr->readBufferEmpty();
     }
     catch (const std::runtime_error& exc)
     {
@@ -376,7 +378,7 @@ void SiTCP::clearReadBuffer()
 {
     try
     {
-        udpSocketWrapper.clearReadBuffer();
+        udpSocketWrapperPtr->clearReadBuffer();
     }
     catch (const std::runtime_error& exc)
     {
@@ -488,7 +490,7 @@ bool SiTCP::initImpl()
 {
     try
     {
-        udpSocketWrapper.init(connectTimeout);
+        udpSocketWrapperPtr->init(connectTimeout);
 
         if (useTcp)
         {
@@ -573,7 +575,7 @@ bool SiTCP::closeImpl()
             }
         }
 
-        udpSocketWrapper.close();
+        udpSocketWrapperPtr->close();
 
         if (tcpSocketWrapperPtr)
             tcpSocketWrapperPtr->close();
@@ -800,9 +802,9 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
      */
     auto checkAndClearReadBuffer = [this, functionName](const std::string& pWarnMsgContext)
     {
-        while (!udpSocketWrapper.readBufferEmpty())
+        while (!udpSocketWrapperPtr->readBufferEmpty())
         {
-            std::vector<std::uint8_t> tmpData = udpSocketWrapper.readMax(3);    //Read just enough for the header
+            std::vector<std::uint8_t> tmpData = udpSocketWrapperPtr->readMax(3);    //Read just enough for the header
 
             if (tmpData.size() == 3)
             {
@@ -850,7 +852,7 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
 
         try
         {
-            udpSocketWrapper.write(request, udpTimeout, writeTimedOut);
+            udpSocketWrapperPtr->write(request, udpTimeout, writeTimedOut);
         }
         catch (const std::runtime_error&)
         {
@@ -873,10 +875,10 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
 
             const auto timeoutRefTime = std::chrono::steady_clock::now();
 
-            while ((std::chrono::steady_clock::now() - timeoutRefTime) < udpTimeout && udpSocketWrapper.readBufferEmpty())
+            while ((std::chrono::steady_clock::now() - timeoutRefTime) < udpTimeout && udpSocketWrapperPtr->readBufferEmpty())
                 std::this_thread::yield();
 
-            if (udpSocketWrapper.readBufferEmpty())
+            if (udpSocketWrapperPtr->readBufferEmpty())
             {
                 if (readAttemptCnt <= udpRetransmitCnt)
                 {
@@ -893,7 +895,7 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
             }
 
             //Read response message
-            const std::vector<std::uint8_t> response = udpSocketWrapper.read();
+            const std::vector<std::uint8_t> response = udpSocketWrapperPtr->read();
 
             //Check if responded message equals sent request
 

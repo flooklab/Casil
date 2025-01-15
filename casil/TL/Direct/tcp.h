@@ -27,9 +27,9 @@
 
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
-#include <casil/TL/CommonImpl/tcpsocketwrapper.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -38,6 +38,8 @@ namespace casil
 
 namespace Layers::TL
 {
+
+namespace CommonImpl { class TCPSocketWrapper; }
 
 /*!
  * \brief %Interface for network communication using the \e Transmission \e Control \e Protocol (%TCP).
@@ -48,7 +50,7 @@ class TCP final : public DirectInterface
 {
 public:
     TCP(std::string pName, LayerConfig pConfig);    ///< Constructor.
-    ~TCP() override = default;                      ///< Default destructor.
+    ~TCP() override;                                ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;
@@ -67,7 +69,7 @@ private:
     const std::string readTermination;              ///< Read termination to detect end of read data stream.
     const std::string writeTermination;             ///< Write termination to append to written data.
     //
-    CommonImpl::TCPSocketWrapper socketWrapper;     ///< Detailed %TCP socket logic wrapper.
+    const std::unique_ptr<CommonImpl::TCPSocketWrapper> socketWrapperPtr;   ///< Detailed %TCP socket logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("TCP")
 };

@@ -64,8 +64,6 @@
 #include <casil/auxil.h>
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
-#include <casil/TL/CommonImpl/tcpsocketwrapper.h>
-#include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
 #include <atomic>
 #include <cstddef>
@@ -85,6 +83,9 @@ namespace casil
 
 namespace Layers::TL
 {
+
+namespace CommonImpl { class TCPSocketWrapper; }
+namespace CommonImpl { class UDPSocketWrapper; }
 
 /*!
  * \brief %Interface to connect to the basil bus on an FPGA that runs the \e %SiTCP library for communication.
@@ -258,7 +259,7 @@ private:
     const double connectTimeoutSecs;                    ///< Configured %TCP/(%UDP) connect timeout value in seconds (for init()).
     const std::chrono::milliseconds connectTimeout;     ///< Rounded chrono version of connectTimeoutSecs.
     //
-    CommonImpl::UDPSocketWrapper udpSocketWrapper;                              ///< Detailed %UDP socket logic wrapper.
+    const std::unique_ptr<CommonImpl::UDPSocketWrapper> udpSocketWrapperPtr;    ///< Detailed %UDP socket logic wrapper.
     const std::unique_ptr<CommonImpl::TCPSocketWrapper> tcpSocketWrapperPtr;    ///< Detailed %TCP socket logic wrapper.
     //
     std::thread fifoThread;                 ///< FIFO polling thread.

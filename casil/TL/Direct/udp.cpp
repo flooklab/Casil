@@ -23,6 +23,7 @@
 #include <casil/TL/Direct/udp.h>
 
 #include <casil/logger.h>
+#include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
 #include <stdexcept>
 #include <utility>
@@ -52,13 +53,18 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
                     ),
     hostName(config.getStr("init.address", "")),
     port(config.getInt("init.port", 1)),
-    socketWrapper(hostName, port)
+    socketWrapperPtr(std::make_unique<CommonImpl::UDPSocketWrapper>(hostName, port))
 {
     if (hostName == "")
         throw std::runtime_error("No address/hostname set for " + getSelfDescription() + ".");
     if (port <= 0 || port > 65535)
         throw std::runtime_error("Invalid port number set for " + getSelfDescription() + ".");
 }
+
+/*!
+ * \brief Default destructor.
+ */
+UDP::~UDP() = default;
 
 //Public
 
@@ -78,7 +84,7 @@ std::vector<std::uint8_t> UDP::read(const int pSize)
 
     try
     {
-        return socketWrapper.read();
+        return socketWrapperPtr->read();
     }
     catch (const std::runtime_error& exc)
     {
@@ -99,7 +105,7 @@ void UDP::write(const std::vector<std::uint8_t>& pData)
 {
     try
     {
-        socketWrapper.write(pData);
+        socketWrapperPtr->write(pData);
     }
     catch (const std::runtime_error& exc)
     {
@@ -137,7 +143,7 @@ bool UDP::readBufferEmpty() const
 {
     try
     {
-        return socketWrapper.readBufferEmpty();
+        return socketWrapperPtr->readBufferEmpty();
     }
     catch (const std::runtime_error& exc)
     {
@@ -154,7 +160,7 @@ void UDP::clearReadBuffer()
 {
     try
     {
-        socketWrapper.clearReadBuffer();
+        socketWrapperPtr->clearReadBuffer();
     }
     catch (const std::runtime_error& exc)
     {
@@ -177,7 +183,7 @@ bool UDP::initImpl()
 {
     try
     {
-        socketWrapper.init();
+        socketWrapperPtr->init();
     }
     catch (const std::runtime_error& exc)
     {
@@ -199,7 +205,7 @@ bool UDP::closeImpl()
 {
     try
     {
-        socketWrapper.close();
+        socketWrapperPtr->close();
     }
     catch (const std::runtime_error& exc)
     {

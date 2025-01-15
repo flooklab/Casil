@@ -27,9 +27,9 @@
 
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
-#include <casil/TL/CommonImpl/serialportwrapper.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -38,6 +38,8 @@ namespace casil
 
 namespace Layers::TL
 {
+
+namespace CommonImpl { class SerialPortWrapper; }
 
 /*!
  * \brief %Interface for communication via a serial port.
@@ -48,7 +50,7 @@ class Serial final : public DirectInterface
 {
 public:
     Serial(std::string pName, LayerConfig pConfig);     ///< Constructor.
-    ~Serial() override = default;                       ///< Default destructor.
+    ~Serial() override;                                 ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;
@@ -67,7 +69,7 @@ private:
     const std::string writeTermination;     ///< Write termination to append to written data.
     const int baudRate;                     ///< Baud rate setting for the serial communication.
     //
-    CommonImpl::SerialPortWrapper serialPortWrapper;    ///< Detailed serial port logic wrapper.
+    const std::unique_ptr<CommonImpl::SerialPortWrapper> serialPortWrapperPtr;  ///< Detailed serial port logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("Serial")
 };

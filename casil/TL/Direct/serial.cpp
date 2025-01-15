@@ -24,6 +24,7 @@
 
 #include <casil/asio.h>
 #include <casil/logger.h>
+#include <casil/TL/CommonImpl/serialportwrapper.h>
 
 #include <boost/system/system_error.hpp>
 
@@ -63,13 +64,18 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
     readTermination(config.getStr("init.read_termination", "\r\n")),
     writeTermination(config.getStr("init.write_termination", readTermination)),
     baudRate(config.getInt("init.baudrate", 9600)),
-    serialPortWrapper(port, readTermination, writeTermination, baudRate)
+    serialPortWrapperPtr(std::make_unique<CommonImpl::SerialPortWrapper>(port, readTermination, writeTermination, baudRate))
 {
     if (port == "")
         throw std::runtime_error("No serial port set for " + getSelfDescription() + ".");
     if (baudRate <= 0)
         throw std::runtime_error("Negative baud rate set for " + getSelfDescription() + ".");
 }
+
+/*!
+ * \brief Default destructor.
+ */
+Serial::~Serial() = default;
 
 //Public
 
@@ -84,7 +90,7 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
  */
 std::vector<std::uint8_t> Serial::read(const int pSize)
 {
-    return serialPortWrapper.read(pSize);
+    return serialPortWrapperPtr->read(pSize);
 }
 
 /*!
@@ -98,7 +104,7 @@ void Serial::write(const std::vector<std::uint8_t>& pData)
 {
     try
     {
-        serialPortWrapper.write(pData);
+        serialPortWrapperPtr->write(pData);
     }
     catch (const std::runtime_error& exc)
     {
@@ -125,7 +131,7 @@ std::vector<std::uint8_t> Serial::query(const std::vector<std::uint8_t>& pData, 
  */
 bool Serial::readBufferEmpty() const
 {
-    return serialPortWrapper.readBufferEmpty();
+    return serialPortWrapperPtr->readBufferEmpty();
 }
 
 /*!
@@ -133,7 +139,7 @@ bool Serial::readBufferEmpty() const
  */
 void Serial::clearReadBuffer()
 {
-    serialPortWrapper.clearReadBuffer();
+    serialPortWrapperPtr->clearReadBuffer();
 }
 
 //Private
@@ -152,7 +158,7 @@ bool Serial::initImpl()
 {
     try
     {
-        serialPortWrapper.init();
+        serialPortWrapperPtr->init();
     }
     catch (const std::runtime_error& exc)
     {
@@ -174,7 +180,7 @@ bool Serial::closeImpl()
 {
     try
     {
-        serialPortWrapper.close();
+        serialPortWrapperPtr->close();
     }
     catch (const std::runtime_error& exc)
     {

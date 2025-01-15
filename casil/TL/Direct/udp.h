@@ -27,9 +27,9 @@
 
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
-#include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -38,6 +38,8 @@ namespace casil
 
 namespace Layers::TL
 {
+
+namespace CommonImpl { class UDPSocketWrapper; }
 
 /*!
  * \brief %Interface for network communication using the \e User \e Datagram \e Protocol (%UDP).
@@ -48,7 +50,7 @@ class UDP final : public DirectInterface
 {
 public:
     UDP(std::string pName, LayerConfig pConfig);    ///< Constructor.
-    ~UDP() override = default;                      ///< Default destructor.
+    ~UDP() override;                                ///< Default destructor.
     //
     std::vector<std::uint8_t> read(int pSize = -1) override;
     void write(const std::vector<std::uint8_t>& pData) override;
@@ -65,7 +67,7 @@ private:
     const std::string hostName;                     ///< Host name of the remote endpoint.
     const int port;                                 ///< Used network port.
     //
-    CommonImpl::UDPSocketWrapper socketWrapper;     ///< Detailed %UDP socket logic wrapper.
+    const std::unique_ptr<CommonImpl::UDPSocketWrapper> socketWrapperPtr;   ///< Detailed %UDP socket logic wrapper.
 
     CASIL_REGISTER_INTERFACE_H("UDP")
 };

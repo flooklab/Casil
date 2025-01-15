@@ -513,14 +513,13 @@ void TCPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
     try
     {
         boost::asio::ip::tcp::resolver resolver(ASIO::getIOContext());
-        boost::asio::ip::tcp::resolver::query tcpQuery(hostName, std::to_string(port));
 
         if (pConnectTimeout <= std::chrono::milliseconds::zero())
-            boost::asio::connect(socket, resolver.resolve(tcpQuery));
+            boost::asio::connect(socket, resolver.resolve(hostName, std::to_string(port)));
         else
         {
             std::future<boost::asio::ip::tcp::endpoint> endpoint = boost::asio::async_connect(socket,
-                                                                                              resolver.resolve(tcpQuery),
+                                                                                              resolver.resolve(hostName, std::to_string(port)),
                                                                                               boost::asio::use_future);
 
             (void)ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(endpoint, socket, pConnectTimeout, pTimedOut);

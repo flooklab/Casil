@@ -276,14 +276,13 @@ void UDPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
     try
     {
         boost::asio::ip::udp::resolver resolver(ASIO::getIOContext());
-        boost::asio::ip::udp::resolver::query udpQuery(hostName, std::to_string(port));
 
         if (pConnectTimeout <= std::chrono::milliseconds::zero())
-            boost::asio::connect(socket, resolver.resolve(udpQuery));
+            boost::asio::connect(socket, resolver.resolve(hostName, std::to_string(port)));
         else
         {
             std::future<boost::asio::ip::udp::endpoint> endpoint = boost::asio::async_connect(socket,
-                                                                                              resolver.resolve(udpQuery),
+                                                                                              resolver.resolve(hostName, std::to_string(port)),
                                                                                               boost::asio::use_future);
 
             (void)ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(endpoint, socket, pConnectTimeout, pTimedOut);

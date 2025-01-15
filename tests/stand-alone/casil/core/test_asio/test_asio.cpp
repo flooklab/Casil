@@ -69,8 +69,7 @@ BOOST_AUTO_TEST_CASE(Test1_asyncIOContext)
     //Start connection
     boost::asio::ip::tcp::socket socket2(ASIO::getIOContext());
     boost::asio::ip::tcp::resolver resolver2(ASIO::getIOContext());
-    boost::asio::ip::tcp::resolver::query query2("127.0.0.1", "10354");
-    boost::asio::connect(socket2, resolver2.resolve(query2));
+    boost::asio::connect(socket2, resolver2.resolve("127.0.0.1", "10354"));
 
     for (int i = 0; i < 20; ++i)
     {

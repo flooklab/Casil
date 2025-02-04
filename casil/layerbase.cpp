@@ -57,7 +57,10 @@ LayerBase::LayerBase(const Layer pLayer, std::string pType, std::string pName, L
                     " instance \"" + name + "\"")
 {
     if (!config.contains(pRequiredConfig, true))
-        throw std::runtime_error("Incomplete/invalid configuration for " + getSelfDescription() + ".");
+    {
+        throw std::runtime_error("Incomplete/invalid configuration for " + getSelfDescription() + ". Passed configuration:\n" +
+                                 config.toString() + "Required configuration:\n" + pRequiredConfig.toString());
+    }
 }
 
 //Public

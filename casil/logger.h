@@ -108,6 +108,8 @@ public:
     static void logVerbose(std::string_view pMessage);                                  ///< Print a log message (LogLevel::Verbose).
     static void logDebug(std::string_view pMessage);                                    ///< Print a log message (LogLevel::Debug).
     static void logDebugDebug(std::string_view pMessage);                               ///< Print a log message (LogLevel::DebugDebug).
+    //
+    static bool includeLogLevel(LogLevel pLevel);                       ///< Check whether a message with a certain log level should be logged.
 
 private:
     static void logMessage(std::string_view pMessage, LogLevel pLevel);                 ///< Format and print a log message.

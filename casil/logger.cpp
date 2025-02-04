@@ -235,8 +235,7 @@ void Logger::removeLogFile(const std::string& pFileName)
 /*!
  * \brief Print a log message.
  *
- * Logs the message \p pMessage, if \p pLevel is lower than or equal to the Logger's current log level.
- * Messages with \p pLevel LogLevel::None will never be printed.
+ * Logs the message \p pMessage, if includeLogLevel() returns true for \p pLevel (see there for further details).
  *
  * The actual logging is done through logMessage(), which adds timestamps and
  * allows for safe logging from different threads. See there for more details.
@@ -246,10 +245,7 @@ void Logger::removeLogFile(const std::string& pFileName)
  */
 void Logger::log(const std::string_view pMessage, const LogLevel pLevel)
 {
-    if (pLevel == LogLevel::None)
-        return;
-
-    if (static_cast<std::uint8_t>(pLevel) > static_cast<std::uint8_t>(logLevel))
+    if (!includeLogLevel(pLevel))
         return;
 
     logMessage(pMessage, pLevel);
@@ -381,6 +377,23 @@ void Logger::logDebug(const std::string_view pMessage)
 void Logger::logDebugDebug(const std::string_view pMessage)
 {
     log(pMessage, LogLevel::DebugDebug);
+}
+
+//
+
+/*!
+ * \brief Check whether a message with a certain log level should be logged.
+ *
+ * A message must be logged if \p pLevel is lower than or equal to the Logger's current log level (see getLogLevel()).
+ * Messages with \p pLevel equal to LogLevel::None must never be printed.
+ *
+ * \param pLevel The log level of the message to potentially be logged.
+ * \return True if a message with log level \p pLevel should be logged according to the Logger's current log level.
+ */
+bool Logger::includeLogLevel(const LogLevel pLevel)
+{
+    return ((pLevel != LogLevel::None) &&
+            (static_cast<std::uint8_t>(pLevel) <= static_cast<std::uint8_t>(logLevel)));
 }
 
 //Private

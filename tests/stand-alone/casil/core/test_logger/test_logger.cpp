@@ -59,6 +59,11 @@ BOOST_AUTO_TEST_CASE(Test1_logLevelThreshold)
     Logger::log("HelloWorld8-Level-Debug", Logger::LogLevel::Debug);
     Logger::log("HelloWorld9-Level-DebugDebug", Logger::LogLevel::DebugDebug);
 
+    Logger::setLogLevel(Logger::LogLevel::DebugDebug);
+    Logger::log("HelloWorld8.1-Level-Debug", Logger::LogLevel::Debug);
+    Logger::log("HelloWorld9.1-Level-DebugDebug", Logger::LogLevel::DebugDebug);
+    Logger::setLogLevel(Logger::LogLevel::Verbose);
+
     Logger::removeOutput(logOutputStrm);
 
     Logger::log("HelloWorld10", Logger::LogLevel::Verbose);
@@ -74,7 +79,9 @@ BOOST_AUTO_TEST_CASE(Test1_logLevelThreshold)
     BOOST_CHECK(testStr.find("HelloWorld6-Level-More") != testStr.npos);
     BOOST_CHECK(testStr.find("HelloWorld7-Level-Verbose") != testStr.npos);
     BOOST_CHECK(testStr.find("HelloWorld8-Level-Debug") == testStr.npos);
+    BOOST_CHECK(testStr.find("HelloWorld8.1-Level-Debug") != testStr.npos);
     BOOST_CHECK(testStr.find("HelloWorld9-Level-DebugDebug") == testStr.npos);
+    BOOST_CHECK(testStr.find("HelloWorld9.1-Level-DebugDebug") != testStr.npos);
     BOOST_CHECK(testStr.find("HelloWorld10") == testStr.npos);
 }
 

@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(Test5_getValues)
 {
     std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10,"
                                   "nested: [{one: 1.3}, {two: 2a, three: True}]},"
-                                  "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
+                           "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
 
     LayerConfig conf = LayerConfig::fromYAML(yamlStr);
 

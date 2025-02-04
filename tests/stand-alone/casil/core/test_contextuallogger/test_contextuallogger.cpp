@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Test1_context)
 
     Logger::removeOutput(logOutputStrm);
 
-    std::string testStr = logOutputStrm.str();
+    const std::string testStr = logOutputStrm.str();
 
     BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (1)") != testStr.npos);
     BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (2)") != testStr.npos);

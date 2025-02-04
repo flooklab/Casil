@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(Test1_logLevelThreshold)
 
     Logger::log("HelloWorld10", Logger::LogLevel::Verbose);
 
-    std::string testStr = logOutputStrm.str();
+    const std::string testStr = logOutputStrm.str();
 
     BOOST_CHECK(testStr.find("HelloWorld0-Level-None") == testStr.npos);
     BOOST_CHECK(testStr.find("HelloWorld1-Level-Critical") != testStr.npos);

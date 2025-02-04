@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(Test1_ptreeFromYAML)
 
     readTree(tree, 0);
 
-    std::string testStr = ostrm.str();
+    const std::string testStr = ostrm.str();
 
     std::ifstream refFile;
 

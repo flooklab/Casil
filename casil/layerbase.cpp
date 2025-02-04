@@ -40,7 +40,7 @@ using casil::LayerBase;
  * \throws std::runtime_error If \p pConfig is incomplete/invalid because \p pRequiredConfig is not contained.
  *
  * \param pLayer %Layer that this component belongs to.
- * \param pType %Name of the component type (as registered to the LayerFactory).
+ * \param pType Name of the component type (as registered to the LayerFactory).
  * \param pName Name of the instance (as e.g. used in Device).
  * \param pConfig Instance-specific component configuration.
  * \param pRequiredConfig Reference configuration required for the components of type \p pType.

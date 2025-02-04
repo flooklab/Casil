@@ -22,8 +22,6 @@
 
 #include <casil/HL/Direct/dummydriver.h>
 
-#include <casil/logger.h>
-
 #include <utility>
 
 using casil::Layers::HL::DummyDriver;
@@ -55,7 +53,7 @@ DummyDriver::DummyDriver(std::string pName, InterfaceBaseType& pInterface, Layer
  */
 bool DummyDriver::initImpl()
 {
-    Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("initImpl() was called.");
     return true;
 }
 
@@ -68,6 +66,6 @@ bool DummyDriver::initImpl()
  */
 bool DummyDriver::closeImpl()
 {
-    Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("closeImpl() was called.");
     return true;
 }

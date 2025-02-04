@@ -23,7 +23,6 @@
 #include <casil/TL/Muxed/dummymuxedinterface.h>
 
 #include <casil/bytes.h>
-#include <casil/logger.h>
 
 #include <utility>
 
@@ -57,9 +56,9 @@ DummyMuxedInterface::DummyMuxedInterface(std::string pName, LayerConfig pConfig)
  */
 std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, const int pSize)
 {
-    Logger::logDebug("Called read() for " + getSelfDescription() + " with arguments " +
-                     "\"pAddr\" = " + Bytes::formatHex(pAddr) + ", " +
-                     "\"pSize\" = " + std::to_string(pSize) + ".");
+    logger.logDebug(std::string("read() was called with arguments ") +
+                    "\"pAddr\" = " + Bytes::formatHex(pAddr) + ", " +
+                    "\"pSize\" = " + std::to_string(pSize) + ".");
     return {};
 }
 
@@ -73,9 +72,9 @@ std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, c
  */
 void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pData)
 {
-    Logger::logDebug("Called write() for " + getSelfDescription() + " with arguments " +
-                     "\"pAddr\" = " + Bytes::formatHex(pAddr) + ", " +
-                     "\"pData\" = " + Bytes::formatByteVec(pData) + ".");
+    logger.logDebug(std::string("write() was called with arguments ") +
+                    "\"pAddr\" = " + Bytes::formatHex(pAddr) + ", " +
+                    "\"pData\" = " + Bytes::formatByteVec(pData) + ".");
 }
 
 /*!
@@ -92,11 +91,11 @@ void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std
 std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteAddr, const std::uint64_t pReadAddr,
                                                      const std::vector<std::uint8_t>& pData, const int pSize)
 {
-    Logger::logDebug("Called query() for " + getSelfDescription() + " with arguments " +
-                     "\"pWriteAddr\" = " + Bytes::formatHex(pWriteAddr) + ", " +
-                     "\"pReadAddr\" = " + Bytes::formatHex(pReadAddr) + ", " +
-                     "\"pData\" = " + Bytes::formatByteVec(pData) + ", " +
-                     "\"pSize\" = " + std::to_string(pSize) + ".");
+    logger.logDebug(std::string("query() was called with arguments ") +
+                    "\"pWriteAddr\" = " + Bytes::formatHex(pWriteAddr) + ", " +
+                    "\"pReadAddr\" = " + Bytes::formatHex(pReadAddr) + ", " +
+                    "\"pData\" = " + Bytes::formatByteVec(pData) + ", " +
+                    "\"pSize\" = " + std::to_string(pSize) + ".");
     return {};
 }
 
@@ -111,7 +110,7 @@ std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteA
  */
 bool DummyMuxedInterface::readBufferEmpty() const
 {
-    Logger::logDebug("Called readBufferEmpty() for " + getSelfDescription() + ".");
+    logger.logDebug("readBufferEmpty() was called.");
     return true;
 }
 
@@ -122,7 +121,7 @@ bool DummyMuxedInterface::readBufferEmpty() const
  */
 void DummyMuxedInterface::clearReadBuffer()
 {
-    Logger::logDebug("Called clearReadBuffer() for " + getSelfDescription() + ".");
+    logger.logDebug("clearReadBuffer() was called.");
 }
 
 //Private
@@ -136,7 +135,7 @@ void DummyMuxedInterface::clearReadBuffer()
  */
 bool DummyMuxedInterface::initImpl()
 {
-    Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("initImpl() was called.");
     return true;
 }
 
@@ -149,6 +148,6 @@ bool DummyMuxedInterface::initImpl()
  */
 bool DummyMuxedInterface::closeImpl()
 {
-    Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("closeImpl() was called.");
     return true;
 }

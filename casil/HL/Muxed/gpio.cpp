@@ -59,7 +59,6 @@
 #include <casil/HL/Muxed/gpio.h>
 
 #include <casil/bytes.h>
-#include <casil/logger.h>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -219,8 +218,8 @@ bool GPIO::initModule()
 {
     if (config.contains(LayerConfig::fromYAML("{init: {output_en: string}}"), true))
     {
-        Logger::logWarning("The \"init.output_en\" setting is unsupported but set for " + getSelfDescription() + ". " +
-                           "Please use the register init setting \"init.OUTPUT_EN\" instead.");
+        logger.logWarning("The \"init.output_en\" setting is unsupported but set. "
+                          "Please use the register init setting \"init.OUTPUT_EN\" instead.");
     }
 
     return true;

@@ -59,7 +59,6 @@
 #include <casil/TL/Muxed/sitcp.h>
 
 #include <casil/bytes.h>
-#include <casil/logger.h>
 #include <casil/TL/CommonImpl/tcpsocketwrapper.h>
 #include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
@@ -344,7 +343,7 @@ void SiTCP::write(const std::uint64_t pAddr, const std::vector<std::uint8_t>& pD
  */
 std::vector<std::uint8_t> SiTCP::query(std::uint64_t, std::uint64_t, const std::vector<std::uint8_t>&, int)
 {
-    Logger::logWarning("The query() function is not implemented for the SiTCP interface (does nothing).");
+    logger.logWarning("The query() function is not implemented for the SiTCP interface (does nothing).");
     return {};
 }
 
@@ -502,7 +501,7 @@ bool SiTCP::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not connect socket of " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not connect socket: ") + exc.what());
         return false;
     }
 
@@ -521,12 +520,12 @@ bool SiTCP::initImpl()
         }
         catch (const std::system_error& exc)
         {
-            Logger::logError("Could not start FIFO thread for " + getSelfDescription() + ": " + exc.what());
+            logger.logError(std::string("Could not start FIFO thread: ") + exc.what());
             return false;
         }
         catch (const std::runtime_error& exc)
         {
-            Logger::logError("Could not start FIFO thread for " + getSelfDescription() + ": " + exc.what());
+            logger.logError(std::string("Could not start FIFO thread: ") + exc.what());
             return false;
         }
 
@@ -538,7 +537,7 @@ bool SiTCP::initImpl()
             }
             catch (const std::runtime_error& exc)
             {
-                Logger::logError("Could not enable \"tcp_to_bus\" feature for " + getSelfDescription() + ": " + exc.what());
+                logger.logError(std::string("Could not enable \"tcp_to_bus\" feature: ") + exc.what());
                 return false;
             }
         }
@@ -571,7 +570,7 @@ bool SiTCP::closeImpl()
             }
             catch (const std::system_error& exc)
             {
-                Logger::logWarning("Could not join FIFO thread of " + getSelfDescription() + ": " + exc.what());
+                logger.logWarning(std::string("Could not join FIFO thread: ") + exc.what());
             }
         }
 
@@ -582,7 +581,7 @@ bool SiTCP::closeImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not close socket connection of " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not close socket connection: ") + exc.what());
         return false;
     }
 
@@ -608,7 +607,7 @@ void SiTCP::enableTcpToBus()
         if (useTcpToBus)
             throw std::runtime_error("Undefined TCP socket. THIS SHOULD NEVER HAPPEN!");
         else
-            Logger::logWarning("Cannot use \"tcp_to_bus\" feature for " + getSelfDescription() + ": \"tcp_to_bus\" is not enabled.");
+            logger.logWarning("Cannot use \"tcp_to_bus\" feature: \"tcp_to_bus\" is not enabled.");
 
         return;
     }
@@ -641,7 +640,7 @@ void SiTCP::pollFifo()
 {
     if (!tcpSocketWrapperPtr)
     {
-        Logger::logError("Cannot poll FIFO of " + getSelfDescription() + ": Undefined TCP socket.");
+        logger.logError("Cannot poll FIFO: Undefined TCP socket.");
         return;
     }
 
@@ -666,12 +665,12 @@ void SiTCP::pollFifo()
             }
             catch (const std::runtime_error& exc)
             {
-                Logger::logError("Error while polling FIFO of " + getSelfDescription() + ": " + exc.what());
+                logger.logError(std::string("Error while polling FIFO: ") + exc.what());
 
                 if (++errorCount > maxFIFOErrorCount)
                 {
                     pollFIFO.store(false);
-                    Logger::logCritical("Exceeded maximum error count while polling FIFO of " + getSelfDescription() + ". Stopping...");
+                    logger.logCritical("Exceeded maximum error count while polling FIFO. Stopping...");
                 }
             }
         }
@@ -808,14 +807,12 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
 
             if (tmpData.size() == 3)
             {
-                Logger::logWarning("Found unexpected datagram on " + getSelfDescription() + " " + pWarnMsgContext +
-                                   " (in " + functionName + "). RBCP message ID: " + std::to_string(rbcpId) + " (expected), " +
-                                                                                     std::to_string(tmpData[2]) + " (received).");
+                logger.logWarning("Found unexpected datagram " + pWarnMsgContext + " (in " + functionName + "). RBCP message ID: " +
+                                  std::to_string(rbcpId) + " (expected), " + std::to_string(tmpData[2]) + " (received).");
             }
             else
             {
-                Logger::logWarning("Found unexpected datagram on " + getSelfDescription() + " " + pWarnMsgContext +
-                                   " (in " + functionName + ").");
+                logger.logWarning("Found unexpected datagram " + pWarnMsgContext + " (in " + functionName + ").");
             }
         }
     };
@@ -858,7 +855,7 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
         {
             if (writeTimedOut && writeAttemptCnt <= udpRetransmitCnt)                       // cppcheck-suppress knownConditionTrueFalse
             {
-                Logger::logWarning("Write timeout on UDP socket of " + getSelfDescription() + " (in " + functionName + "). Retry write...");
+                logger.logWarning("Write timeout on UDP socket (in " + functionName + "). Retry write...");
                 continue;
             }
             else if (writeTimedOut)                                                         // cppcheck-suppress knownConditionTrueFalse
@@ -882,12 +879,12 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
             {
                 if (readAttemptCnt <= udpRetransmitCnt)
                 {
-                    Logger::logWarning("Read timeout on UDP socket of " + getSelfDescription() + " (in " + functionName + "). Retry read...");
+                    logger.logWarning("Read timeout on UDP socket (in " + functionName + "). Retry read...");
                     continue;
                 }
                 else if (writeAttemptCnt <= udpRetransmitCnt)
                 {
-                    Logger::logWarning("Read timeout on UDP socket of " + getSelfDescription() + " (in " + functionName + "). Retry write...");
+                    logger.logWarning("Read timeout on UDP socket (in " + functionName + "). Retry write...");
                     break;
                 }
                 else
@@ -909,14 +906,12 @@ std::optional<std::vector<std::uint8_t>> SiTCP::doSingleRBCPOperation(const std:
             {
                 if (readAttemptCnt <= udpRetransmitCnt)
                 {
-                    Logger::logWarning("RBCP message received on " + getSelfDescription() + " has wrong ID " +
-                                       "(in " + functionName + "). Retry read...");
+                    logger.logWarning("Received RBCP message has wrong ID (in " + functionName + "). Retry read...");
                     continue;
                 }
                 else if (writeAttemptCnt <= udpRetransmitCnt)
                 {
-                    Logger::logWarning("RBCP message received on " + getSelfDescription() + " has wrong ID " +
-                                       "(in " + functionName + "). Retry write...");
+                    logger.logWarning("Received RBCP message has wrong ID (in " + functionName + "). Retry write...");
                     break;
                 }
                 else

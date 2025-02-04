@@ -22,7 +22,6 @@
 
 #include <casil/TL/Direct/udp.h>
 
-#include <casil/logger.h>
 #include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
 #include <stdexcept>
@@ -187,7 +186,7 @@ bool UDP::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not connect socket of " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not connect socket: ") + exc.what());
         return false;
     }
 
@@ -209,7 +208,7 @@ bool UDP::closeImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not close socket connection of " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not close socket connection: ") + exc.what());
         return false;
     }
 

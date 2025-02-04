@@ -23,7 +23,6 @@
 #include <casil/HL/Muxed/dummymuxeddriver.h>
 
 #include <casil/bytes.h>
-#include <casil/logger.h>
 
 #include <utility>
 
@@ -58,9 +57,9 @@ DummyMuxedDriver::DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterf
  */
 std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::uint32_t pAddrOffs)
 {
-    Logger::logDebug("Called getData() for " + getSelfDescription() + " with arguments " +
-                     "\"pSize\" = " + std::to_string(pSize) + ", " +
-                     "\"pAddrOffs\" = " + Bytes::formatHex(pAddrOffs) + ".");
+    logger.logDebug(std::string("getData() was called with arguments ") +
+                    "\"pSize\" = " + std::to_string(pSize) + ", " +
+                    "\"pAddrOffs\" = " + Bytes::formatHex(pAddrOffs) + ".");
     return {};
 }
 
@@ -74,9 +73,9 @@ std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::
  */
 void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std::uint32_t pAddrOffs)
 {
-    Logger::logDebug("Called setData() for " + getSelfDescription() + " with arguments " +
-                     "\"pData\" = " + Bytes::formatByteVec(pData) + ", " +
-                     "\"pAddrOffs\" = " + Bytes::formatHex(pAddrOffs) + ".");
+    logger.logDebug(std::string("setData() was called with arguments ") +
+                    "\"pData\" = " + Bytes::formatByteVec(pData) + ", " +
+                    "\"pAddrOffs\" = " + Bytes::formatHex(pAddrOffs) + ".");
 }
 
 /*!
@@ -86,7 +85,7 @@ void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std
  */
 void DummyMuxedDriver::exec()
 {
-    Logger::logDebug("Called exec() for " + getSelfDescription() + ".");
+    logger.logDebug("exec() was called.");
 }
 
 /*!
@@ -98,7 +97,7 @@ void DummyMuxedDriver::exec()
  */
 bool DummyMuxedDriver::isDone()
 {
-    Logger::logDebug("Called isDone() for " + getSelfDescription() + ".");
+    logger.logDebug("isDone() was called.");
     return false;
 }
 
@@ -113,7 +112,7 @@ bool DummyMuxedDriver::isDone()
  */
 bool DummyMuxedDriver::initImpl()
 {
-    Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("initImpl() was called.");
     return true;
 }
 
@@ -126,6 +125,6 @@ bool DummyMuxedDriver::initImpl()
  */
 bool DummyMuxedDriver::closeImpl()
 {
-    Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("closeImpl() was called.");
     return true;
 }

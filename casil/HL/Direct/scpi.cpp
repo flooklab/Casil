@@ -61,7 +61,6 @@
 #include <casil/auxil.h>
 #include <casil/bytes.h>
 #include <casil/env.h>
-#include <casil/logger.h>
 
 #include <algorithm>
 #include <cctype>
@@ -159,10 +158,7 @@ void SCPI::writeCommand(const std::string_view pCmd, const std::optional<int> pC
     else
     {
         if (!isSetter(pCmd))
-        {
-            Logger::logWarning("Dropping value argument for " + getSelfDescription() + " because \"" + std::string(pCmd) + "\" " +
-                               "is not a setter.");
-        }
+            logger.logWarning("Dropping value argument because \"" + std::string(pCmd) + "\" is not a setter.");
 
         std::vector<std::uint8_t> cmd = getWriteCommand(pCmd, channel);
 
@@ -222,10 +218,7 @@ std::optional<std::string> SCPI::command(const std::string_view pCmd, const std:
     if (isQueryCommand(pCmd, channel))
     {
         if (!std::holds_alternative<std::monostate>(pValue))
-        {
-            Logger::logWarning("Dropping value argument for " + getSelfDescription() + " because \"" + std::string(pCmd) + "\" " +
-                               "is a query command.");
-        }
+            logger.logWarning("Dropping value argument because \"" + std::string(pCmd) + "\" is a query command.");
 
         return queryCommand(pCmd, channel);
     }
@@ -256,7 +249,7 @@ bool SCPI::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not initialize " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not initialize: ") + exc.what());
         return false;
     }
     catch (const std::invalid_argument&)
@@ -267,8 +260,8 @@ bool SCPI::initImpl()
 
     if (ident != deviceIdentifier)
     {
-        Logger::logError("Wrong SCPI device description configured for " + getSelfDescription() +
-                         " (expected identifier: \"" + deviceIdentifier + "\"; actual identifier: \"" + ident + "\").");
+        logger.logError("Wrong SCPI device description configured (expected identifier: \"" + deviceIdentifier +
+                        "\"; actual identifier: \"" + ident + "\").");
         return false;
     }
 

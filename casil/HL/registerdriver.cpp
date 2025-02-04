@@ -60,7 +60,6 @@
 
 #include <casil/auxil.h>
 #include <casil/bytes.h>
-#include <casil/logger.h>
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -329,10 +328,7 @@ std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegNa
             if (!std::holds_alternative<std::monostate>(cachedVal))
             {
                 if (retVal != std::get<std::vector<std::uint8_t>>(cachedVal))
-                {
-                    Logger::logWarning("Byte sequence read from register \"" + std::string(pRegName) + "\" of " +
-                                       getSelfDescription() + " differs from cached one.");
-                }
+                    logger.logWarning("Byte sequence read from register \"" + std::string(pRegName) + "\" differs from cached one.");
             }
         }
 
@@ -447,10 +443,7 @@ std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
             if (!std::holds_alternative<std::monostate>(cachedVal))
             {
                 if (retVal != std::get<std::uint64_t>(cachedVal))
-                {
-                    Logger::logWarning("Value read from register \"" + std::string(pRegName) + "\" of " +
-                                       getSelfDescription() + " differs from cached value.");
-                }
+                    logger.logWarning("Value read from register \"" + std::string(pRegName) + "\" differs from cached value.");
             }
         }
 
@@ -692,7 +685,7 @@ bool RegisterDriver::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not reset " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not reset: ") + exc.what());
         return false;
     }
 
@@ -705,14 +698,14 @@ bool RegisterDriver::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not determine firmware version of FPGA module used for " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not determine firmware version of FPGA module: ") + exc.what());
         return false;
     }
 
     if (!checkVersionRequirement(softwareVersion, firmwareVersion))
     {
-        Logger::logError("FPGA module used for " + getSelfDescription() + " reports incompatible firmware version: " +
-                         std::to_string(firmwareVersion) + "; driver software version is: " + std::to_string(softwareVersion) + ".");
+        logger.logError("FPGA module reports incompatible firmware version: " + std::to_string(firmwareVersion) +
+                        "; driver software version is: " + std::to_string(softwareVersion) + ".");
         return false;
     }
 
@@ -722,16 +715,15 @@ bool RegisterDriver::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not write default register states for " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not write default register states: ") + exc.what());
         return false;
     }
 
     if (!initModule())
         return false;
 
-    Logger::logSuccess("Initialized " + getSelfDescription() + ": Using FPGA module at base address " +
-                       Bytes::formatHex(baseAddr) + " with firmware version " + std::to_string(firmwareVersion) +
-                       " (driver version: " + std::to_string(softwareVersion) + ").");
+    logger.logSuccess("Initialized: Using FPGA module at base address " + Bytes::formatHex(baseAddr) + " with firmware version " +
+                      std::to_string(firmwareVersion) + " (driver version: " + std::to_string(softwareVersion) + ").");
 
     return true;
 }

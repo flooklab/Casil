@@ -23,7 +23,6 @@
 #include <casil/TL/Direct/serial.h>
 
 #include <casil/asio.h>
-#include <casil/logger.h>
 #include <casil/TL/CommonImpl/serialportwrapper.h>
 
 #include <boost/system/system_error.hpp>
@@ -162,7 +161,7 @@ bool Serial::initImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not initialize " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not open serial port: ") + exc.what());
         return false;
     }
 
@@ -184,7 +183,7 @@ bool Serial::closeImpl()
     }
     catch (const std::runtime_error& exc)
     {
-        Logger::logError("Could not close " + getSelfDescription() + ": " + exc.what());
+        logger.logError(std::string("Could not close serial port: ") + exc.what());
         return false;
     }
 

@@ -22,8 +22,6 @@
 
 #include <casil/TL/muxedinterface.h>
 
-#include <casil/logger.h>
-
 #include <chrono>
 #include <stdexcept>
 #include <thread>
@@ -69,7 +67,7 @@ std::vector<std::uint8_t> MuxedInterface::query(const std::uint64_t pWriteAddr, 
     {
         if (!readBufferEmpty())
         {
-            Logger::logWarning("Clearing not empty read buffer of " + getSelfDescription() + " before sending query.");
+            logger.logWarning("Clearing not empty read buffer before sending query.");
             clearReadBuffer();
         }
 

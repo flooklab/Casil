@@ -23,7 +23,6 @@
 #include <casil/TL/Direct/dummyinterface.h>
 
 #include <casil/bytes.h>
-#include <casil/logger.h>
 
 #include <utility>
 
@@ -56,7 +55,7 @@ DummyInterface::DummyInterface(std::string pName, LayerConfig pConfig) :
  */
 std::vector<std::uint8_t> DummyInterface::read(const int pSize)
 {
-    Logger::logDebug("Called read() for " + getSelfDescription() + " with argument \"pSize\" = " + std::to_string(pSize) + ".");
+    logger.logDebug("read() was called with argument \"pSize\" = " + std::to_string(pSize) + ".");
     return {};
 }
 
@@ -69,7 +68,7 @@ std::vector<std::uint8_t> DummyInterface::read(const int pSize)
  */
 void DummyInterface::write(const std::vector<std::uint8_t>& pData)
 {
-    Logger::logDebug("Called write() for " + getSelfDescription() + " with argument \"pData\" = " + Bytes::formatByteVec(pData) + ".");
+    logger.logDebug("write() was called with argument \"pData\" = " + Bytes::formatByteVec(pData) + ".");
 }
 
 /*!
@@ -83,9 +82,9 @@ void DummyInterface::write(const std::vector<std::uint8_t>& pData)
  */
 std::vector<std::uint8_t> DummyInterface::query(const std::vector<std::uint8_t>& pData, const int pSize)
 {
-    Logger::logDebug("Called query() for " + getSelfDescription() + " with arguments " +
-                     "\"pData\" = " + Bytes::formatByteVec(pData) + ", " +
-                     "\"pSize\" = " + std::to_string(pSize) + ".");
+    logger.logDebug(std::string("query() was called with arguments ") +
+                    "\"pData\" = " + Bytes::formatByteVec(pData) + ", " +
+                    "\"pSize\" = " + std::to_string(pSize) + ".");
     return {};
 }
 
@@ -100,7 +99,7 @@ std::vector<std::uint8_t> DummyInterface::query(const std::vector<std::uint8_t>&
  */
 bool DummyInterface::readBufferEmpty() const
 {
-    Logger::logDebug("Called readBufferEmpty() for " + getSelfDescription() + ".");
+    logger.logDebug("readBufferEmpty() was called.");
     return true;
 }
 
@@ -111,7 +110,7 @@ bool DummyInterface::readBufferEmpty() const
  */
 void DummyInterface::clearReadBuffer()
 {
-    Logger::logDebug("Called clearReadBuffer() for " + getSelfDescription() + ".");
+    logger.logDebug("clearReadBuffer() was called.");
 }
 
 //Private
@@ -125,7 +124,7 @@ void DummyInterface::clearReadBuffer()
  */
 bool DummyInterface::initImpl()
 {
-    Logger::logDebug("Called initImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("initImpl() was called.");
     return true;
 }
 
@@ -138,6 +137,6 @@ bool DummyInterface::initImpl()
  */
 bool DummyInterface::closeImpl()
 {
-    Logger::logDebug("Called closeImpl() for " + getSelfDescription() + ".");
+    logger.logDebug("closeImpl() was called.");
     return true;
 }

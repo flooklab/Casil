@@ -80,10 +80,6 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
                     break;
                 }
                 case YAML::NodeType::Sequence:
-                {
-                    fillTree(tSubTree, childNode);
-                    break;
-                }
                 case YAML::NodeType::Map:
                 {
                     fillTree(tSubTree, childNode);

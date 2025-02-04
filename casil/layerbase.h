@@ -23,6 +23,7 @@
 #ifndef CASIL_LAYERBASE_H
 #define CASIL_LAYERBASE_H
 
+#include <casil/contextuallogger.h>
 #include <casil/layerconfig.h>
 
 #include <cstdint>
@@ -88,6 +89,8 @@ protected:
     const LayerConfig config;                       ///< Component-specific configuration tree (typically from loaded YAML file).
     //
     bool initialized;                               ///< Initialized and not closed.
+    //
+    const ContextualLogger logger;                  ///< Logger instance (automatically adding information about this component to each entry).
 
 private:
     const std::string selfDescription;              ///< Standard description of the layer component for logging purposes.

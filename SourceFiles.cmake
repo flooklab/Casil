@@ -25,6 +25,7 @@ set(HEADER_FILE_NAMES
     auxil.h
     bytes.h
     concepts.h
+    contextuallogger.h
     device.h
     env.h
     layerbase.h
@@ -74,6 +75,7 @@ set(SOURCE_FILE_NAMES
     assert
     auxil
     bytes
+    contextuallogger
     device
     env
     layerbase

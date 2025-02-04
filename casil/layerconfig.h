@@ -67,6 +67,8 @@ public:
                                                                                             ///< \brief Get a 64 bit unsigned integer sequence
                                                                                             ///  from the configuration tree.
     //
+    std::string toString() const;                                       ///< Format the configuration tree content as human-readable string.
+    //
     static LayerConfig fromYAML(const std::string& pYAMLString);        ///< Create a configuration object from YAML format.
 
 private:

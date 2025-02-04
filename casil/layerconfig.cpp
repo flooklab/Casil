@@ -32,6 +32,7 @@
 #include <functional>
 #include <type_traits>
 #include <utility>
+#include <sstream>
 
 namespace
 {
@@ -381,6 +382,43 @@ std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::
 std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault) const
 {
     return ::geTSeq<std::uint64_t>(tree, pKey, std::move(pDefault));
+}
+
+//
+
+/*!
+ * \brief Format the configuration tree content as human-readable string.
+ *
+ * \return The configuration tree as a string (formatted similar to the represented YAML document).
+ */
+std::string LayerConfig::toString() const
+{
+    using boost::property_tree::ptree;
+
+    std::ostringstream ostrm;
+
+    std::function<void(const ptree&, int)> printTree = [&printTree, &ostrm](const ptree& pTree, const int pLevel) -> void
+    {
+        const std::string indent(4*pLevel, ' ');
+
+        if (pLevel > 0)
+        {
+            if (pTree.data() != "")
+                ostrm<<": "<<pTree.data()<<"\n";
+            else
+                ostrm<<":\n";
+        }
+
+        for (const auto& it : pTree)
+        {
+            ostrm<<indent<<it.first;
+            printTree(it.second, pLevel+1);
+        }
+    };
+
+    printTree(tree, 0);
+
+    return ostrm.str();
 }
 
 //

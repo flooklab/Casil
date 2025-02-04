@@ -141,6 +141,24 @@ BOOST_AUTO_TEST_CASE(Test5_getValues)
     BOOST_CHECK_EQUAL(conf.getUIntSeq("s5", {99}), (std::vector<std::uint64_t>{74, 73}));
 }
 
+BOOST_AUTO_TEST_CASE(Test6_toString)
+{
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10,"
+                                        "nested: [{one: 1.3}, {two: 2a, three: True}]},"
+                                 "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
+
+    const LayerConfig conf = LayerConfig::fromYAML(yamlStr);
+    const std::string confStr = conf.toString();
+
+    const std::string confRefStr = "init:\n    port: /dev/ttyUSB1\n    read_termination: \n\r\n    baudrate: 19200\n    "
+                                   "limit: -1\n    addr: 0x10\n    nested:\n        #0:\n            one: 1.3\n        "
+                                   "#1:\n            two: 2a\n            three: True\ns1:\n    #0: 1\n    #1: 2\n    "
+                                   "#2: 3\ns2:\n    #0: -1\n    #1: -2\n    #2: -3\ns3:\n    #0: 1024\n    #1: 2048\n    "
+                                   "#2: 486\n    #3: 45\ns4:\ns5:\n    z: 74\n    a: 73\n";
+
+    BOOST_CHECK_EQUAL(confStr, confRefStr);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

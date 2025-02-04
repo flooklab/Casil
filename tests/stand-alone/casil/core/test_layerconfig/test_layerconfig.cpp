@@ -45,32 +45,32 @@ BOOST_AUTO_TEST_SUITE(LayerConfig_Tests)
 
 BOOST_AUTO_TEST_CASE(Test1_fromYAML)
 {
-    std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: none, nested: [{one: 1}, {two: 2}]}}";
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: none, nested: [{one: 1}, {two: 2}]}}";
 
     BOOST_CHECK(LayerConfig(casil::Auxil::propertyTreeFromYAML(yamlStr)) == LayerConfig::fromYAML(yamlStr));
 }
 
 BOOST_AUTO_TEST_CASE(Test2_selfContained)
 {
-    std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: none, nested: [{one: 1}, {two: 2}]}}";
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: none, nested: [{one: 1}, {two: 2}]}}";
 
-    boost::property_tree::ptree pTree = casil::Auxil::propertyTreeFromYAML(yamlStr);
+    const boost::property_tree::ptree pTree = casil::Auxil::propertyTreeFromYAML(yamlStr);
 
-    LayerConfig conf1(pTree);
-    LayerConfig conf2(pTree);
+    const LayerConfig conf1(pTree);
+    const LayerConfig conf2(pTree);
 
     BOOST_CHECK(conf1.contains(conf2) == true);
 }
 
 BOOST_AUTO_TEST_CASE(Test3_containsStuff)
 {
-    std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: none, nested: [{one: 1}, {two: 2}]}}";
-    std::string toBeContainedStr = "{init: {port: \"foo\", read_termination: bar, baudrate: 123, nested: hello}}";
-    std::string notToBeContainedStr = "{init: {porto: \"foo\"}}";
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: none, nested: [{one: 1}, {two: 2}]}}";
+    const std::string toBeContainedStr = "{init: {port: \"foo\", read_termination: bar, baudrate: 123, nested: hello}}";
+    const std::string notToBeContainedStr = "{init: {porto: \"foo\"}}";
 
-    LayerConfig conf = LayerConfig::fromYAML(yamlStr);
-    LayerConfig containedConf = LayerConfig::fromYAML(toBeContainedStr);
-    LayerConfig notContainedConf = LayerConfig::fromYAML(notToBeContainedStr);
+    const LayerConfig conf = LayerConfig::fromYAML(yamlStr);
+    const LayerConfig containedConf = LayerConfig::fromYAML(toBeContainedStr);
+    const LayerConfig notContainedConf = LayerConfig::fromYAML(notToBeContainedStr);
 
     BOOST_CHECK(conf.contains(containedConf) == true);
     BOOST_CHECK(conf.contains(notContainedConf) == false);
@@ -78,27 +78,27 @@ BOOST_AUTO_TEST_CASE(Test3_containsStuff)
 
 BOOST_AUTO_TEST_CASE(Test4_containsTypes)
 {
-    std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10, flag: True,"
-                                  "nested: [{one: 1}, {two: 2a}]}, s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45]}";
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10, flag: True,"
+                                        "nested: [{one: 1}, {two: 2a}]}, s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45]}";
 
-    std::string toBeContainedStr = "{init: {port: string, read_termination: string, baudrate: int, limit: int, addr: uint, flag: bool,"
-                                   "nested: [{one: double}]}, s1: byteSeq, s3: uintSeq}";
+    const std::string toBeContainedStr = "{init: {port: string, read_termination: string, baudrate: int, limit: int, addr: uint,"
+                                          "flag: bool, nested: [{one: double}]}, s1: byteSeq, s3: uintSeq}";
 
-    std::string notToBeContainedStr1 = "{init: {port: int, read_termination: string, baudrate: int, limit: int, addr: uint, flag: bool,"
-                                       "nested: [{one: double}]}, s1: byteSeq, s3: uintSeq}";
-    std::string notToBeContainedStr2 = "{init: {port: string, read_termination: string, baudrate: int, limit: uint, addr: uint, flag: bool,"
-                                       "nested: [{one: double}]}, s1: byteSeq, s3: uintSeq}";
-    std::string notToBeContainedStr3 = "{init: {port: string, read_termination: string, baudrate: int, limit: int, addr: uint, flag: bool,"
-                                       "nested: [{one: double}]}, s2: uintSeq}";
-    std::string notToBeContainedStr4 = "{init: {port: string, read_termination: string, baudrate: int, limit: int, addr: uint, flag: bool,"
-                                       "nested: [{one: double}]}, s3: byteSeq}";
+    const std::string notToBeContainedStr1 = "{init: {port: int, read_termination: string, baudrate: int, limit: int, addr: uint,"
+                                              "flag: bool, nested: [{one: double}]}, s1: byteSeq, s3: uintSeq}";
+    const std::string notToBeContainedStr2 = "{init: {port: string, read_termination: string, baudrate: int, limit: uint, addr: uint,"
+                                              "flag: bool, nested: [{one: double}]}, s1: byteSeq, s3: uintSeq}";
+    const std::string notToBeContainedStr3 = "{init: {port: string, read_termination: string, baudrate: int, limit: int, addr: uint,"
+                                              "flag: bool, nested: [{one: double}]}, s2: uintSeq}";
+    const std::string notToBeContainedStr4 = "{init: {port: string, read_termination: string, baudrate: int, limit: int, addr: uint,"
+                                              "flag: bool, nested: [{one: double}]}, s3: byteSeq}";
 
-    LayerConfig conf = LayerConfig::fromYAML(yamlStr);
-    LayerConfig containedConf = LayerConfig::fromYAML(toBeContainedStr);
-    LayerConfig notContainedConf1 = LayerConfig::fromYAML(notToBeContainedStr1);
-    LayerConfig notContainedConf2 = LayerConfig::fromYAML(notToBeContainedStr2);
-    LayerConfig notContainedConf3 = LayerConfig::fromYAML(notToBeContainedStr3);
-    LayerConfig notContainedConf4 = LayerConfig::fromYAML(notToBeContainedStr4);
+    const LayerConfig conf = LayerConfig::fromYAML(yamlStr);
+    const LayerConfig containedConf = LayerConfig::fromYAML(toBeContainedStr);
+    const LayerConfig notContainedConf1 = LayerConfig::fromYAML(notToBeContainedStr1);
+    const LayerConfig notContainedConf2 = LayerConfig::fromYAML(notToBeContainedStr2);
+    const LayerConfig notContainedConf3 = LayerConfig::fromYAML(notToBeContainedStr3);
+    const LayerConfig notContainedConf4 = LayerConfig::fromYAML(notToBeContainedStr4);
 
     BOOST_CHECK(conf.contains(containedConf, true) == true);
     BOOST_CHECK(conf.contains(notContainedConf1, true) == false);
@@ -109,11 +109,11 @@ BOOST_AUTO_TEST_CASE(Test4_containsTypes)
 
 BOOST_AUTO_TEST_CASE(Test5_getValues)
 {
-    std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10,"
-                                  "nested: [{one: 1.3}, {two: 2a, three: True}]},"
-                           "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10,"
+                                        "nested: [{one: 1.3}, {two: 2a, three: True}]},"
+                                 "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
 
-    LayerConfig conf = LayerConfig::fromYAML(yamlStr);
+    const LayerConfig conf = LayerConfig::fromYAML(yamlStr);
 
     BOOST_CHECK_EQUAL(conf.getStr("init.port", "port1"), "/dev/ttyUSB1");
     BOOST_CHECK_EQUAL(conf.getStr("init.read_termination", "\r\n"), "\n\r");

@@ -116,6 +116,9 @@ set(TESTS_FILE_NAMES
     core/test_asio/test_asio.cpp
     core/test_auxil/test_auxil.cpp
     core/test_bytes/test_bytes.cpp
+    core/test_contextuallogger/test_contextuallogger.cpp
+    core/test_contextuallogger/loggingdriver.cpp
+    core/test_contextuallogger/loggingdriver.h
     core/test_device/test_device.cpp
     core/test_layerbase/test_layerbase.cpp
     core/test_layerbase/layertestclass.cpp

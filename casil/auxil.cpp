@@ -25,11 +25,14 @@
 #include <casil/layerconfig.h>
 
 #include <yaml-cpp/exceptions.h>
+#include <yaml-cpp/node/convert.h>
+#include <yaml-cpp/node/emit.h>
 #include <yaml-cpp/node/impl.h>
 #include <yaml-cpp/node/iterator.h>
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/node/type.h>
+#include <yaml-cpp/node/detail/impl.h>
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -103,7 +106,7 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
     }
     catch (const YAML::ParserException&)
     {
-        throw std::runtime_error("Could not successfully parse YAML content.");
+        throw std::runtime_error("Could not successfully parse YAML document.");
     }
 
     ptree tTree;
@@ -111,6 +114,76 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
     fillTree(tTree, topNode);
 
     return tTree;
+}
+
+/*!
+ * \brief Generate a YAML document from a Boost Property Tree.
+ *
+ * Provides the inverse operation to propertyTreeFromYAML().
+ *
+ * Note: Sub-trees within \p pTree will result into a YAML \e sequence if and only if
+ * the respective branch keys are exactly as specified in propertyTreeFromYAML(),
+ * i.e. "#0", "#1", etc... (in that order). Otherwise a YAML \e map will be generated.
+ *
+ * \throws std::runtime_error If the conversion of the generated YAML node tree to the needed YAML document string fails.
+ *
+ * \param pTree Property Tree representing the structure/content of the YAML document to be generated.
+ * \return Generated YAML document.
+ */
+std::string propertyTreeToYAML(const boost::property_tree::ptree& pYAMLTree)
+{
+    using boost::property_tree::ptree;
+
+    std::function<void(YAML::Node&, const ptree&)> fillNode = [&fillNode](YAML::Node& pNode, const ptree& pTree) -> void
+    {
+        if (pTree.empty())
+            return;
+
+        //Determine node type for YAML node according to key names
+        bool nodeTypeIsSequence = true;
+        std::size_t tSequenceCtr = 0;
+        for (const auto& [key, val] : pTree)
+        {
+            (void)val;
+            if (key != ("#" + std::to_string(tSequenceCtr++)))
+            {
+                nodeTypeIsSequence = false;
+                break;
+            }
+        }
+
+        for (const auto& [childKey, childTree] : pTree)
+        {
+            YAML::Node tSubNode;
+
+            if (childTree.empty())
+                tSubNode = childTree.data();
+            else
+                fillNode(tSubNode, childTree);
+
+            if (nodeTypeIsSequence)
+                pNode.push_back(tSubNode);
+            else
+                pNode[childKey] = tSubNode;
+        }
+    };
+
+    YAML::Node topNode;
+
+    fillNode(topNode, pYAMLTree);
+
+    std::string tYAMLString;
+
+    try
+    {
+        tYAMLString = YAML::Dump(topNode);
+    }
+    catch (const YAML::ParserException&)
+    {
+        throw std::runtime_error("Could not successfully generate YAML document.");
+    }
+
+    return tYAMLString;
 }
 
 /*!

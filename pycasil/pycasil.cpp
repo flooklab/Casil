@@ -23,6 +23,7 @@
 #include <pycasil/pycasil.h>
 
 extern void bind_ASIO(py::module&);
+extern void bind_ContextualLogger(py::module&);
 extern void bind_Device(py::module&);
 extern void bind_LayerBase(py::module&);
 extern void bind_LayerConfig(py::module&);
@@ -42,6 +43,7 @@ PYBIND11_MODULE(PyCasil, pyCasil)
     pyCasil.doc() = "Python binding of Casil, a reimplementation of the data acquisition framework basil in C++.";
 
     bind_ASIO(pyCasil);
+    bind_ContextualLogger(pyCasil);
     bind_Device(pyCasil);
     bind_LayerBase(pyCasil);
     bind_LayerConfig(pyCasil);

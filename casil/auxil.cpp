@@ -129,6 +129,9 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
  *
  * Note: An empty (default-constructed) \p pYAMLTree will result in an empty string.
  *
+ * Note: The data string at the root of \p pYAMLTree will be ignored, i.e. there
+ * must be at least one child branch for \p pYAMLTree not to count as empty.
+ *
  * \throws std::runtime_error If the conversion of the generated YAML node tree to the needed YAML document string fails.
  *
  * \param pYAMLTree Property Tree representing the structure/content of the YAML document to be generated.

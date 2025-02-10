@@ -51,6 +51,8 @@ namespace casil::Auxil
  * - Scalar elements are represented as a sub-tree with a value (see \c boost::property_tree::ptree::data() ) and no childs.
  * - Elements of sequence/map type are recursively parsed sub-trees.
  *
+ * Note: An empty \p pYAMLString will result in an empty Property Tree.
+ *
  * \throws std::runtime_error If parsing of the YAML document \p pYAMLString fails.
  *
  * \param pYAMLString The YAML document to be parsed.
@@ -125,9 +127,11 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
  * the respective branch keys are exactly as specified in propertyTreeFromYAML(),
  * i.e. "#0", "#1", etc... (in that order). Otherwise a YAML \e map will be generated.
  *
+ * Note: An empty (default-constructed) \p pYAMLTree will result in an empty string.
+ *
  * \throws std::runtime_error If the conversion of the generated YAML node tree to the needed YAML document string fails.
  *
- * \param pTree Property Tree representing the structure/content of the YAML document to be generated.
+ * \param pYAMLTree Property Tree representing the structure/content of the YAML document to be generated.
  * \return Generated YAML document.
  */
 std::string propertyTreeToYAML(const boost::property_tree::ptree& pYAMLTree)

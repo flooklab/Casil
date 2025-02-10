@@ -229,7 +229,15 @@ endif()
 
 set(BUILD_TESTING OFF CACHE BOOL "")    #Disable Boost tests
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)       #Use BoostConfig.cmake
+endif()
+
+if(CASIL_BUILD_TESTS)
+    find_package(Boost 1.70 REQUIRED COMPONENTS unit_test_framework)
+else()
+    find_package(Boost 1.70 REQUIRED)
+endif()
 
 find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development)
 

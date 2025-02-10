@@ -21,6 +21,7 @@
 */
 
 #include "layertestclass.h"
+#include "rtconftestclass.h"
 
 #include <casil/layerbase.h>
 #include <casil/layerconfig.h>
@@ -158,6 +159,37 @@ BOOST_AUTO_TEST_CASE(Test5_initClose)
     BOOST_CHECK(layerTestClass4->close() == true);
     BOOST_CHECK(layerTestClass4->close(true) == false); //Must fail because forcibly closing
     BOOST_CHECK(layerTestClass4->close() == true);
+}
+
+BOOST_AUTO_TEST_CASE(Test6_runtimeConfiguration)
+{
+    LayerTestClass layerTestClass = LayerTestClass(LayerConfig(), LayerConfig());
+    RTConfTestClass rtConfTestClass = RTConfTestClass(LayerConfig(), LayerConfig());
+
+    BOOST_REQUIRE(layerTestClass.init());
+    BOOST_REQUIRE(rtConfTestClass.init());
+
+    BOOST_CHECK_EQUAL(layerTestClass.dumpRuntimeConfiguration(), "");
+    BOOST_CHECK(layerTestClass.loadRuntimeConfiguration("") == true);
+    BOOST_CHECK(layerTestClass.loadRuntimeConfiguration("{init: ") == false);   //Invalid YAML code
+
+    BOOST_CHECK_EQUAL(rtConfTestClass.dumpRuntimeConfiguration(), "some_number: 2");
+    BOOST_CHECK(rtConfTestClass.loadRuntimeConfiguration("{some_number: 107}") == true);
+    BOOST_CHECK_EQUAL(rtConfTestClass.dumpRuntimeConfiguration(), "some_number: 107");
+
+    BOOST_REQUIRE(rtConfTestClass.loadRuntimeConfiguration("{some_number: 59}") == true);   //Dumping should deliberately fail now
+    bool exceptionThrown = false;
+
+    try
+    {
+        (void)rtConfTestClass.dumpRuntimeConfiguration();
+    }
+    catch (const std::runtime_error&)
+    {
+        exceptionThrown = true;
+    }
+
+    BOOST_CHECK(exceptionThrown == true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

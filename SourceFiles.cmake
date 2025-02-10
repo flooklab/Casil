@@ -120,9 +120,13 @@ set(TESTS_FILE_NAMES
     core/test_contextuallogger/loggingdriver.cpp
     core/test_contextuallogger/loggingdriver.h
     core/test_device/test_device.cpp
+    core/test_device/rtconfdriver.cpp
+    core/test_device/rtconfdriver.h
     core/test_layerbase/test_layerbase.cpp
     core/test_layerbase/layertestclass.cpp
     core/test_layerbase/layertestclass.h
+    core/test_layerbase/rtconftestclass.cpp
+    core/test_layerbase/rtconftestclass.h
     core/test_layerconfig/test_layerconfig.cpp
     core/test_layerfactory/test_layerfactory.cpp
     core/test_layerpolymorphism/test_layerpolymorphism.cpp

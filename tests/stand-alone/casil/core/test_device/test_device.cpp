@@ -25,7 +25,9 @@
 #include <casil/TL/directinterface.h>
 
 #include <cstdint>
+#include <map>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 using casil::Device;
@@ -228,6 +230,51 @@ BOOST_AUTO_TEST_CASE(Test5_interLayerDependency)
     catch (const std::runtime_error&) { ++exceptionCtr; }
 
     BOOST_CHECK_EQUAL(exceptionCtr, 3);
+}
+
+BOOST_AUTO_TEST_CASE(Test6_runtimeConfiguration)
+{
+    Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface}],"
+                       "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"
+                                    "{name: runtimeDrv, type: RTConfDrv, interface: intf1}],"
+                       "registers: [{name: reg1, type: DummyRegister, hw_driver: drv1},"
+                                   "{name: reg2, type: DummyRegister, hw_driver: runtimeDrv}]}");
+
+    BOOST_REQUIRE(exampleDev.init());
+
+    std::map<std::string, std::string> rtConf = exampleDev.dumpRuntimeConfiguration();
+
+    BOOST_CHECK(rtConf.contains("intf1") == false);
+    BOOST_CHECK(rtConf.contains("drv1") == false);
+    BOOST_CHECK(rtConf.contains("reg1") == false);
+    BOOST_CHECK(rtConf.contains("reg2") == false);
+    BOOST_CHECK_EQUAL(rtConf.size(), 1);
+    BOOST_CHECK(rtConf.contains("runtimeDrv") == true);
+    BOOST_CHECK_EQUAL(rtConf.at("runtimeDrv"), "some_number: 123");
+
+    BOOST_CHECK(exampleDev.loadRuntimeConfiguration({{"runtimeDrv", "{some_number: 54156}"}}) == true);
+
+    rtConf = exampleDev.dumpRuntimeConfiguration();
+
+    BOOST_CHECK(rtConf.contains("intf1") == false);
+    BOOST_CHECK(rtConf.contains("drv1") == false);
+    BOOST_CHECK(rtConf.contains("reg1") == false);
+    BOOST_CHECK(rtConf.contains("reg2") == false);
+    BOOST_CHECK_EQUAL(rtConf.size(), 1);
+    BOOST_CHECK(rtConf.contains("runtimeDrv") == true);
+    BOOST_CHECK_EQUAL(rtConf.at("runtimeDrv"), "some_number: 54156");
+
+    BOOST_CHECK(exampleDev.loadRuntimeConfiguration({{"runtimeDrv", "{some_number: 0}"},
+                                                     {"notAValidComponent", "{init: "}      //Invalid YAML code but invalid component
+                                                    }) == true);                            //is skipped before error and thus succeeds
+
+    BOOST_CHECK(exampleDev.loadRuntimeConfiguration({{"runtimeDrv", "{some_number: 0}"},
+                                                     {"reg2", ""}                           //Valid empty YAML code and loading is
+                                                    }) == true);                            //ignored by default implementation anyway
+
+    BOOST_CHECK(exampleDev.loadRuntimeConfiguration({{"runtimeDrv", "{some_number: 0}"},
+                                                     {"reg2", "{init: "}        //Fails because of invalid YAML code for existing component
+                                                    }) == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

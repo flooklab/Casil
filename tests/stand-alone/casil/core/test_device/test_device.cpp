@@ -232,7 +232,87 @@ BOOST_AUTO_TEST_CASE(Test5_interLayerDependency)
     BOOST_CHECK_EQUAL(exceptionCtr, 3);
 }
 
-BOOST_AUTO_TEST_CASE(Test6_runtimeConfiguration)
+BOOST_AUTO_TEST_CASE(Test6_componentNameCollision)
+{
+    int exceptionCtr = 0;
+
+    try
+    {
+        //OK
+        Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface},"
+                                            "{name: intf2, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"
+                                        "{name: drv2, type: DummyDriver, interface: intf2}],"
+                           "registers: [{name: reg1, type: DummyRegister, hw_driver: drv1},"
+                                       "{name: reg2, type: DummyRegister, hw_driver: drv2}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface},"
+                                            "{name: intf1, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"
+                                        "{name: drv2, type: DummyDriver, interface: intf1}],"
+                           "registers: [{name: reg1, type: DummyRegister, hw_driver: drv1},"
+                                       "{name: reg2, type: DummyRegister, hw_driver: drv2}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface},"
+                                            "{name: intf2, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"
+                                        "{name: drv1, type: DummyDriver, interface: intf2}],"
+                           "registers: [{name: reg1, type: DummyRegister, hw_driver: drv1},"
+                                       "{name: reg2, type: DummyRegister, hw_driver: drv1}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface},"
+                                            "{name: intf2, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"
+                                        "{name: drv2, type: DummyDriver, interface: intf2}],"
+                           "registers: [{name: reg1, type: DummyRegister, hw_driver: drv1},"
+                                       "{name: reg1, type: DummyRegister, hw_driver: drv2}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface},"
+                                            "{name: repeat, type: DummyInterface}],"
+                           "hw_drivers: [{name: repeat, type: DummyDriver, interface: intf1},"
+                                        "{name: drv2, type: DummyDriver, interface: intf1}],"
+                           "registers: [{name: reg1, type: DummyRegister, hw_driver: drv2},"
+                                       "{name: reg2, type: DummyRegister, hw_driver: drv2}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface},"
+                                            "{name: intf2, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"
+                                        "{name: repeat, type: DummyDriver, interface: intf2}],"
+                           "registers: [{name: repeat, type: DummyRegister, hw_driver: drv1},"
+                                       "{name: reg2, type: DummyRegister, hw_driver: drv1}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 5);
+}
+
+BOOST_AUTO_TEST_CASE(Test7_runtimeConfiguration)
 {
     Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface}],"
                        "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"

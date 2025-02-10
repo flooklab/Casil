@@ -30,6 +30,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <utility>
+#include <set>
 #include <stdexcept>
 
 using casil::Device;
@@ -78,6 +79,9 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
         const ptree& hlConf = pConfig.get_child("hw_drivers");
         const ptree& rlConf = pConfig.get_child("registers");
 
+        //Make sure that component names are unique
+        std::set<std::string> componentNames;
+
         for (auto [key, intfConf] : tlConf)
         {
             const std::string intfName = intfConf.get_child("name").data();
@@ -85,6 +89,11 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
 
             intfConf.erase("name");
             intfConf.erase("type");
+
+            if (componentNames.contains(intfName))
+                throw std::runtime_error("Cannot create interface \"" + intfName + "\": The name is already used by another component.");
+            else
+                componentNames.insert(intfName);
 
             try
             {
@@ -105,6 +114,11 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
             drvConf.erase("name");
             drvConf.erase("type");
             drvConf.erase("interface");
+
+            if (componentNames.contains(drvName))
+                throw std::runtime_error("Cannot create driver \"" + drvName + "\": The name is already used by another component.");
+            else
+                componentNames.insert(drvName);
 
             const auto it = interfaces.find(intfName);
 
@@ -131,6 +145,11 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
             regConf.erase("name");
             regConf.erase("type");
             regConf.erase("hw_driver");
+
+            if (componentNames.contains(regName))
+                throw std::runtime_error("Cannot create register \"" + regName + "\": The name is already used by another component.");
+            else
+                componentNames.insert(regName);
 
             const auto it = drivers.find(drvName);
 

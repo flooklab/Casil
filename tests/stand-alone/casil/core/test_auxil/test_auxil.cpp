@@ -119,6 +119,10 @@ BOOST_AUTO_TEST_CASE(Test1_ptreeFromYAML)
     refFile.close();
 
     BOOST_CHECK_EQUAL(testStr, refStr);
+
+    const ptree treeEmptyYamlStr = Auxil::propertyTreeFromYAML("");
+
+    BOOST_CHECK(treeEmptyYamlStr == ptree());
 }
 
 BOOST_AUTO_TEST_CASE(Test2_ptreeFromYAMLParserException)
@@ -140,7 +144,35 @@ BOOST_AUTO_TEST_CASE(Test2_ptreeFromYAMLParserException)
     BOOST_CHECK(exceptionThrown == true);
 }
 
-BOOST_AUTO_TEST_CASE(Test3_uintSeqFromYAML)
+BOOST_AUTO_TEST_CASE(Test3_ptreeToYAML)
+{
+    using boost::property_tree::ptree;
+
+    const std::string yamlStrOrig1 = "";
+    const std::string yamlStrOrig2 = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10,"
+                                             "nested: [{one: 1.3}, {two: 2a, three: True}]},"
+                                      "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
+
+    const ptree tree1 = Auxil::propertyTreeFromYAML(yamlStrOrig1);
+    const ptree tree2 = Auxil::propertyTreeFromYAML(yamlStrOrig2);
+
+    const std::string yamlStrBackConv1 = Auxil::propertyTreeToYAML(tree1);
+    const std::string yamlStrBackConv2 = Auxil::propertyTreeToYAML(tree2);
+
+    const ptree treeBackConv1 = Auxil::propertyTreeFromYAML(yamlStrBackConv1);
+    const ptree treeBackConv2 = Auxil::propertyTreeFromYAML(yamlStrBackConv2);
+
+    BOOST_CHECK(tree1 == treeBackConv1);
+    BOOST_CHECK_EQUAL(yamlStrOrig1, yamlStrBackConv1);
+
+    BOOST_CHECK(tree2 == treeBackConv2);    //Do not compare YAML strings here because of lack of formatting in original string
+
+    const std::string yamlStrDefaultTree = Auxil::propertyTreeToYAML(ptree());
+
+    BOOST_CHECK_EQUAL(yamlStrDefaultTree, "");
+}
+
+BOOST_AUTO_TEST_CASE(Test4_uintSeqFromYAML)
 {
     using Auxil::uintSeqFromYAML;
 
@@ -157,7 +189,7 @@ BOOST_AUTO_TEST_CASE(Test3_uintSeqFromYAML)
     BOOST_CHECK(exceptionThrown == true);
 }
 
-BOOST_AUTO_TEST_CASE(Test4_chrono)
+BOOST_AUTO_TEST_CASE(Test5_chrono)
 {
     using Auxil::getChronoMilliSecs;
     using Auxil::getChronoMicroSecs;
@@ -177,7 +209,7 @@ BOOST_AUTO_TEST_CASE(Test4_chrono)
     BOOST_CHECK_EQUAL(getChronoMicroSecs(-1.5e-6), -2us);
 }
 
-BOOST_AUTO_TEST_CASE(Test5_asioRunner)
+BOOST_AUTO_TEST_CASE(Test6_asioRunner)
 {
     Auxil::AsyncIORunner<2> ioRunner;
     (void)ioRunner;

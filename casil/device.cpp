@@ -303,15 +303,15 @@ bool Device::init(const bool pForce)
 
     initialized = false;
 
-    for (auto& [key, intf] : interfaces)
+    for (const auto& [key, intf] : interfaces)
         if (!intf->init(pForce))
             return false;
 
-    for (auto& [key, drv] : drivers)
+    for (const auto& [key, drv] : drivers)
         if (!drv->init(pForce))
             return false;
 
-    for (auto& [key, regter] : registers)
+    for (const auto& [key, regter] : registers)
         if (!regter->init(pForce))
             return false;
 
@@ -340,15 +340,15 @@ bool Device::close(const bool pForce)
     if (!initialized && !pForce)
         return true;
 
-    for (auto& [key, regter] : registers)
+    for (const auto& [key, regter] : registers)
         if (!regter->close(pForce))
             return false;
 
-    for (auto& [key, drv] : drivers)
+    for (const auto& [key, drv] : drivers)
         if (!drv->close(pForce))
             return false;
 
-    for (auto& [key, intf] : interfaces)
+    for (const auto& [key, intf] : interfaces)
         if (!intf->close(pForce))
             return false;
 

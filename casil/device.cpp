@@ -25,6 +25,7 @@
 #include <casil/auxil.h>
 #include <casil/layerconfig.h>
 #include <casil/layerfactory.h>
+#include <casil/logger.h>
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -354,4 +355,93 @@ bool Device::close(const bool pForce)
     initialized = false;
 
     return true;
+}
+
+//
+
+/*!
+ * \brief Load additional runtime configuration data/values for the components.
+ *
+ * Loads the runtime configuration for every existing component that is specified in
+ * \p pConf by calling LayerBase::loadRuntimeConfiguration(). This is done in order,
+ * first for every interface, then for every driver and then for every register.
+ * The keys in \p pConf determine the respective component names and the values
+ * will be passed as arguments to LayerBase::loadRuntimeConfiguration().
+ *
+ * Skips remaining components and returns false if loading the configuration fails for one component.
+ *
+ * Elements in \p pConf that refer to non-existent components will be ignored.
+ *
+ * \param pConf Map of runtime configurations (as YAML documents) with the component names as keys.
+ * \return If successful.
+ */
+bool Device::loadRuntimeConfiguration(const std::map<std::string, std::string>& pConf) const
+{
+    for (const auto& [key, intf] : interfaces)
+        if (pConf.contains(key))
+            if (!intf->loadRuntimeConfiguration(pConf.at(key)))
+                return false;
+
+    for (const auto& [key, drv] : drivers)
+        if (pConf.contains(key))
+            if (!drv->loadRuntimeConfiguration(pConf.at(key)))
+                return false;
+
+    for (const auto& [key, regter] : registers)
+        if (pConf.contains(key))
+            if (!regter->loadRuntimeConfiguration(pConf.at(key)))
+                return false;
+
+    //Warn about missing components
+    for (const auto& it : pConf)
+        if (!interfaces.contains(it.first) && !drivers.contains(it.first) && !registers.contains(it.first))
+            Logger::logWarning("Did not load runtime configuration for component \"" + it.first + "\": No such component.");
+
+    return true;
+}
+
+/*!
+ * \brief Save current runtime configuration data/values of the components.
+ *
+ * Collects the components' runtime configurations by calling LayerBase::dumpRuntimeConfiguration()
+ * for every register, then for every driver and then for every interface.
+ * A map will be returned that gets filled with only the non-empty configurations.
+ *
+ * \throws std::runtime_error If LayerBase::dumpRuntimeConfiguration() throws \c std::runtime_error for one of the components.
+ *
+ * \return Map of non-empty runtime configurations (as YAML documents) with the component names as keys.
+ */
+std::map<std::string, std::string> Device::dumpRuntimeConfiguration() const
+{
+    std::map<std::string, std::string> tConf;
+
+    try
+    {
+        for (const auto& [key, regter] : registers)
+        {
+            std::string tDump = regter->dumpRuntimeConfiguration();
+            if (tDump != "")
+                tConf[key] = std::move(tDump);
+        }
+
+        for (const auto& [key, drv] : drivers)
+        {
+            std::string tDump = drv->dumpRuntimeConfiguration();
+            if (tDump != "")
+                tConf[key] = std::move(tDump);
+        }
+
+        for (const auto& [key, intf] : interfaces)
+        {
+            std::string tDump = intf->dumpRuntimeConfiguration();
+            if (tDump != "")
+                tConf[key] = std::move(tDump);
+        }
+    }
+    catch (const std::runtime_error&)
+    {
+        throw;
+    }
+
+    return tConf;
 }

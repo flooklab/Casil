@@ -40,5 +40,9 @@ void bind_LayerBase(py::module& pM)
             .def("getType", &LayerBase::getType, "Get the type name of this layer component.", py::return_value_policy::reference)
             .def("getName", &LayerBase::getName, "Get the instance name of this layer component.", py::return_value_policy::reference)
             .def("init", &LayerBase::init, "Initialize this layer component.", py::arg("force") = false)
-            .def("close", &LayerBase::close, "Close (\"uninitialize\") this layer component.", py::arg("force") = false);
+            .def("close", &LayerBase::close, "Close (\"uninitialize\") this layer component.", py::arg("force") = false)
+            .def("loadRuntimeConfiguration", &LayerBase::loadRuntimeConfiguration,
+                 "Load additional, component-specific configuration data/values.", py::arg("conf"))
+            .def("dumpRuntimeConfiguration", &LayerBase::dumpRuntimeConfiguration,
+                 "Save current state of component-specific configuration data/values.");
 }

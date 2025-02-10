@@ -70,6 +70,11 @@ public:
     //
     bool init(bool pForce = false);                                 ///< Initialize by initializing all components of all layers.
     bool close(bool pForce = false);                                ///< Close by closing all components of all layers.
+    //
+    bool loadRuntimeConfiguration(const std::map<std::string, std::string>& pConf) const;
+                                                                    ///< Load additional runtime configuration data/values for the components.
+    std::map<std::string, std::string> dumpRuntimeConfiguration() const;
+                                                                    ///< Save current runtime configuration data/values of the components.
 
 private:
     std::map<std::string, const std::unique_ptr<TL::Interface>, std::less<>> interfaces;    ///< Map of all interfaces with their names as keys.

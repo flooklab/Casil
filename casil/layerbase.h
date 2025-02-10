@@ -26,6 +26,8 @@
 #include <casil/contextuallogger.h>
 #include <casil/layerconfig.h>
 
+#include <boost/property_tree/ptree_fwd.hpp>
+
 #include <cstdint>
 #include <string>
 
@@ -49,23 +51,26 @@ public:
 
 public:
     LayerBase(Layer pLayer, std::string pType, std::string pName, LayerConfig pConfig, const LayerConfig& pRequiredConfig);
-                                                    ///< Constructor.
-    LayerBase(const LayerBase&) = delete;           ///< Deleted copy constructor.
-    LayerBase(LayerBase&&) = default;               ///< Default move constructor.
-    virtual ~LayerBase() = default;                 ///< Default destructor.
+                                                                ///< Constructor.
+    LayerBase(const LayerBase&) = delete;                       ///< Deleted copy constructor.
+    LayerBase(LayerBase&&) = default;                           ///< Default move constructor.
+    virtual ~LayerBase() = default;                             ///< Default destructor.
     //
-    LayerBase& operator=(LayerBase) = delete;       ///< Deleted copy assignment operator.
-    LayerBase& operator=(LayerBase&&) = delete;     ///< Deleted move assignment operator.
+    LayerBase& operator=(LayerBase) = delete;                   ///< Deleted copy assignment operator.
+    LayerBase& operator=(LayerBase&&) = delete;                 ///< Deleted move assignment operator.
     //
-    Layer getLayer() const;                         ///< Get the layer of this layer component.
-    const std::string& getType() const;             ///< Get the type name of this layer component.
-    const std::string& getName() const;             ///< Get the instance name of this layer component.
+    Layer getLayer() const;                                     ///< Get the layer of this layer component.
+    const std::string& getType() const;                         ///< Get the type name of this layer component.
+    const std::string& getName() const;                         ///< Get the instance name of this layer component.
     //
-    bool init(bool pForce = false);                 ///< Initialize this layer component.
-    bool close(bool pForce = false);                ///< Close ("uninitialize") this layer component.
+    bool init(bool pForce = false);                             ///< Initialize this layer component.
+    bool close(bool pForce = false);                            ///< Close ("uninitialize") this layer component.
+    //
+    bool loadRuntimeConfiguration(const std::string& pConf);    ///< Load additional, component-specific configuration data/values.
+    std::string dumpRuntimeConfiguration() const;               ///< Save current state of component-specific configuration data/values.
 
 protected:
-    const std::string& getSelfDescription() const;  ///< Get a standard description of this layer component for logging purposes.
+    const std::string& getSelfDescription() const;              ///< Get a standard description of this layer component for logging purposes.
 
 private:
     /*!
@@ -80,6 +85,9 @@ private:
      * \return True if successful.
      */
     virtual bool closeImpl() = 0;
+    //
+    virtual bool loadRuntimeConfImpl(boost::property_tree::ptree&& pConf);  ///< Perform component-specific loading of runtime configuration.
+    virtual boost::property_tree::ptree dumpRuntimeConfImpl() const;        ///< Perform component-specific saving of runtime configuration.
 
 protected:
     const Layer layer;                              ///< %Layer that this layer component belongs to.

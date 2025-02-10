@@ -40,5 +40,9 @@ void bind_Device(py::module& pM)
             .def("reg", &Device::reg, "Access one of the register components from the register layer.",
                  py::arg("name"), py::return_value_policy::reference)
             .def("init", &Device::init, "Initialize by initializing all components of all layers.", py::arg("force") = false)
-            .def("close", &Device::close, "Close by closing all components of all layers.", py::arg("force") = false);
+            .def("close", &Device::close, "Close by closing all components of all layers.", py::arg("force") = false)
+            .def("loadRuntimeConfiguration", &Device::loadRuntimeConfiguration,
+                 "Load additional runtime configuration data/values for the components.", py::arg("conf"))
+            .def("dumpRuntimeConfiguration", &Device::dumpRuntimeConfiguration,
+                 "Save current runtime configuration data/values of the components.");
 }

@@ -220,7 +220,8 @@ BOOST_AUTO_TEST_CASE(Test5_readDefaults)
                                 "TESTVAL_D: 0x291083F,"
                                 "TESTVAL_E: 0x36630C181,"
                                 "TESTVAL_F: 0x3B9C70E0E0701FD,"
-                                "TESTVAL_G: 0x7BCF1E1E0F03C07F"
+                                "TESTVAL_G: 0x7BCF1E1E0F03C07F,"
+                                "NOT_A_REGISTER: 0x7BCF1E1E0F03C07F"    //Non-existent register, should be simply ignored
                              "}}],"
                "registers: []}");
 

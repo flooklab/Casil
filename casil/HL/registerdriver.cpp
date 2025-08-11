@@ -86,6 +86,7 @@ using casil::Layers::HL::RegisterDriver;
  * for potentially invalid register configurations (see the documented exceptions and also RegisterDescr).
  * Also gets any optional default values "init.REG_NAME" for these registers (which override any defaults
  * from \p pRegisters) from \p pConfig (unsigned integers or byte sequences, depending on RegisterDescr::DataType).
+ * Init values from \p pConfig that do \e not match any of the registers will be ignored.
  *
  * \throws std::runtime_error If an invalid name is set for one of the registers.
  * \throws std::runtime_error If the size is set to zero for one of the registers.

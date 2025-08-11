@@ -45,18 +45,18 @@ using boost::property_tree::ptree_bad_path;
  * Parses and returns the value sequence stored in the configuration tree 'pTree'
  * at branch location 'pKey' with sequence elements converted to integer type 'T'.
  *
- * Returns 'pDefault' if the conversion fails or if 'pKey' is not found.
+ * Returns std::nullopt if the conversion fails or if 'pKey' is not found.
  */
 template<typename T>
     requires std::is_integral_v<T>
-std::vector<T> geTSeq(const ptree& pTree, const std::string& pKey, std::vector<T>&& pDefault)
+std::optional<std::vector<T>> geTSeq(const ptree& pTree, const std::string& pKey)
 {
     try
     {
         const ptree& subTree = pTree.get_child(pKey);
 
         if (subTree.data() != "")
-            return pDefault;
+            return std::nullopt;
 
         std::vector<T> retSeq;
         retSeq.reserve(subTree.size());
@@ -66,7 +66,7 @@ std::vector<T> geTSeq(const ptree& pTree, const std::string& pKey, std::vector<T
             (void)seqKey;
 
             if (seqVal.data() == "" || !seqVal.empty())
-                return pDefault;
+                return std::nullopt;
 
             try
             {
@@ -76,7 +76,7 @@ std::vector<T> geTSeq(const ptree& pTree, const std::string& pKey, std::vector<T
             }
             catch (const YAML::BadConversion&)
             {
-                return pDefault;
+                return std::nullopt;
             }
         }
 
@@ -84,7 +84,7 @@ std::vector<T> geTSeq(const ptree& pTree, const std::string& pKey, std::vector<T
     }
     catch (const ptree_bad_path&)
     {
-        return pDefault;
+        return std::nullopt;
     }
 }
 
@@ -238,13 +238,12 @@ bool LayerConfig::contains(const LayerConfig& pOther, const bool pCheckTypes) co
  *
  * Gets the configuration value stored in the tree at branch location \p pKey converted to boolean type.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns \c std::nullopt if the conversion fails or if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
- * \param pDefault Default value to return on error.
- * \return Converted value at \p pKey or \p pDefault in case of an error.
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
  */
-bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
+std::optional<bool> LayerConfig::getBoolOpt(const std::string& pKey) const
 {
     try
     {
@@ -254,7 +253,7 @@ bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
     }
     catch (const YAML::BadConversion&)
     {
-        return pDefault;
+        return std::nullopt;
     }
 }
 
@@ -263,13 +262,12 @@ bool LayerConfig::getBool(const std::string &pKey, const bool pDefault) const
  *
  * Gets the configuration value stored in the tree at branch location \p pKey converted to integer type.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns \c std::nullopt if the conversion fails or if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
- * \param pDefault Default value to return on error.
- * \return Converted value at \p pKey or \p pDefault in case of an error.
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
  */
-int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
+std::optional<int> LayerConfig::getIntOpt(const std::string& pKey) const
 {
     try
     {
@@ -279,7 +277,7 @@ int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
     }
     catch (const YAML::BadConversion&)
     {
-        return pDefault;
+        return std::nullopt;
     }
 }
 
@@ -288,13 +286,12 @@ int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
  *
  * Gets the configuration value stored in the tree at branch location \p pKey converted to unsigned integer type.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns \c std::nullopt if the conversion fails or if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
- * \param pDefault Default value to return on error.
- * \return Converted value at \p pKey or \p pDefault in case of an error.
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
  */
-std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t pDefault) const
+std::optional<std::uint64_t> LayerConfig::getUIntOpt(const std::string& pKey) const
 {
     try
     {
@@ -304,7 +301,7 @@ std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t 
     }
     catch (const YAML::BadConversion&)
     {
-        return pDefault;
+        return std::nullopt;
     }
 }
 
@@ -313,13 +310,12 @@ std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t 
  *
  * Gets the configuration value stored in the tree at branch location \p pKey converted to floating point type.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns \c std::nullopt if the conversion fails or if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
- * \param pDefault Default value to return on error.
- * \return Converted value at \p pKey or \p pDefault in case of an error.
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
  */
-double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
+std::optional<double> LayerConfig::getDblOpt(const std::string& pKey) const
 {
     try
     {
@@ -329,7 +325,7 @@ double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
     }
     catch (const YAML::BadConversion&)
     {
-        return pDefault;
+        return std::nullopt;
     }
 }
 
@@ -338,15 +334,21 @@ double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
  *
  * Gets the configuration value stored in the tree at branch location \p pKey as string.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns \c std::nullopt if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
- * \param pDefault Default value to return on error.
- * \return Converted value at \p pKey or \p pDefault in case of an error.
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
  */
-std::string LayerConfig::getStr(const std::string& pKey, const std::string& pDefault) const
+std::optional<std::string> LayerConfig::getStrOpt(const std::string& pKey) const
 {
-    return tree.get<std::string>(pKey, pDefault);
+    try
+    {
+        return tree.get_child(pKey).data();
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+        return std::nullopt;
+    }
 }
 
 //
@@ -357,15 +359,14 @@ std::string LayerConfig::getStr(const std::string& pKey, const std::string& pDef
  * Gets the configuration value sequence stored in the tree at branch location \p pKey
  * with sequence elements converted to 8 bit unsigned integer type.
  *
- * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ * Returns \c std::nullopt if the conversion fails or if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
- * \param pDefault Default value to return on error.
- * \return Converted value at \p pKey or \p pDefault in case of an error.
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
  */
-std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault) const
+std::optional<std::vector<std::uint8_t>> LayerConfig::getByteSeqOpt(const std::string& pKey) const
 {
-    return ::geTSeq<std::uint8_t>(tree, pKey, std::move(pDefault));
+    return ::geTSeq<std::uint8_t>(tree, pKey);
 }
 
 /*!
@@ -374,15 +375,167 @@ std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::
  * Gets the configuration value sequence stored in the tree at branch location \p pKey
  * with sequence elements converted to 64 bit unsigned integer type.
  *
+ * Returns \c std::nullopt if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \return Converted value at \p pKey or \c std::nullopt in case of an error.
+ */
+std::optional<std::vector<std::uint64_t>> LayerConfig::getUIntSeqOpt(const std::string& pKey) const
+{
+    return ::geTSeq<std::uint64_t>(tree, pKey);
+}
+
+//
+
+/*!
+ * \brief Get a boolean configuration value.
+ *
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to boolean type.
+ * See also getBoolOpt().
+ *
  * Returns \p pDefault if the conversion fails or if \p pKey is not found.
  *
- * \param pKey Value location as individual branch keys that are connected with full stops (".").
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
+ */
+bool LayerConfig::getBool(const std::string& pKey, const bool pDefault) const
+{
+    const std::optional<bool> val = getBoolOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
+}
+
+/*!
+ * \brief Get a (signed) integer configuration value.
+ *
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to integer type.
+ * See also getIntOpt().
+ *
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
+ */
+int LayerConfig::getInt(const std::string& pKey, const int pDefault) const
+{
+    const std::optional<int> val = getIntOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
+}
+
+/*!
+ * \brief Get an unsigned integer configuration value.
+ *
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to unsigned integer type.
+ * See also getUIntOpt().
+ *
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
+ */
+std::uint64_t LayerConfig::getUInt(const std::string& pKey, const std::uint64_t pDefault) const
+{
+    const std::optional<std::uint64_t> val = getUIntOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
+}
+
+/*!
+ * \brief Get a floating point configuration value.
+ *
+ * Gets the configuration value stored in the tree at branch location \p pKey converted to floating point type.
+ * See also getDblOpt().
+ *
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
+ */
+double LayerConfig::getDbl(const std::string& pKey, const double pDefault) const
+{
+    const std::optional<double> val = getDblOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
+}
+
+/*!
+ * \brief Get a string-type configuration value.
+ *
+ * Gets the configuration value stored in the tree at branch location \p pKey as string.
+ * See also getStrOpt().
+ *
+ * Returns \p pDefault if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
+ */
+std::string LayerConfig::getStr(const std::string& pKey, const std::string& pDefault) const
+{
+    const std::optional<std::string> val = getStrOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
+}
+
+//
+
+/*!
+ * \brief Get an 8 bit unsigned integer sequence from the configuration tree.
+ *
+ * Gets the configuration value sequence stored in the tree at branch location \p pKey
+ * with sequence elements converted to 8 bit unsigned integer type.
+ * See also getByteSeqOpt().
+ *
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
+ * \param pDefault Default value to return on error.
+ * \return Converted value at \p pKey or \p pDefault in case of an error.
+ */
+std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault) const
+{
+    const std::optional<std::vector<std::uint8_t>> val = getByteSeqOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
+}
+
+/*!
+ * \brief Get a 64 bit unsigned integer sequence from the configuration tree.
+ *
+ * Gets the configuration value sequence stored in the tree at branch location \p pKey
+ * with sequence elements converted to 64 bit unsigned integer type.
+ * See also getUIntSeqOpt().
+ *
+ * Returns \p pDefault if the conversion fails or if \p pKey is not found.
+ *
+ * \param pKey Value location as individual branch keys that are connected with periods ('.').
  * \param pDefault Default value to return on error.
  * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
 std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault) const
 {
-    return ::geTSeq<std::uint64_t>(tree, pKey, std::move(pDefault));
+    const std::optional<std::vector<std::uint64_t>> val = getUIntSeqOpt(pKey);
+    if (val)
+        return val.value();
+    else
+        return pDefault;
 }
 
 //

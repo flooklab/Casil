@@ -28,6 +28,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -124,6 +125,7 @@ BOOST_AUTO_TEST_CASE(Test5_getValues)
     BOOST_CHECK_EQUAL(conf.getUInt("init.addr", 0), 16u);
     BOOST_CHECK_EQUAL(conf.getUInt("init.address", 0xAAu), 0xAAu);
     BOOST_CHECK_EQUAL(conf.getDbl("init.nested.#0.one", 0), 1.3);
+    BOOST_CHECK_EQUAL(conf.getDbl("init.nested.#0.zero", 45.67), 45.67);
     BOOST_CHECK_EQUAL(conf.getInt("init.nested.#1.two", 1013), 1013);
     BOOST_CHECK_EQUAL(conf.getBool("init.nested.#1.three", false), true);
     BOOST_CHECK_EQUAL(conf.getBool("init.nested.#1.four", false), false);
@@ -140,6 +142,23 @@ BOOST_AUTO_TEST_CASE(Test5_getValues)
     BOOST_CHECK_EQUAL(conf.getUIntSeq("s3", {99}), (std::vector<std::uint64_t>{1024, 2048, 486, 45}));
     BOOST_CHECK_EQUAL(conf.getUIntSeq("s4", {99}), (std::vector<std::uint64_t>{}));
     BOOST_CHECK_EQUAL(conf.getUIntSeq("s5", {99}), (std::vector<std::uint64_t>{74, 73}));
+
+    BOOST_CHECK(conf.getStrOpt("init.port").has_value() == true);
+    BOOST_CHECK(conf.getStrOpt("init.foo").has_value() == false);
+    BOOST_CHECK(conf.getIntOpt("init.baudrate").has_value() == true);
+    BOOST_CHECK(conf.getIntOpt("init.port").has_value() == false);
+    BOOST_CHECK(conf.getUIntOpt("init.addr").has_value() == true);
+    BOOST_CHECK(conf.getUIntOpt("init.port").has_value() == false);
+    BOOST_CHECK(conf.getDblOpt("init.nested.#0.one").has_value() == true);
+    BOOST_CHECK(conf.getDblOpt("init.nested.#1.two").has_value() == false);
+    BOOST_CHECK(conf.getBoolOpt("init.nested.#1.three").has_value() == true);
+    BOOST_CHECK(conf.getBoolOpt("init.nested.#1.two").has_value() == false);
+
+    BOOST_CHECK(conf.getByteSeqOpt("s1").has_value() == true);
+    BOOST_CHECK(conf.getByteSeqOpt("init.port").has_value() == false);
+
+    BOOST_CHECK(conf.getUIntSeqOpt("s1").has_value() == true);
+    BOOST_CHECK(conf.getUIntSeqOpt("init.nested").has_value() == false);
 }
 
 BOOST_AUTO_TEST_CASE(Test6_toString)

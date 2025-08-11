@@ -27,6 +27,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -54,6 +55,17 @@ public:
     bool operator==(const LayerConfig& pOther) const;                   ///< Equality operator.
     //
     bool contains(const LayerConfig& pOther, bool pCheckTypes = false) const;   ///< Check the configuration tree structure (and value types).
+    //
+    std::optional<bool> getBoolOpt(const std::string& pKey) const;                          ///< Get a boolean configuration value.
+    std::optional<int> getIntOpt(const std::string& pKey) const;                            ///< Get a (signed) integer configuration value.
+    std::optional<std::uint64_t> getUIntOpt(const std::string& pKey) const;                 ///< Get an unsigned integer configuration value.
+    std::optional<double> getDblOpt(const std::string& pKey) const;                         ///< Get a floating point configuration value.
+    std::optional<std::string> getStrOpt(const std::string& pKey) const;                    ///< Get a string-type configuration value.
+    //
+    std::optional<std::vector<std::uint8_t>> getByteSeqOpt(const std::string& pKey) const;  ///< \brief Get an 8 bit unsigned integer sequence
+                                                                                            ///  from the configuration tree.
+    std::optional<std::vector<std::uint64_t>> getUIntSeqOpt(const std::string& pKey) const; ///< \brief Get a 64 bit unsigned integer sequence
+                                                                                            ///  from the configuration tree.
     //
     bool getBool(const std::string& pKey, bool pDefault = false) const;                     ///< Get a boolean configuration value.
     int getInt(const std::string& pKey, int pDefault = 0) const;                            ///< Get a (signed) integer configuration value.

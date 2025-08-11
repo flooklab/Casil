@@ -627,15 +627,11 @@ std::map<int, SCPI::CommandMapType> SCPI::parseCommands(const boost::property_tr
             channelNr = std::stoul(channel.substr(channelPrefix.length()));
 
             if (channelNr < 0)
-                throw std::out_of_range("");
+                throw std::runtime_error("Parsed channel number from SCPI device description is out of range.");
         }
         catch (const std::invalid_argument&)
         {
             throw std::runtime_error("Could not parse channel number in SCPI device description.");
-        }
-        catch (const std::out_of_range&)
-        {
-            throw std::runtime_error("Parsed channel number from SCPI device description is out of range.");
         }
 
         CommandMapType cmdsCurrentChannel;

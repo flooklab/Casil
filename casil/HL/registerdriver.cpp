@@ -95,6 +95,7 @@ using casil::Layers::HL::RegisterDriver;
  * \throws std::runtime_error If a default value is set for one of the read-only registers.
  * \throws std::runtime_error If the type of the default value does not match the register's data type for one of the registers.
  * \throws std::runtime_error If the length of the default byte sequence does not match the register size for one of the byte array registers.
+ * \throws std::runtime_error If an init value is set for one of the read-only registers.
  * \throws std::runtime_error If the type of the init value (default override) from \p pConfig
  *                            does not match the register's data type for one of the registers.
  * \throws std::runtime_error If the length of the init byte sequence (default override) from \p pConfig
@@ -167,6 +168,12 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
         //Collect manually overridden default values from "init" map of configuration YAML
 
         initValues[regName] = std::monostate{};
+
+        //Cannot use init entries for read-only registers
+        if (regDescr.mode == AccessMode::ReadOnly && config.contains(LayerConfig::fromYAML("{init: {" + regName + ": }}"), false))
+        {
+            throw std::runtime_error("Init value set for read-only register \"" + regName + "\" of register driver \"" + name + "\".");
+        }
 
         if (config.contains(LayerConfig::fromYAML("{init: {" + regName + ": uint}}"), true))
         {

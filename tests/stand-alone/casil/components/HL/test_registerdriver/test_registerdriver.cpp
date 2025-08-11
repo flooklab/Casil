@@ -138,7 +138,18 @@ BOOST_AUTO_TEST_CASE(Test2_invalidRegisterDefaultOverrides)
     }
     catch (const std::runtime_error&) { ++exceptionCtr; }
 
-    BOOST_CHECK_EQUAL(exceptionCtr, 4);
+    try
+    {
+        //Read-only
+        Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
+                  "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
+                                "init: { VERSION: 0x5 }}],"
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 5);
 }
 
 BOOST_AUTO_TEST_CASE(Test3_initModuleCloseModule)

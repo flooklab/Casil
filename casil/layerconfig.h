@@ -73,10 +73,10 @@ public:
     double getDbl(const std::string& pKey, double pDefault = 0.0) const;                    ///< Get a floating point configuration value.
     std::string getStr(const std::string& pKey, const std::string& pDefault = "") const;    ///< Get a string-type configuration value.
     //
-    std::vector<std::uint8_t> getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault = {}) const;
+    std::vector<std::uint8_t> getByteSeq(const std::string& pKey, const std::vector<std::uint8_t>& pDefault = {}) const;
                                                                                             ///< \brief Get an 8 bit unsigned integer sequence
                                                                                             ///  from the configuration tree.
-    std::vector<std::uint64_t> getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault = {}) const;
+    std::vector<std::uint64_t> getUIntSeq(const std::string& pKey, const std::vector<std::uint64_t>& pDefault = {}) const;
                                                                                             ///< \brief Get a 64 bit unsigned integer sequence
                                                                                             ///  from the configuration tree.
     //

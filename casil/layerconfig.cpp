@@ -507,7 +507,7 @@ std::string LayerConfig::getStr(const std::string& pKey, const std::string& pDef
  * \param pDefault Default value to return on error.
  * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
-std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::vector<std::uint8_t> pDefault) const
+std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, const std::vector<std::uint8_t>& pDefault) const
 {
     const std::optional<std::vector<std::uint8_t>> val = getByteSeqOpt(pKey);
     if (val)
@@ -529,7 +529,7 @@ std::vector<std::uint8_t> LayerConfig::getByteSeq(const std::string& pKey, std::
  * \param pDefault Default value to return on error.
  * \return Converted value at \p pKey or \p pDefault in case of an error.
  */
-std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std::vector<std::uint64_t> pDefault) const
+std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, const std::vector<std::uint64_t>& pDefault) const
 {
     const std::optional<std::vector<std::uint64_t>> val = getUIntSeqOpt(pKey);
     if (val)

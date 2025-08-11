@@ -456,7 +456,7 @@ using BoolRef = StandardRegister::BoolRef;
  *
  * Binds the instance's bit access/manipulation functions to the bit \p pIdx of bitset \p pBits.
  *
- * \note \p pIdx must be a valid index for \p pBits as this will not be checked.
+ * \throws std::invalid_argument If \p pIdx exceeds size of \p pBits.
  *
  * \param pBits Bitset that holds the referenced bit.
  * \param pIdx Index of the referenced bit.
@@ -465,6 +465,8 @@ BoolRef::BoolRef(boost::dynamic_bitset<>& pBits, const std::size_t pIdx) :
     dataField(pBits),
     idx(pIdx)
 {
+    if  (pIdx >= pBits.size())
+        throw std::invalid_argument("Index exceeds size of referenced bitset.");
 }
 
 /*!
@@ -472,7 +474,7 @@ BoolRef::BoolRef(boost::dynamic_bitset<>& pBits, const std::size_t pIdx) :
  *
  * Binds the instance's bit access/manipulation functions to the bit \p pIdx of register field \p pParent.
  *
- * \note \p pIdx must be a valid index for \p pParent as this will not be checked.
+ * \throws std::invalid_argument If \p pIdx exceeds size of \p pParent.
  *
  * \param pParent Register field that itself references the referenced bit.
  * \param pIdx Index of the referenced bit.
@@ -481,6 +483,8 @@ BoolRef::BoolRef(const RegField& pParent, const std::size_t pIdx) :
     dataField(pParent),
     idx(pIdx)
 {
+    if  (pIdx >= pParent.getSize())
+        throw std::invalid_argument("Index exceeds size of referenced field.");
 }
 
 //Public
@@ -542,6 +546,9 @@ using RegField = StandardRegister::RegField;
  * Binds the instance's register field access functions to the field (with name \p pName) that corresponds to the sequence of bits
  * within \p pBits with size \p pSize and offset \p pOffs, i.e. <tt>field[(pSize-1):0] = pBits[pOffs:(pOffs-(pSize-1))]</tt>.
  *
+ * \throws std::invalid_argument If \p pSize is zero.
+ * \throws std::invalid_argument If the field would exceed the extent of \p pBits (given values of \p pSize and \p pOffs).
+ *
  * \param pBits Bitset that holds the referenced bit sequence.
  * \param pName Name of the referenced register field.
  * \param pSize Size of the referenced field in number of bits.
@@ -557,7 +564,10 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, con
     childFields(),
     repetitionKeys()
 {
-    //TODO check sizes etc.
+    if (size == 0)
+        throw std::invalid_argument("Invalid field size (must be larger than zero).");
+    if ((size > offs+1) || (offs >= parentSize))
+        throw std::invalid_argument("Field exceeds parent bitset's extent.");
 }
 
 /*!
@@ -565,6 +575,9 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, con
  *
  * Binds the instance's register field access functions to the field (with name \p pName) that corresponds to the sequence of bits
  * within \p pParent with size \p pSize and offset \p pOffs, i.e. <tt>field[(pSize-1):0] = pParent[pOffs:(pOffs-(pSize-1))]</tt>.
+ *
+ * \throws std::invalid_argument If \p pSize is zero.
+ * \throws std::invalid_argument If the field would exceed the extent of \p pParent (given values of \p pSize and \p pOffs).
  *
  * \param pParent Parent register field that itself references the bits of the referenced bit sequence.
  * \param pName Name of the referenced register field.
@@ -581,7 +594,10 @@ RegField::RegField(const RegField& pParent, const std::string& pName, const std:
     childFields(),
     repetitionKeys()
 {
-    //TODO check sizes etc.
+    if (size == 0)
+        throw std::invalid_argument("Invalid field size (must be larger than zero).");
+    if ((size > offs+1) || (offs >= parentSize))
+        throw std::invalid_argument("Field exceeds parent field's extent.");
 }
 
 //Public

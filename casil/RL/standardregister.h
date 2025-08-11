@@ -101,10 +101,10 @@ public:
     StandardRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig);  ///< Constructor.
     ~StandardRegister() override = default;                                         ///< Default destructor.
     //
-    const RegField& operator[](const std::string& pFieldPath) const;                ///< TODO
-    const BoolRef& operator[](std::size_t pIdx) const;                              ///< TODO
+    const RegField& operator[](const std::string& pFieldPath) const;                ///< Access a specific register field.
+    const BoolRef& operator[](std::size_t pIdx) const;                              ///< Access a specific bit in the register.
     //
-    const RegField& root() const;                                                   ///< TODO
+    const RegField& root() const;                                                   ///< Get the root field node.
     //
     std::uint64_t getSize() const;                                                  ///< Get the size of the register.
 /*    //
@@ -116,19 +116,22 @@ public:
     void read() const;*/
 
 private:
-    bool initImpl() override;                                                       ///< TODO
-    bool closeImpl() override;                                                      ///< TODO
+    bool initImpl() override;
+    bool closeImpl() override;
     //
-    typedef boost::property_tree::basic_ptree<std::string, std::shared_ptr<RegField>> FieldTree;    ///< TODO
+    typedef boost::property_tree::basic_ptree<std::string, std::shared_ptr<RegField>> FieldTree;    ///< \brief Property tree for register
+                                                                                                    ///  fields that reference parts of the
+                                                                                                    ///  register with the field names as keys.
     void populateFieldTree(FieldTree& pFieldTree, const boost::property_tree::ptree& pConfTree, const std::string& pParentKey) const;
-                                                                                    ///< TODO
+                                                                                                ///< \brief Populate the register field tree by
+                                                                                                ///  recursing through the field configuration.
 
 private:
-    const std::uint64_t size;       ///< TODO
+    const std::uint64_t size;       ///< Size of the register in number of bits.
     //
-    boost::dynamic_bitset<> data;   ///< TODO
+    boost::dynamic_bitset<> data;   ///< Register content.
     //
-    FieldTree fields;               ///< TODO
+    FieldTree fields;               ///< Tree representing the hierarchy of named register fields for convenient access to them.
 
     CASIL_REGISTER_REGISTER_H("StandardRegister")
 };
@@ -150,19 +153,19 @@ public:
     BoolRef& operator=(const BoolRef&) = delete;                ///< Deleted copy assignment operator.
     BoolRef& operator=(BoolRef&&) = delete;                     ///< Deleted move assignment operator.
     //
-    bool operator=(bool pValue) const;                          ///< TODO
+    bool operator=(bool pValue) const;                          ///< Assign a value to the referenced bit.
     //
-    operator bool() const;                                      ///< TODO
+    operator bool() const;                                      ///< Get the value of the referenced bit.
     //
-    bool get() const;                                           ///< TODO
+    bool get() const;                                           ///< Get the value of the referenced bit.
 
 private:
     using BitsetRef = std::reference_wrapper<boost::dynamic_bitset<>>;
     using FieldRef = std::reference_wrapper<const RegField>;
 
 private:
-    const std::variant<const BitsetRef, const FieldRef> dataField;  ///< TODO
-    const std::size_t idx;                                          ///< TODO
+    const std::variant<const BitsetRef, const FieldRef> dataField;  ///< Referenced dataset (either raw bitset or abstract register field).
+    const std::size_t idx;                                          ///< Index of the referenced bit in the referenced register field.
 };
 
 /*!
@@ -182,42 +185,43 @@ public:
     RegField& operator=(const RegField&) = delete;                                          ///< Deleted copy assignment operator.
     RegField& operator=(RegField&&) = delete;                                               ///< Deleted move assignment operator.
     //
-    std::uint64_t operator=(std::uint64_t pValue) const;                                    ///< TODO
-    const boost::dynamic_bitset<>& operator=(const boost::dynamic_bitset<>& pBits) const;   ///< TODO
+    std::uint64_t operator=(std::uint64_t pValue) const;                                    ///< Assign equivalent integer value to the field.
+    const boost::dynamic_bitset<>& operator=(const boost::dynamic_bitset<>& pBits) const;   ///< Assign a raw bit sequence to the field.
     //
-    explicit operator std::uint64_t() const;                                                ///< TODO
-    explicit operator boost::dynamic_bitset<>() const;                                      ///< TODO
+    explicit operator std::uint64_t() const;                                                ///< Get the integer equivalent of field's content.
+    explicit operator boost::dynamic_bitset<>() const;                                      ///< Get the field's content as raw bitset.
     //
-    std::uint64_t toUInt() const;                                                           ///< TODO
-    boost::dynamic_bitset<> toBits() const;                                                 ///< TODO
+    std::uint64_t toUInt() const;                                                           ///< Get the integer equivalent of field's content.
+    boost::dynamic_bitset<> toBits() const;                                                 ///< Get the field's data as raw bitset.
     //
-    const RegField& operator[](const std::string_view pFieldName) const;                    ///< TODO
-    const BoolRef& operator[](std::size_t pIdx) const;                                      ///< TODO
+    const RegField& operator[](const std::string_view pFieldName) const;                    ///< Access an immediate child field.
+    const BoolRef& operator[](std::size_t pIdx) const;                                      ///< Access a specific bit in the field.
     //
-    const RegField& n(std::size_t pFieldRepIdx) const;                                      ///< TODO
+    const RegField& n(std::size_t pFieldRepIdx) const;                                      ///< Access the n-th repetition of the field.
     //
-    std::uint64_t getSize() const;                                                          ///< TODO
-    std::uint64_t getOffset() const;                                                        ///< TODO
+    std::uint64_t getSize() const;                                                          ///< Get the size of the field.
+    std::uint64_t getOffset() const;                                                        ///< \brief Get the field's offset
+                                                                                            ///  with respect to its parent field.
 
 private:
     void setChildFields(std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> pChildFields);
-                                                                                            ///< TODO
+                                                                                            ///< Set references to the immediate child fields.
     void setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>>& pFieldReps);
-                                                                                            ///< TODO
+                                                                            ///< Assign field repetition numbers to actual child field names.
     //
     //Let enclosing StandardRegister class set children after recursively constructing nested fields branch
     friend void StandardRegister::populateFieldTree(StandardRegister::FieldTree&, const boost::property_tree::ptree&, const std::string&) const;
 
 private:
-    const std::string name;                     ///< TODO
+    const std::string name;                     ///< Name of the field.
     //
-    const std::uint64_t size;                   ///< TODO
-    const std::uint64_t offs;                   ///< TODO
+    const std::uint64_t size;                   ///< Size of the field in number of bits.
+    const std::uint64_t offs;                   ///< Index of the field's most significant bit in the parent field.
     //
-    const std::vector<BoolRef> dataRefs;        ///< TODO
+    const std::vector<BoolRef> dataRefs;        ///< Proxy references to all of the field's bits (least significant bit at front).
     //
-    std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> childFields;   ///< TODO
-    std::vector<std::string> repetitionKeys;    ///< TODO
+    std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> childFields;   ///< Map of immediate child fields.
+    std::vector<std::string> repetitionKeys;    ///< Assignment of number of field's repetition to respective key in 'childFields'.
 };
 
 } // namespace Layers::RL

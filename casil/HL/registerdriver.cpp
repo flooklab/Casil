@@ -1060,6 +1060,8 @@ RegisterProxy::RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName) :
 {
 }
 
+//Public
+
 /*!
  * \brief Write an integer value to the register.
  *

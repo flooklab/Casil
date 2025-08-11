@@ -74,7 +74,8 @@ using BoolRef = casil::Layers::RL::StandardRegister::BoolRef;
  * Creates and returns a 'pSize' long vector of proxy class instances for bit manipulation of a contiguous
  * range of 'pSize' bits that are stored in 'pBits' at a most significant bit offset of 'pOffs'.
  * The indexing is hence such that returnValue[(pSize-1):0] ^= pBits[pOffs:(pOffs-(pSize-1))].
- * Boundaries are not checked here.
+ *
+ * Boundaries are not checked here but used BoolRef::BoolRef() will throw std::invalid_argument if an index exceeds the referenced bitset.
  */
 std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, const std::uint64_t pSize, const std::uint64_t pOffs)
 {
@@ -89,7 +90,8 @@ std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, const std::ui
  * Creates and returns a 'pSize' long vector of proxy class instances for bit manipulation of a contiguous range of
  * 'pSize' bits from (and in turn indirectly referenced by) 'pParent' at a most significant bit offset of 'pOffs'.
  * The indexing is hence such that returnValue[(pSize-1):0] ^= pParent[pOffs:(pOffs-(pSize-1))].
- * Boundaries are not checked here.
+ *
+ * Boundaries are not checked here but used BoolRef::BoolRef() will throw std::invalid_argument if an index exceeds the referenced field.
  */
 std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs)
 {

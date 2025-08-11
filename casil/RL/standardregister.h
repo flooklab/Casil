@@ -108,6 +108,8 @@ public:
     const RegField& root() const;                                                   ///< Get the root field node.
     //
     std::uint64_t getSize() const;                                                  ///< Get the size of the register.
+    //
+    void applyDefaults();                                                           ///< Set register fields to configured default/init values.
 /*    //
     void set(const boost::dynamic_bitset<>& pBits);
     boost::dynamic_bitset<> getWr() const;
@@ -133,6 +135,10 @@ private:
     boost::dynamic_bitset<> data;   ///< Register content.
     //
     FieldTree fields;               ///< Tree representing the hierarchy of named register fields for convenient access to them.
+    //
+    typedef std::variant<std::monostate, std::uint64_t, boost::dynamic_bitset<>> VariantValueType;
+                                                            ///< Variant to optionally store the two possible register field assignment types.
+    std::map<std::string, VariantValueType> initValues;     ///< Register fields' default values from YAML configuration.
 
     CASIL_REGISTER_REGISTER_H("StandardRegister")
 };

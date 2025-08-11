@@ -185,9 +185,22 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * StandardRegister::operator[](const std::string&) const using "#0", "#1", etc. as keys.
  * Note that here the zeroth repetition is the one starting at the highest offset (as inherited from basil).
  *
+ * An optional "init" map can be specified in \p pConfig in order to define default values for specific register fields.
+ * The keys in that map define the fields by their paths (as used in the argument to operator[](const std::string&) const).
+ * The values can be either unsigned integers (as used in the argument to RegField::operator=(std::uint64_t) const) or strings
+ * of zeros and ones with "0b" prefix for directly constructing the underlying bit sequences (represented bit sequence as used
+ * in the argument to RegField::operator=(const boost::dynamic_bitset<>&) const). As an example, the format of the init map
+ * should be equivalent to <tt>init: {"Path.To.Reg.Field.1": 1234, "Path.To.Another.Field": "0b1011001"}</tt>.
+ *
+ * The fields that appear in the init map will be automatically set to the specified values at initialization of the component
+ * (see init()) and can be manually set to their init values again by calling applyDefaults(). Fields without such an init value
+ * stay unchanged and init map entries that point to no existing field will be ignored. Setting the values happens as if by calling
+ * RegField::operator=(std::uint64_t) const / RegField::operator=(const boost::dynamic_bitset<>&) const. Note that in case of the
+ * bit sequence the sequence/string length must be equal to the field length. Also note that there must not be multiple/conflicting
+ * assignments for overlapping/nested fields as no guarantee is made about the order in which the fields will be set.
+ *
  * \todo bit_order...
  * \todo auto_start...
- * \todo init...
  *
  * \internal \sa populateFieldTree() \endinternal
  *
@@ -204,6 +217,9 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
  * \throws std::runtime_error If the same field name is defined multiple times within a group of child fields.
  * \throws std::runtime_error If a field exceeds the parent field's extent.
+ * \throws std::runtime_error If an init value or init bit sequence from \p pConfig has an invalid format for one of the register fields.
+ * \throws std::runtime_error If the length of an init bit sequence from \p pConfig (string length excluding prefix)
+ *                            does not match the field size for one of the register fields.
  *
  * \param pName Component instance name.
  * \param pDriver %Driver instance to be used.
@@ -212,18 +228,83 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
 StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig) :
     Register(typeName, std::move(pName), pDriver, std::move(pConfig), LayerConfig::fromYAML("{size: uint}")),
     size(config.getUInt("size", 0)),
-    data(size, 0)
+    data(size, 0),
+    fields(),
+    initValues()
 {
-    //TODO process "init", "auto_start", "bit_order" (field)
+    //TODO process "auto_start", "bit_order" (field)
 
     if (size == 0)
         throw std::runtime_error("Invalid register size set for " + getSelfDescription() + ".");
+
+    //Fill property tree with register field hierarchy, starting with unnamed root field
 
     fields.data() = std::make_shared<RegField>(data, "", size, size-1);
 
     const boost::property_tree::ptree fieldsConfig = config.getRawTreeAt("fields");
 
     populateFieldTree(fields, fieldsConfig, "fields");
+
+    //Initially fill init value map for every register field with no value (i.e. std::monostate) set
+
+    std::function<void(std::map<std::string, VariantValueType>&, const FieldTree&, const std::string&)> fillInitValues =
+            [&fillInitValues](std::map<std::string, VariantValueType>& pInitValues, const FieldTree& pFieldTree,
+                              const std::string& pParentKey) -> void
+    {
+        if (pParentKey != "")
+            pInitValues[pParentKey] = std::monostate{};
+
+        for (const auto& [key, subTree] : pFieldTree)
+        {
+            if (pParentKey == "")
+                fillInitValues(pInitValues, subTree, key);
+            else
+                fillInitValues(pInitValues, subTree, pParentKey + "." + key);
+        }
+    };
+
+    fillInitValues(initValues, fields, "");
+
+    //Collect default values from "init" map of configuration YAML
+
+    for (auto& [fieldPath, value] : initValues)
+    {
+        if (config.contains(LayerConfig::fromYAML("{init: {" + fieldPath + ": uint}}"), true))
+        {
+            value = config.getUInt("init." + fieldPath);
+        }
+        else if (config.contains(LayerConfig::fromYAML("{init: {" + fieldPath + ": }}"), false))
+        {
+            const std::string bitSeqStr = config.getStr("init." + fieldPath);
+
+            if (bitSeqStr == "")    //(Need to) ignore empty nodes as most likely just intermediate nodes not actually set in the init map
+                continue;
+
+            if (!bitSeqStr.starts_with("0b"))
+            {
+                throw std::runtime_error("Invalid init bit sequence for register field \"" + fieldPath + "\" "
+                                         "of  standard register \"" + name + "\".");
+            }
+
+            const std::string bitStr = bitSeqStr.substr(2);
+
+            //Assume bit sequence, which must consist of '0's and '1's
+            if (std::any_of(bitStr.begin(), bitStr.end(), [](const char c){ return (c != '0' && c != '1'); }))
+            {
+                throw std::runtime_error("Invalid init bit sequence for register field \"" + fieldPath + "\" "
+                                         "of  standard register \"" + name + "\".");
+            }
+
+            const RegField& field = *(fields.get_child(fieldPath).data());
+            if (bitStr.size() != field.getSize())
+            {
+                throw std::runtime_error("Init bit sequence for register field \"" + fieldPath + "\" of standard register "
+                                         "\"" + name + "\" has wrong size.");
+            }
+
+            value = boost::dynamic_bitset(std::string(bitStr));
+        }
+    }
 }
 
 //Public
@@ -292,6 +373,27 @@ std::uint64_t StandardRegister::getSize() const
     return size;
 }
 
+//
+
+/*!
+ * \brief Set register fields to configured default/init values.
+ *
+ * Every register field that has a default value/sequence defined in the "init" map in the
+ * component configuration (see StandardRegister()) will be assigned to this init value/sequence.
+ *
+ * Note: The order of assignments might be arbitrary.
+ */
+void StandardRegister::applyDefaults()
+{
+    for (auto& [fieldPath, value] : initValues)
+    {
+        if (std::holds_alternative<std::uint64_t>(value))
+            operator[](fieldPath) = std::get<std::uint64_t>(value);
+        else if (std::holds_alternative<boost::dynamic_bitset<>>(value))
+            operator[](fieldPath) = std::get<boost::dynamic_bitset<>>(value);
+    }
+}
+
 //Private
 
 /*!
@@ -306,6 +408,9 @@ std::uint64_t StandardRegister::getSize() const
 bool StandardRegister::initImpl()
 {
     //TODO
+
+    applyDefaults();
+
     return true;
 }
 

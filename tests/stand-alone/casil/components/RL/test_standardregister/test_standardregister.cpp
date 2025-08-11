@@ -547,7 +547,141 @@ BOOST_AUTO_TEST_CASE(Test7_repeat)
     BOOST_CHECK_EQUAL(exceptionCtr, 4);
 }
 
-BOOST_AUTO_TEST_CASE(Test8_advancedSelect)
+BOOST_AUTO_TEST_CASE(Test8_initApplyDefaults)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 12}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 28, fields: ["
+                                "{name: COMP0, offset: 27, size: 4, repeat: 2, fields: ["
+                                    "{name: R0, size: 2, offset: 3},"
+                                    "{name: L0, size: 2, offset: 1}"
+                                "]},"
+                                "{name: COMP1, offset: 19, size: 4, repeat: 3, fields: ["
+                                    "{name: R0, size: 2, offset: 3},"
+                                    "{name: L0, size: 2, offset: 1}"
+                                "]},"
+                                "{name: COMP2, offset: 7, size: 8, fields : ["
+                                    "{name: En0, size: 1, offset: 5},"
+                                    "{name: En1, size: 1, offset: 4},"
+                                    "{name: CTR, size: 4, offset: 3}"
+                                "]}"
+                            "], init: {"
+                                    "COMP0.#0: 0x9,"
+                                    "COMP1.#0.R0: 3,"
+                                    "COMP1.#2.R0: 0,"
+                                    "COMP1.#2.L0: 0x2,"
+                                    "COMP2.En0: 0,"
+                                    "COMP2.CTR: \"0b1010\""
+                            "}}]}");
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+
+    BOOST_CHECK_EQUAL(reg["COMP0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En1"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP2.CTR"].toUInt(), std::uint64_t{0x0u});
+
+    BOOST_TEST(reg.init());
+
+    BOOST_CHECK_EQUAL(reg["COMP0"].toUInt(), std::uint64_t{0x90u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.R0"].toUInt(), std::uint64_t{0b10u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.L0"].toUInt(), std::uint64_t{0b01u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.R0"].toUInt(), std::uint64_t{0x3u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.L0"].toUInt(), std::uint64_t{0x2u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En1"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP2.CTR"].toUInt(), std::uint64_t{0b1010u});
+
+    reg["COMP0"] = 0b11101111u;
+    reg["COMP1.#0.R0"] = 0b01u;
+    reg["COMP1.#0.L0"] = 0b10u;
+    reg["COMP1.#1.R0"] = 0b01u;
+    reg["COMP1.#1.L0"] = 0b00u;
+    reg["COMP1.#2.R0"] = 0b11u;
+    reg["COMP1.#2.L0"] = 0b01u;
+    reg["COMP2.En0"] = 0b1u;
+    reg["COMP2.En1"] = 0b1u;
+    reg["COMP2.CTR"] = 0b00011u;
+
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.R0"].toUInt(), std::uint64_t{0b11u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.L0"].toUInt(), std::uint64_t{0b10u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.R0"].toUInt(), std::uint64_t{0b11u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.L0"].toUInt(), std::uint64_t{0b11u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.R0"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.L0"].toUInt(), std::uint64_t{0x2u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.R0"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.R0"].toUInt(), std::uint64_t{0x3u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.L0"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En0"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En1"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP2.CTR"].toUInt(), std::uint64_t{0b0011u});
+
+    reg.applyDefaults();
+
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.R0"].toUInt(), std::uint64_t{0b10u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#0.L0"].toUInt(), std::uint64_t{0b01u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.R0"].toUInt(), std::uint64_t{0b11u});
+    BOOST_CHECK_EQUAL(reg["COMP0.#1.L0"].toUInt(), std::uint64_t{0b11u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.R0"].toUInt(), std::uint64_t{0x3u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#0.L0"].toUInt(), std::uint64_t{0x2u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.R0"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#1.L0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.R0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP1.#2.L0"].toUInt(), std::uint64_t{0x2u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En0"].toUInt(), std::uint64_t{0x0u});
+    BOOST_CHECK_EQUAL(reg["COMP2.En1"].toUInt(), std::uint64_t{0x1u});
+    BOOST_CHECK_EQUAL(reg["COMP2.CTR"].toUInt(), std::uint64_t{0b1010u});
+
+    //Test exceptions
+
+    int exceptionCtr = 0;
+
+    const std::string confStr1 = "{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                                  "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 12}],"
+                                  "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 10, fields: ["
+                                                    "{name: MainField, offset: 9, size: 10}"
+                                                "], init: ";
+    const std::string confStr2 = "}]}";
+
+    try { Device d2(confStr1 + "{ MainField: 12345 }" + confStr2); (void)d2; }              //OK
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d2(confStr1 + "{ MainField: \"0b0011010101\" }" + confStr2); (void)d2; }   //OK
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d2(confStr1 + "{ MainField: \"10b0011010101\" }" + confStr2); (void)d2; }  //Invalid prefix
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d2(confStr1 + "{ MainField: \"0b101010110\" }" + confStr2); (void)d2; }    //Too short
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d2(confStr1 + "{ MainField: \"0b10011010101\" }" + confStr2); (void)d2; }  //Too long
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d2(confStr1 + "{ MainField: \"0b00110abc01\" }" + confStr2); (void)d2; }   //Invalid characters
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 4);
+}
+
+BOOST_AUTO_TEST_CASE(Test9_advancedSelect)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
               "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
@@ -613,7 +747,7 @@ BOOST_AUTO_TEST_CASE(Test8_advancedSelect)
     BOOST_CHECK_EQUAL(exceptionCtr, 5);
 }
 
-BOOST_AUTO_TEST_CASE(Test9_zeroSize)
+BOOST_AUTO_TEST_CASE(Test10_zeroSize)
 {
     try
     {
@@ -630,7 +764,7 @@ BOOST_AUTO_TEST_CASE(Test9_zeroSize)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Test10_fieldConfExceptions)
+BOOST_AUTO_TEST_CASE(Test11_fieldConfExceptions)
 {
     int exceptionCtr = 0;
 
@@ -726,7 +860,7 @@ BOOST_AUTO_TEST_CASE(Test10_fieldConfExceptions)
     BOOST_CHECK_EQUAL(exceptionCtr, 17);
 }
 
-BOOST_AUTO_TEST_CASE(Test11_otherExceptions)
+BOOST_AUTO_TEST_CASE(Test12_otherExceptions)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
               "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"

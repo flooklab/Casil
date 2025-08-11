@@ -118,7 +118,7 @@ std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::vector<st
     std::vector<BoolRef> retVal;
     retVal.reserve(pIdxs.size());
     for (auto idx : (pIdxs | std::views::reverse))
-        retVal.push_back(pParent[idx]);
+        retVal.push_back(pParent[idx]);                                                                 // cppcheck-suppress useStlAlgorithm
     return retVal;
 }
 

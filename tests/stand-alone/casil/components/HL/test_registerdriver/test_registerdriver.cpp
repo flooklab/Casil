@@ -151,11 +151,13 @@ BOOST_AUTO_TEST_CASE(Test3_initModuleCloseModule)
 
     Driver& drv = d.driver("drv");
 
+    //See counter logic in TestRegDriver
     BOOST_CHECK_EQUAL(drv.init(), true);
     BOOST_CHECK_EQUAL(drv.init(true), true);
     BOOST_CHECK_EQUAL(drv.init(true), false);
     BOOST_CHECK_EQUAL(drv.init(true), false);
 
+    //See counter logic in TestRegDriver
     BOOST_CHECK_EQUAL(drv.close(true), true);
     BOOST_CHECK_EQUAL(drv.close(true), true);
     BOOST_CHECK_EQUAL(drv.close(true), false);

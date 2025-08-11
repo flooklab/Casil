@@ -1060,6 +1060,9 @@ std::uint64_t RegField::getTotalOffset() const
  * Makes the field aware of its immediate child fields and thereby makes their proxy references
  * accessible from the field via RegField::operator[](std::string_view) const.
  *
+ * Note: For the special case of \e field \e repetitions the followig overload must be used instead:
+ * setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>>&)
+ *
  * \param pChildFields Map of child field proxy references with their field names as keys.
  */
 void RegField::setChildFields(std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> pChildFields)

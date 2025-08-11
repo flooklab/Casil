@@ -138,9 +138,9 @@ private:
 };
 
 /*!
- * \brief The StandardRegister::BoolRef class
+ * \brief Proxy class for accessing an individual register bit.
  *
- * \todo ...
+ * Provides convenient read/write access to a single bit of a StandardRegister instance or of a specific register field thereof.
  */
 class StandardRegister::BoolRef                                 // cppcheck-suppress noConstructor symbolName=BoolRef
 {
@@ -161,8 +161,8 @@ public:
     bool get() const;                                           ///< Get the value of the referenced bit.
 
 private:
-    using BitsetRef = std::reference_wrapper<boost::dynamic_bitset<>>;
-    using FieldRef = std::reference_wrapper<const RegField>;
+    using BitsetRef = std::reference_wrapper<boost::dynamic_bitset<>>;  ///< Wrapper for reference to bitset to be held by \c std::variant.
+    using FieldRef = std::reference_wrapper<const RegField>;            ///< Wrapper for reference to RegField to be held by \c std::variant.
 
 private:
     const std::variant<const BitsetRef, const FieldRef> dataField;  ///< Referenced dataset (either raw bitset or abstract register field).
@@ -170,9 +170,10 @@ private:
 };
 
 /*!
- * \brief The StandardRegister::RegField class
+ * \brief Proxy class for accessing an individual register field.
  *
- * \todo ...
+ * Provides convenient read/write access to a certain register \e field, a subset of
+ * bits from a StandardRegister instance or of another, parent register field thereof.
  */
 class StandardRegister::RegField                                                        // cppcheck-suppress noConstructor symbolName=RegField
 {
@@ -218,8 +219,15 @@ private:
     void setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>>& pFieldReps);
                                                                             ///< Assign field repetition numbers to actual child field names.
     //
-    //Let enclosing StandardRegister class set children after recursively constructing nested fields branch
+    /// \cond INTERNAL
+    /*!
+     * \brief Let the enclosing StandardRegister class set the field's child
+     * fields \e after it has recursively constructed the nested fields branch.
+     *
+     * See setChildFields() and StandardRegister::populateFieldTree().
+     */
     friend void StandardRegister::populateFieldTree(StandardRegister::FieldTree&, const boost::property_tree::ptree&, const std::string&) const;
+    /// \endcond INTERNAL
 
 private:
     const std::string name;                     ///< Name of the field.

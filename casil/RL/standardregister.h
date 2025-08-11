@@ -194,7 +194,7 @@ public:
     std::uint64_t toUInt() const;                                                           ///< Get the integer equivalent of field's content.
     boost::dynamic_bitset<> toBits() const;                                                 ///< Get the field's data as raw bitset.
     //
-    const RegField& operator[](const std::string_view pFieldName) const;                    ///< Access an immediate child field.
+    const RegField& operator[](std::string_view pFieldName) const;                          ///< Access an immediate child field.
     const BoolRef& operator[](std::size_t pIdx) const;                                      ///< Access a specific bit in the field.
     //
     const RegField& n(std::size_t pFieldRepIdx) const;                                      ///< Access the n-th repetition of the field.

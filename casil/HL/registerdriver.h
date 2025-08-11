@@ -214,7 +214,7 @@ protected:
 
 private:
     std::map<std::string, RegisterDescr::VariantValueType, std::less<>> registerWrittenCache;   ///< Cache of last written register values.
-    std::map<std::string, RegisterDescr::VariantValueType, std::less<>> initValues;     ///< Overridden default values from YAML configuration.
+    std::map<std::string, RegisterDescr::VariantValueType> initValues;      ///< Overridden default values from YAML configuration.
 
 public:
     /*!

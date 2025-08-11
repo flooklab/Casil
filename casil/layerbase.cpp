@@ -110,6 +110,8 @@ const std::string& LayerBase::getName() const
  *
  * Remembers the initialized state on success (gets unset otherwise).
  *
+ * \internal The component-specific logic is to be implemented by initImpl(). \endinternal
+ *
  * \param pForce Ignore initialized state.
  * \return True if already or successfully initialized.
  */
@@ -138,6 +140,8 @@ bool LayerBase::init(const bool pForce)
  * Immediately returns true if already closed (i.e. unset initialized state), unless \p pForce is set.
  *
  * Unsets the initialized state (set by init()) on success.
+ *
+ * \internal The component-specific logic is to be implemented by closeImpl(). \endinternal
  *
  * \param pForce Ignore (not-)initialized state.
  * \return True if already or successfully closed.
@@ -172,6 +176,8 @@ bool LayerBase::close(const bool pForce)
  * Whether this does something interesting (such as resetting the configuration)
  * or nothing depends on the component-specific implementation.
  *
+ * \internal The component-specific logic is to be implemented by loadRuntimeConfImpl(). \endinternal
+ *
  * Note: It is assumed that both functions (this one and dumpRuntimeConfiguration())
  * are only used when the component is initialized.
  *
@@ -204,6 +210,8 @@ bool LayerBase::loadRuntimeConfiguration(const std::string& pConf)
  *
  * The saved runtime configuration or some altered configuration with the same format/structure
  * can be applied to the component using the complementary function loadRuntimeConfiguration().
+ *
+ * \internal The component-specific logic is to be implemented by dumpRuntimeConfImpl(). \endinternal
  *
  * Note: It is assumed that both functions are only used when the component is initialized.
  *

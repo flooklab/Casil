@@ -229,6 +229,8 @@ const RegisterDriver::RegisterProxy& RegisterDriver::operator[](const std::strin
  *
  * Performs a driver-specific reset sequence for the module.
  *
+ * \internal This logic is to be implemented by resetImpl(). \endinternal
+ *
  * Then, if "clear_cache_after_reset" was enabled in the component configuration, the
  * cache for previously written register values will be cleared (see RegisterDriver()).
  */

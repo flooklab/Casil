@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2025 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -23,15 +23,14 @@
 
 #include <pycasil/pycasil.h>
 
-extern void bindRL_Register(py::module&);
+#include <casil/RL/standardregister.h>
 
-extern void bindRL_DummyRegister(py::module&);
-extern void bindRL_StandardRegister(py::module&);
+using casil::RL::StandardRegister;
 
-void bindRL(py::module& pM)
+void bindRL_StandardRegister(py::module& pM)
 {
-    bindRL_Register(pM);
-
-    bindRL_DummyRegister(pM);
-    bindRL_StandardRegister(pM);
+    py::class_<StandardRegister, casil::RL::Register>(pM, "StandardRegister", "... TODO ...")
+            .def(py::init<std::string, casil::HL::Driver&, casil::LayerConfig>(), "Constructor.",
+                 py::arg("name"), py::arg("driver"), py::arg("config"));
+    //TODO
 }

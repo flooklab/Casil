@@ -49,6 +49,7 @@ set(HEADER_FILE_NAMES
     HL/Muxed/sitcpfifo.h
     RL/dummyregister.h
     RL/register.h
+    RL/standardregister.h
     TL/directinterface.h
     TL/interface.h
     TL/muxedinterface.h
@@ -96,6 +97,7 @@ set(SOURCE_FILE_NAMES
     HL/Muxed/sitcpfifo
     RL/dummyregister
     RL/register
+    RL/standardregister
     TL/directinterface
     TL/interface
     TL/muxedinterface
@@ -152,6 +154,7 @@ set(TESTS_FILE_NAMES
     components/HL/test_registerdriver/testregdriver.cpp
     components/HL/test_registerdriver/testregdriver.h
     components/HL/test_scpi/test_scpi.cpp
+    components/RL/test_standardregister/test_standardregister.cpp
     components/TL/test_tcp/test_tcp.cpp
     components/TL/test_udp/test_udp.cpp
 )

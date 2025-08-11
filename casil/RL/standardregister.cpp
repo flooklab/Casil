@@ -148,6 +148,7 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  *                            hold a \e value or has child nodes.
  * \throws std::runtime_error If a field size is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field repetition count is set to zero or the corresponding unsigned integer conversion fails.
+ * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
  * \throws std::runtime_error If the same field name is defined multiple times within a group of child fields.
  * \throws std::runtime_error If a field exceeds the parent field's extent.
  *
@@ -326,6 +327,7 @@ bool StandardRegister::closeImpl()
  *                            hold a \e value or has child nodes.
  * \throws std::runtime_error If a field size is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field repetition count is set to zero or the corresponding unsigned integer conversion fails.
+ * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
  * \throws std::runtime_error If the same field name is defined multiple times within a group of child fields.
  * \throws std::runtime_error If a field exceeds the parent field's extent.
  * \throws std::runtime_error Possibly/effectively if \p pParentKey is wrong (might cause on of the other exceptions).
@@ -380,6 +382,8 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         if (tReps == 0)
             throw std::runtime_error("Zero repetitions set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
 
+        if (tName.find('.') != tName.npos || tName.starts_with('#'))
+            throw std::runtime_error("Invalid name set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
         if (pFieldTree.find(tName) != pFieldTree.not_found())
             throw std::runtime_error("Field with name \"" + tName + "\" is defined multiple times for " + getSelfDescription() + ".");
 

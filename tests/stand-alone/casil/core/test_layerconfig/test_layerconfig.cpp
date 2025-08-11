@@ -160,6 +160,25 @@ BOOST_AUTO_TEST_CASE(Test6_toString)
     BOOST_CHECK_EQUAL(confStr, confRefStr);
 }
 
+BOOST_AUTO_TEST_CASE(Test7_rawTree)
+{
+    const std::string yamlStr = "{init: {port: /dev/ttyUSB1, read_termination: \"\\n\\r\", baudrate: 19200, limit: -1, addr: 0x10,"
+                                        "nested: [{one: 1.3}, {two: 2a, three: True}]},"
+                                 "s1: [1,2,3], s2: [-1, -2, -3], s3: [1024, 2048, 486, 45], s4: [], s5: {z: 74, a: 73}}";
+
+    const LayerConfig conf = LayerConfig::fromYAML(yamlStr);
+
+    BOOST_CHECK(casil::Auxil::propertyTreeFromYAML(yamlStr) == conf.getRawTreeAt(""));
+
+    const std::string subConfStr = LayerConfig(conf.getRawTreeAt("init")).toString();
+
+    const std::string subConfRefStr = "port: /dev/ttyUSB1\nread_termination: \n\r\nbaudrate: 19200\n"
+                                      "limit: -1\naddr: 0x10\nnested:\n    #0:\n        one: 1.3\n    "
+                                      "#1:\n        two: 2a\n        three: True\n";
+
+    BOOST_CHECK_EQUAL(subConfStr, subConfRefStr);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

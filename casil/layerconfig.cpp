@@ -388,6 +388,31 @@ std::vector<std::uint64_t> LayerConfig::getUIntSeq(const std::string& pKey, std:
 //
 
 /*!
+ * \brief Get the raw configuration (sub-)tree at a specific path.
+ *
+ * Gets a whole part/branch of the configuration tree at location \p pPath.
+ * The root path is an empty string.
+ *
+ * Returns an empty tree if the path does not exist.
+ *
+ * \param pPath The path to the requested tree branch.
+ * \return The configuration tree branch at \p pPath or an empty tree if \p pPath does not exist.
+ */
+boost::property_tree::ptree LayerConfig::getRawTreeAt(const std::string& pPath) const
+{
+    try
+    {
+        return tree.get_child(pPath);
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+        return boost::property_tree::ptree();
+    }
+}
+
+//
+
+/*!
  * \brief Format the configuration tree content as human-readable string.
  *
  * \return The configuration tree as a string (formatted similar to the represented YAML document).

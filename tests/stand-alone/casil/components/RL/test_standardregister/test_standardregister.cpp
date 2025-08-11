@@ -91,6 +91,7 @@ BOOST_AUTO_TEST_CASE(Test2_flatLayout)
 
     StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
 
+    BOOST_CHECK_EQUAL(reg.getSize(), 11);
     BOOST_CHECK_EQUAL(reg.root().getSize(), 11);
     BOOST_CHECK_EQUAL(reg.root().getOffset(), 10);
     BOOST_CHECK_EQUAL(reg.root().getTotalOffset(), 10);

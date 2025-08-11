@@ -61,6 +61,7 @@
 
 #include <casil/bytes.h>
 
+#include <optional>
 #include <stdexcept>
 
 namespace
@@ -146,6 +147,7 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * \throws std::runtime_error If a field node definition is missing an essential value (need "name", "size", "offset").
  * \throws std::runtime_error If one of the "value"-keys (such as "name", "size", etc.) in a field node definition does not
  *                            hold a \e value or has child nodes.
+ * \throws std::runtime_error If parsing of one of the integer values (size, offset, repeat) fails.
  * \throws std::runtime_error If a field size is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field repetition count is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
@@ -325,6 +327,7 @@ bool StandardRegister::closeImpl()
  * \throws std::runtime_error If a field node definition is missing an essential value (need "name", "size", "offset").
  * \throws std::runtime_error If one of the "value"-keys (such as "name", "size", etc.) in a field node definition does not
  *                            hold a \e value or has child nodes.
+ * \throws std::runtime_error If parsing of one of the integer values (size, offset, repeat) fails.
  * \throws std::runtime_error If a field size is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field repetition count is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
@@ -373,9 +376,20 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         const std::string fullKey = pParentKey + "." + key;
 
         const std::string tName = config.getStr(fullKey + ".name");
-        const std::uint64_t tSize = config.getUInt(fullKey + ".size", 0);
-        const std::uint64_t tOffs = config.getUInt(fullKey + ".offset", 0); //TODO need check if conversion OK (size 0, repeat 0 excl. anyway)
-        const std::uint64_t tReps = repsDefined ? config.getUInt(fullKey + ".repeat", 0) : 1;
+        const std::optional<std::uint64_t> tSizeOpt = config.getUIntOpt(fullKey + ".size");
+        const std::optional<std::uint64_t> tOffsOpt = config.getUIntOpt(fullKey + ".offset");
+        const std::optional<std::uint64_t> tRepsOpt = repsDefined ? config.getUIntOpt(fullKey + ".repeat") : 1;
+
+        if (!tSizeOpt)
+            throw std::runtime_error("Could not parse size value for register field \"" + tName + "\" of " + getSelfDescription() + ".");
+        if (!tOffsOpt)
+            throw std::runtime_error("Could not parse offset value for register field \"" + tName + "\" of " + getSelfDescription() + ".");
+        if (!tRepsOpt)
+            throw std::runtime_error("Could not parse repetition count for register field \"" + tName + "\" of " + getSelfDescription() + ".");
+
+        const std::uint64_t tSize = tSizeOpt.value();
+        const std::uint64_t tOffs = tOffsOpt.value();
+        const std::uint64_t tReps = tRepsOpt.value();
 
         if (tSize == 0)
             throw std::runtime_error("Zero size set for register field \"" + tName + "\" of " + getSelfDescription() + ".");

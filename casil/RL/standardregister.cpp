@@ -350,6 +350,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         if (field.data() != "")
             throw std::runtime_error("Invalid register field configuration for " + getSelfDescription() + ".");
 
+        //Handle unknown field description elements
         for (const auto& [fieldKey, fieldVal] : field)
         {
             (void)fieldVal;
@@ -357,14 +358,17 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
                 throw std::runtime_error("Unknown key \"" + fieldKey + "\" in register field definition for " + getSelfDescription() + ".");
         }
 
+        //Handle missing but essential field description elements
         if (field.find("name") == field.not_found() || field.find("size") == field.not_found() ||
             field.find("offset") == field.not_found())
         {
             throw std::runtime_error("Missing key in register field definition for " + getSelfDescription() + ".");
         }
 
+        //Field repetition number defined? (optional)
         const bool repsDefined = (field.find("repeat") != field.not_found());
 
+        //Handle missing/invalid data of field description elements
         if (!field.get_child("name").empty() || field.get_child("name").data() == "" ||
             !field.get_child("size").empty() || field.get_child("size").data() == "" ||
             !field.get_child("offset").empty() || field.get_child("offset").data() == "" ||
@@ -373,8 +377,10 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             throw std::runtime_error("Invalid register field configuration for " + getSelfDescription() + ".");
         }
 
+        //Compose layer configuration path for current field
         const std::string fullKey = pParentKey + "." + key;
 
+        //Parse field description elements
         const std::string tName = config.getStr(fullKey + ".name");
         const std::optional<std::uint64_t> tSizeOpt = config.getUIntOpt(fullKey + ".size");
         const std::optional<std::uint64_t> tOffsOpt = config.getUIntOpt(fullKey + ".offset");
@@ -391,6 +397,8 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         const std::uint64_t tOffs = tOffsOpt.value();
         const std::uint64_t tReps = tRepsOpt.value();
 
+        //Handle invalid values
+
         if (tSize == 0)
             throw std::runtime_error("Zero size set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
         if (tReps == 0)
@@ -403,13 +411,16 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
 
         const RegField& parentField = *(pFieldTree.data());
 
+        //Field must be fully contained within the parent field
         if ((tSize*tReps > tOffs+1) || (tOffs >= parentField.getSize()))
             throw std::runtime_error("Register field \"" + tName + "\" exceeds parent field's extent for " + getSelfDescription() + ".");
 
+        //Create new field tree branch for current field
         FieldTree tSubTree;
 
         if (tReps > 1)  //Need to (iteratively) add nested layer of fields to reflect and enable access to individual repetitions
         {
+            //Add proxy instance for entire current field (i.e. spanning all repetitions)
             tSubTree.data() = std::make_shared<RegField>(parentField, tName, tSize*tReps, tOffs);
 
             const RegField& parentFieldForReps = *(tSubTree.data());
@@ -418,8 +429,10 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             {
                 const std::string tSubName = "#" + std::to_string(i);
 
+                //Create new field tree branch for current field repetition
                 FieldTree tSubSubTree;
 
+                //Add proxy instance for current field repetition
                 tSubSubTree.data() = std::make_shared<RegField>(parentFieldForReps, tSubName, tSize, tSize*(tReps-i)-1);
 
                 //Recurse, if any sub-fields specified
@@ -432,6 +445,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
                     childFieldRefs.emplace(subSubFieldName, *(subSubField.data()));
                 tSubSubTree.data()->setChildFields(std::move(childFieldRefs));
 
+                //Add new field tree branch for current field repetition to branch of the entire field
                 tSubTree.add_child(tSubName, tSubSubTree);
             }
 
@@ -444,6 +458,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         }
         else
         {
+            //Add proxy instance for current field
             tSubTree.data() = std::make_shared<RegField>(parentField, tName, tSize, tOffs);
 
             //Recurse, if any sub-fields specified
@@ -457,6 +472,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             tSubTree.data()->setChildFields(std::move(childFieldRefs));
         }
 
+        //Add new field tree branch for current field to parent/existing tree
         pFieldTree.add_child(tName, tSubTree);
     }
 }

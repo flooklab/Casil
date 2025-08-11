@@ -491,7 +491,11 @@ using BoolRef = StandardRegister::BoolRef;
  * \param pBits Bitset that holds the referenced bit.
  * \param pIdx Index of the referenced bit.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+BoolRef::BoolRef(boost::dynamic_bitset<>& pBits, /*const */std::size_t pIdx) :
+#else
 BoolRef::BoolRef(boost::dynamic_bitset<>& pBits, const std::size_t pIdx) :
+#endif
     dataField(pBits),
     idx(pIdx)
 {
@@ -509,7 +513,11 @@ BoolRef::BoolRef(boost::dynamic_bitset<>& pBits, const std::size_t pIdx) :
  * \param pParent Register field that itself references the referenced bit.
  * \param pIdx Index of the referenced bit.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+BoolRef::BoolRef(const RegField& pParent, /*const */std::size_t pIdx) :
+#else
 BoolRef::BoolRef(const RegField& pParent, const std::size_t pIdx) :
+#endif
     dataField(pParent),
     idx(pIdx)
 {
@@ -527,7 +535,11 @@ BoolRef::BoolRef(const RegField& pParent, const std::size_t pIdx) :
  * \param pValue Value to be set.
  * \return \p pValue.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+bool BoolRef::operator=(/*const */bool pValue) const
+#else
 bool BoolRef::operator=(const bool pValue) const
+#endif
 {
     if (std::holds_alternative<const BitsetRef>(dataField))
         std::get<const BitsetRef>(dataField).get().operator[](idx) = pValue;
@@ -584,7 +596,11 @@ using RegField = StandardRegister::RegField;
  * \param pSize Size of the referenced field in number of bits.
  * \param pOffs Index of the referenced field's most significant bit in \p pBits.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, /*const */std::uint64_t pSize, /*const */std::uint64_t pOffs) :
+#else
 RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs) :
+#endif
     name(pName),
     size(pSize),
     offs(pOffs),
@@ -644,7 +660,11 @@ RegField::RegField(const RegField& pParent, const std::string& pName, const std:
  * \param pValue Value to be assigned.
  * \return \p pValue.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+std::uint64_t RegField::operator=(/*const */std::uint64_t pValue) const
+#else
 std::uint64_t RegField::operator=(const std::uint64_t pValue) const
+#endif
 {
     *this = Bytes::bitsetFromBytes(Bytes::composeByteVec(true, pValue), size);
     return pValue;
@@ -741,7 +761,11 @@ boost::dynamic_bitset<> RegField::toBits() const
  * \param pFieldName Name of the desired field.
  * \return Proxy class instance for child field with name \p pFieldName.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+const RegField& RegField::operator[](/*const */std::string_view pFieldName) const
+#else
 const RegField& RegField::operator[](const std::string_view pFieldName) const
+#endif
 {
     const auto it = childFields.find(pFieldName);
 
@@ -759,7 +783,11 @@ const RegField& RegField::operator[](const std::string_view pFieldName) const
  * \param pIdx Field-local bit number, assuming least significant bit first.
  * \return Proxy class instance for register field's bit \p pIdx.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+const BoolRef& RegField::operator[](/*const */std::size_t pIdx) const
+#else
 const BoolRef& RegField::operator[](const std::size_t pIdx) const
+#endif
 {
     if (pIdx >= size)
         throw std::invalid_argument("Index " + std::to_string(pIdx) + " is out of range for register field \"" + name + "\".");

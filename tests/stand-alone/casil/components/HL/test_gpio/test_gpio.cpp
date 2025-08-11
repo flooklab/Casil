@@ -44,7 +44,7 @@ namespace boost { using casil::Bytes::operator<<; }
 
 BOOST_FIXTURE_TEST_SUITE(Components_Tests, DataDirFixture)
 
-BOOST_AUTO_TEST_SUITE(RegisterDriver_Tests)
+BOOST_AUTO_TEST_SUITE(GPIO_Tests)
 
 BOOST_AUTO_TEST_CASE(Test1_zeroSize)
 {

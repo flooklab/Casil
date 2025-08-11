@@ -29,6 +29,7 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <string>
 
 using casil::Device;
 using casil::RL::StandardRegister;
@@ -543,6 +544,143 @@ BOOST_AUTO_TEST_CASE(Test7_repeat)
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
     BOOST_CHECK_EQUAL(exceptionCtr, 4);
+}
+
+BOOST_AUTO_TEST_CASE(Test8_zeroSize)
+{
+    try
+    {
+        Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                  "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 3}],"
+                  "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 0}]}");
+        (void)d;
+
+        BOOST_CHECK(false);
+    }
+    catch (const std::runtime_error&)
+    {
+        BOOST_CHECK(true);
+    }
+}
+
+/*BOOST_AUTO_TEST_CASE(Test9_fieldConfExceptions)
+{
+}*/
+
+BOOST_AUTO_TEST_CASE(Test10_otherExceptions)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 9, fields: ["
+                                "{name: COMP1, offset: 8, size: 2, fields: ["
+                                    "{name: R0, size: 1, offset: 1},"
+                                    "{name: L0, size: 1, offset: 0}"
+                                "]},"
+                                "{name: COMP2, offset: 5, size: 6, fields : ["
+                                    "{name: En0, size: 1, offset: 3},"
+                                    "{name: En1, size: 1, offset: 2},"
+                                    "{name: CTR, size: 2, offset: 1}"
+                                "]}"
+                            "]}]}");
+
+    BOOST_REQUIRE(d["reg"].init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+
+    int exceptionCtr = 0;
+
+    //Wrong path
+
+    try { (void)reg["COMP3"].getSize(); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg["COMP2"]["En0"].getSize(); }                //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg["COMP2"]["Enable"].getSize(); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    //Index range
+
+    try { (void)reg[0].get(); }                                 //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg[9].get(); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg["COMP2"][0].get(); }                        //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg["COMP2"][6].get(); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    //Assignment bitset length
+
+    try { reg["COMP2"] = boost::dynamic_bitset(std::string("010101")); }    //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { reg["COMP2"] = boost::dynamic_bitset(std::string("0101011")); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { reg["COMP2"] = boost::dynamic_bitset(std::string("01010")); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 6);
+
+    exceptionCtr = 0;
+
+    using BoolRef = StandardRegister::BoolRef;
+    using RegField = StandardRegister::RegField;
+
+    boost::dynamic_bitset bits(std::string("111111"));
+
+    try { RegField field1(bits, "SomeName", 5, 5); (void)field1; }      //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { RegField field1(bits, "SomeName", 0, 5); (void)field1; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { RegField field1(bits, "SomeName", 5, 3); (void)field1; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { RegField field1(bits, "SomeName", 5, 6); (void)field1; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 3);
+
+    exceptionCtr = 0;
+
+    RegField field1(bits, "SomeName", 5, 5);
+
+    try { RegField field2(field1, "SomeName", 4, 4); (void)field2; }    //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { RegField field2(field1, "SomeName", 0, 4); (void)field2; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { RegField field2(field1, "SomeName", 4, 2); (void)field2; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { RegField field2(field1, "SomeName", 4, 5); (void)field2; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 3);
+
+    exceptionCtr = 0;
+
+    try { BoolRef bref(bits, 0); (void)bref; }                  //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { BoolRef bref(bits, 6); (void)bref; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { BoolRef bref(field1, 0); (void)bref; }                //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { BoolRef bref(field1, 5); (void)bref; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -138,8 +138,6 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * \todo auto_start...
  * \todo init...
  *
- * \todo add more and describe those exceptions
- *
  * \internal \sa populateFieldTree() \endinternal
  *
  * \throws std::runtime_error If "size" is not defined or set to zero.

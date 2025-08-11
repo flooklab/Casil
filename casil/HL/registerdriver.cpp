@@ -98,6 +98,8 @@ using casil::Layers::HL::RegisterDriver;
  *                            does not match the register's data type for one of the registers.
  * \throws std::runtime_error If the length of the init byte sequence (default override) from \p pConfig
  *                            does not match the register size for one of the byte array registers.
+ * \throws std::runtime_error If the init value (default override) from \p pConfig cannot be parsed at all
+ *                            (does not match any of the supported data types) for one of the registers.
  *
  * \param pType Registered component type name.
  * \param pName Component instance name.
@@ -192,6 +194,11 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
             }
 
             initValues[regName] = std::move(seqVec);
+        }
+        else if (config.contains(LayerConfig::fromYAML("{init: {" + regName + ": }}"), false))
+        {
+            //Contains an entry for the register name but with invalid value / wrong type
+            throw std::runtime_error("Could not parse init value for register \"" + regName + "\" of register driver \"" + name + "\".");
         }
 
         //Initialize register proxies

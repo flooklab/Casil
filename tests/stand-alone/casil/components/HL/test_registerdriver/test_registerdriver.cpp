@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(Test2_invalidRegisterDefaultOverrides)
 
     try
     {
-        //Default type
+        //Default type mismatch
         Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
                   "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
                                 "init: { OUTPUT: 0x313 }}],"
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(Test2_invalidRegisterDefaultOverrides)
 
     try
     {
-        //Default type
+        //Default type mismatch
         Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
                   "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
                                 "init: { FOOBAR: [0x11, 0x22, 0x44] }}],"
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(Test2_invalidRegisterDefaultOverrides)
 
     try
     {
-        //Default length
+        //Default length mismatch
         Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
                   "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
                                 "init: { OUTPUT: [0x11, 0x22] }}],"
@@ -127,7 +127,18 @@ BOOST_AUTO_TEST_CASE(Test2_invalidRegisterDefaultOverrides)
     }
     catch (const std::runtime_error&) { ++exceptionCtr; }
 
-    BOOST_CHECK_EQUAL(exceptionCtr, 3);
+    try
+    {
+        //Invalid type
+        Device d("{transfer_layer: [{name: intf2, type: FakeInterface}],"
+                  "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
+                                "init: { OUTPUT: abc }}],"
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 4);
 }
 
 BOOST_AUTO_TEST_CASE(Test3_initModuleCloseModule)

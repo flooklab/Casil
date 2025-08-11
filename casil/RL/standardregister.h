@@ -72,6 +72,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <initializer_list>
 #include <map>
 #include <memory>
 #include <string>
@@ -175,6 +176,9 @@ private:
  */
 class StandardRegister::RegField                                                        // cppcheck-suppress noConstructor symbolName=RegField
 {
+private:
+    RegField(const RegField& pParent, const std::vector<std::size_t>& pIdxs);                                       ///< Constructor.
+
 public:
     RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs);   ///< Constructor.
     RegField(const RegField& pParent, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs);          ///< Constructor.
@@ -196,6 +200,9 @@ public:
     //
     const RegField& operator[](std::string_view pFieldName) const;                          ///< Access an immediate child field.
     const BoolRef& operator[](std::size_t pIdx) const;                                      ///< Access a specific bit in the field.
+    RegField operator()(std::size_t pMsbIdx, std::size_t pLsbIdx) const;                    ///< Access a slice of bits in the field.
+    RegField operator[](const std::vector<std::size_t>& pIdxs) const;                       ///< Access a set of unique bits in the field.
+    RegField operator[](std::initializer_list<std::size_t> pIdxs) const;                    ///< Access a set of unique bits in the field.
     //
     const RegField& n(std::size_t pFieldRepIdx) const;                                      ///< Access the n-th repetition of the field.
     //

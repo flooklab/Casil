@@ -547,7 +547,73 @@ BOOST_AUTO_TEST_CASE(Test7_repeat)
     BOOST_CHECK_EQUAL(exceptionCtr, 4);
 }
 
-BOOST_AUTO_TEST_CASE(Test8_zeroSize)
+BOOST_AUTO_TEST_CASE(Test8_advancedSelect)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 9, fields: ["
+                                "{name: COMP1, offset: 8, size: 2},"
+                                "{name: COMP2, offset: 5, size: 6}"
+                            "]}]}");
+
+    BOOST_REQUIRE(d["reg"].init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+
+    BOOST_CHECK_EQUAL((reg.root()(8, 0).toUInt()), 0u);
+    BOOST_CHECK_EQUAL((reg.root()[{1,3,5}].toUInt()), 0u);
+
+    reg.root()[{1, 3, 5, 0}] = 0b1100u;
+
+    BOOST_CHECK_EQUAL((reg.root()[{1, 3, 5}].toUInt()), 0b110u);
+    BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b000001010u);
+
+    reg.root()[0] = true;
+    reg.root()(4, 1) = 0x0u;
+
+    BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b000000001u);
+
+    reg.root() = 0b110010111u;
+
+    BOOST_CHECK_EQUAL((reg.root()(7, 2).toUInt()), 0b100101u);
+    BOOST_CHECK_EQUAL(reg["COMP1"].toUInt(), 0b11u);
+    BOOST_CHECK_EQUAL(reg["COMP2"].toUInt(), 0b010111u);
+    BOOST_CHECK_EQUAL(reg["COMP2"](4, 2).toUInt(), 0b101u);
+
+    reg["COMP2"](3, 3)[0] = true;
+    reg["COMP1"][{0, 1}][1] = false;
+    reg["COMP1"][{0, 1}][0] = true;
+
+    BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b100011111u);
+
+    reg.root()(6, 3) = reg.root()[{3, 4, 5, 6}].toBits();
+    //TODO replace by
+    //reg.root()(6, 3) = reg.root()(3, 6).toBits();
+    //if/once reverse selection gets implemented
+
+    BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b101100111u);
+
+    int exceptionCtr = 0;
+
+    try { (void)reg.root()(1, 2); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()(9, 1); }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()[std::vector<std::size_t>{}]; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()[{9, 1, 0}]; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()[{0, 1, 1}]; }
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 5);
+}
+
+BOOST_AUTO_TEST_CASE(Test9_zeroSize)
 {
     try
     {
@@ -564,7 +630,7 @@ BOOST_AUTO_TEST_CASE(Test8_zeroSize)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Test9_fieldConfExceptions)
+BOOST_AUTO_TEST_CASE(Test10_fieldConfExceptions)
 {
     int exceptionCtr = 0;
 
@@ -660,7 +726,7 @@ BOOST_AUTO_TEST_CASE(Test9_fieldConfExceptions)
     BOOST_CHECK_EQUAL(exceptionCtr, 17);
 }
 
-BOOST_AUTO_TEST_CASE(Test10_otherExceptions)
+BOOST_AUTO_TEST_CASE(Test11_otherExceptions)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
               "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"

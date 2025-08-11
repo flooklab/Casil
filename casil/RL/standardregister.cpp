@@ -61,7 +61,10 @@
 
 #include <casil/bytes.h>
 
+#include <algorithm>
 #include <optional>
+#include <ranges>
+#include <set>
 #include <stdexcept>
 
 namespace
@@ -100,6 +103,54 @@ std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t 
     for (std::size_t i = pOffs-(pSize-1); i <= pOffs; ++i)
         retVal.emplace_back(pParent, i);
     return retVal;
+}
+
+/*
+ * Creates and returns a vector of proxy class instances for bit manipulation of an arbitrarily
+ * ordered set of bits (with indices 'pIdxs') from (and in turn indirectly referenced by) 'pParent'.
+ * The indexing is such that returnValue[(pIdxs.size()-1):0] ^= pParent[pIdxs[0]:pIdxs[pIdxs.size()-1]].
+ *
+ * Boundaries are not checked here but used RegField::operator[](std::size_t)
+ * will throw std::invalid_argument if an index exceeds the referenced field.
+ */
+std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::vector<std::size_t>& pIdxs)
+{
+    std::vector<BoolRef> retVal;
+    retVal.reserve(pIdxs.size());
+    for (auto idx : (pIdxs | std::views::reverse))
+        retVal.push_back(pParent[idx]);
+    return retVal;
+}
+
+/*
+ * This is a helper function for RegField::RegField().
+ *
+ * Checks if 'pSize' is larger than zero and throws std::invalid_argument otherwise.
+ *
+ * Returns 'pSize'.
+ */
+std::uint64_t checkFieldSize(const std::uint64_t pSize)
+{
+    if (pSize == 0)
+        throw std::invalid_argument("Invalid field size (must be larger than zero).");
+
+    return pSize;
+}
+
+/*
+ * This is a helper function for RegField::RegField().
+ *
+ * Checks if the register field specified by values 'pSize' and 'pOffs' lies within the extent
+ * of its parent field with size 'pParentSize' and throws std::invalid_argument otherwise.
+ *
+ * Returns 'pOffs'.
+ */
+std::uint64_t checkFieldOffset(const std::uint64_t pOffs, const std::uint64_t pSize, const std::uint64_t pParentSize)
+{
+    if ((pSize > pOffs+1) || (pOffs >= pParentSize))
+        throw std::invalid_argument("Field exceeds parent field's extent.");
+
+    return pOffs;
 }
 
 } // namespace
@@ -585,6 +636,56 @@ using RegField = StandardRegister::RegField;
 /*!
  * \brief Constructor.
  *
+ * Binds the instance's register field access functions to the "artificial" field that corresponds
+ * to the potentially incoherent/disconnected set of bits with indices \p pIdxs within \p pParent.
+ * The \e first index in \p pIdxs results in the field's \e most significant bit, i.e.
+ * <tt>field[(pIdxs.size()-1):0] = pParent[pIdxs[0]:pIdxs[pIdxs.size()-1]]</tt>.
+ *
+ * The indices in \p pIdxs must be \e unique and each of them must be within the extent of \p pParent.
+ *
+ * \note This constructor is primarily made for being used by operator[](const std::vector<std::size_t>&) const. See also there.
+ *
+ * \note Other than a regular RegField (as constructed by one of the public constructors
+ *       RegField(boost::dynamic_bitset<>&, const std::string&, std::uint64_t, std::uint64_t)
+ *       or RegField(const RegField&, const std::string&, std::uint64_t, std::uint64_t))
+ *       the field offset (see getOffset() and getTotalOffset()) is set such that it
+ *       equals the \e largest index in \p pIdxs, regardless of its position.
+ *
+ * \note Invalid \p pIdxs correctly result in \c std::invalid_argument exceptions but for this constructor with possibly confusing
+ *       or at least not very helpful exception texts. Hence the passed \p pIdxs should simply \e always be correct (see above).
+ *
+ * \throws std::invalid_argument If \p pIdxs is empty.
+ * \throws std::invalid_argument If one of \p pIdxs exceeds the extent of \p pParent.
+ * \throws std::invalid_argument If \p pIdxs contains duplicate indices.
+ *
+ * \param pParent Parent register field that itself references the bits of the referenced bit sequence.
+ * \param pIdxs Indices of the bits to be referenced from \p pParent.
+ */
+RegField::RegField(const RegField& pParent, const std::vector<std::size_t>& pIdxs) :
+    name(""),
+    size(::checkFieldSize(pIdxs.size())),
+    offs(::checkFieldOffset(*std::max_element(pIdxs.begin(), pIdxs.end()), pIdxs.size(), pParent.getSize())),
+    parentSize(pParent.getSize()),
+    parentTotalOffs(pParent.getTotalOffset()),
+    dataRefs(::createBitRefs(pParent, pIdxs)),
+    childFields(),
+    repetitionKeys()
+{
+    std::set<std::size_t> idxSet;
+    for (auto idx : pIdxs)
+    {
+        if (idxSet.contains(idx))
+            throw std::invalid_argument("Indices must be unique.");
+        else
+            idxSet.insert(idx);
+    }
+}
+
+//
+
+/*!
+ * \brief Constructor.
+ *
  * Binds the instance's register field access functions to the field (with name \p pName) that corresponds to the sequence of bits
  * within \p pBits with size \p pSize and offset \p pOffs, i.e. <tt>field[(pSize-1):0] = pBits[pOffs:(pOffs-(pSize-1))]</tt>.
  *
@@ -602,18 +703,14 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, /*c
 RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs) :
 #endif
     name(pName),
-    size(pSize),
-    offs(pOffs),
+    size(::checkFieldSize(pSize)),
+    offs(::checkFieldOffset(pOffs, pSize, pBits.size())),
     parentSize(pBits.size()),
     parentTotalOffs(pBits.size()-1),
-    dataRefs(::createBitRefs(pBits, size, offs)),
+    dataRefs(::createBitRefs(pBits, pSize, pOffs)),
     childFields(),
     repetitionKeys()
 {
-    if (size == 0)
-        throw std::invalid_argument("Invalid field size (must be larger than zero).");
-    if ((size > offs+1) || (offs >= parentSize))
-        throw std::invalid_argument("Field exceeds parent bitset's extent.");
 }
 
 /*!
@@ -630,20 +727,20 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, con
  * \param pSize Size of the referenced field in number of bits.
  * \param pOffs Index of the referenced field's most significant bit in \p pParent.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+RegField::RegField(const RegField& pParent, const std::string& pName, /*const */std::uint64_t pSize, /*const */std::uint64_t pOffs) :
+#else
 RegField::RegField(const RegField& pParent, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs) :
+#endif
     name(pName),
-    size(pSize),
-    offs(pOffs),
+    size(::checkFieldSize(pSize)),
+    offs(::checkFieldOffset(pOffs, pSize, pParent.getSize())),
     parentSize(pParent.getSize()),
     parentTotalOffs(pParent.getTotalOffset()),
-    dataRefs(::createBitRefs(pParent, size, offs)),
+    dataRefs(::createBitRefs(pParent, pSize, pOffs)),
     childFields(),
     repetitionKeys()
 {
-    if (size == 0)
-        throw std::invalid_argument("Invalid field size (must be larger than zero).");
-    if ((size > offs+1) || (offs >= parentSize))
-        throw std::invalid_argument("Field exceeds parent field's extent.");
 }
 
 //Public
@@ -793,6 +890,97 @@ const BoolRef& RegField::operator[](const std::size_t pIdx) const
         throw std::invalid_argument("Index " + std::to_string(pIdx) + " is out of range for register field \"" + name + "\".");
 
     return dataRefs[pIdx];
+}
+
+/*!
+ * \brief Access a slice of bits in the field.
+ *
+ * Creates (and returns) a custom register field on demand for a contiguous
+ * slice of bits between (and including) indices \p pMsbIdx and \p pLsbIdx.
+ *
+ * \note The returned field only \e references its parent field (i.e. the field this function is called on)
+ *       and consequently all parents thereof and ultimately the containing StandardRegister.
+ *       Hence take their scope into account when trying to access the data through it.
+ *
+ * \throws std::invalid_argument If \p pMsbIdx exceeds the field size.
+ * \throws std::invalid_argument If \p pLsbIdx is larger than \p pMsbIdx.
+ *
+ * \param pMsbIdx Field-local bit number for the \e most significant bit of the selected slice.
+ * \param pLsbIdx Field-local bit number for the \e least significant bit of the selected slice.
+ * \return New proxy class instance for <tt>field[pMsbIdx:plsbIdx]</tt>.
+ */
+RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx) const
+{
+    //TODO this function should eventually become operator[] (need C++23 for multi-args there)
+
+    if (pMsbIdx >= size)
+    {
+        throw std::invalid_argument("Most significant bit index " + std::to_string(pMsbIdx) +
+                                    " is out of range for register field \"" + name + "\".");
+    }
+
+    //TODO can maybe allow reverse order by using bit_order or sth.???
+    if (pLsbIdx > pMsbIdx)
+        throw std::invalid_argument("Least significant bit index must not be larger than most significant bit index.");
+    /*if (pLsbIdx >= size)                  this check is redundant otherwise
+    {
+        throw std::invalid_argument("Least significant bit index " + std::to_string(pLsbIdx) +
+                                    " is out of range for register field \"" + name + "\".");
+    }*/
+
+    return RegField(*this, "", pMsbIdx-pLsbIdx+1, pMsbIdx);
+}
+
+/*!
+ * \brief Access a set of unique bits in the field.
+ *
+ * Creates (and returns) a custom register field on demand for an arbitrary selection of unique bits \p pIdxs.
+ *
+ * \note The returned field only \e references its parent field (i.e. the field this function is called on)
+ *       and consequently all parents thereof and ultimately the containing StandardRegister.
+ *       Hence take their scope into account when trying to access the data through it.
+ *
+ * \throws std::invalid_argument If \p pIdxs is empty.
+ * \throws std::invalid_argument If one of \p pIdxs exceeds the field's extent.
+ * \throws std::invalid_argument If \p pIdxs contains duplicate indices.
+ *
+ * \param pIdxs Unique, field-local bit numbers to form a new sub-field (in specified order).
+ * \return New proxy class instance for <tt>field[pIdxs[0]:pIdxs[pIdxs.size()-1]]</tt>.
+ */
+RegField RegField::operator[](const std::vector<std::size_t>& pIdxs) const
+{
+    if (pIdxs.empty())
+        throw std::invalid_argument("Number of selected indices must be larger than zero.");
+
+    std::set<std::size_t> idxSet;
+    for (auto idx : pIdxs)
+    {
+        if (idx >= size)
+            throw std::invalid_argument("Index " + std::to_string(idx) + " is out of range for register field \"" + name + "\".");
+
+        if (idxSet.contains(idx))
+            throw std::invalid_argument("Selected indices must be unique.");
+        else
+            idxSet.insert(idx);
+    }
+
+    return RegField(*this, pIdxs);
+}
+
+/*!
+ * \brief Access a set of unique bits in the field.
+ *
+ * This function improves overload resolution if operator[](const std::vector<std::size_t>&) const is targeted.
+ *
+ * \copydetails operator[](const std::vector<std::size_t>&) const
+ */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+RegField RegField::operator[](/*const */std::initializer_list<std::size_t> pIdxs) const
+#else
+RegField RegField::operator[](const std::initializer_list<std::size_t> pIdxs) const
+#endif
+{
+    return operator[](std::vector<std::size_t>(pIdxs));
 }
 
 //

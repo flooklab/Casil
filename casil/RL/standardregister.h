@@ -141,7 +141,7 @@ private:
  *
  * \todo ...
  */
-class StandardRegister::BoolRef
+class StandardRegister::BoolRef                                 // cppcheck-suppress noConstructor symbolName=BoolRef
 {
 public:
     BoolRef(boost::dynamic_bitset<>& pBits, std::size_t pIdx);  ///< Constructor.
@@ -173,7 +173,7 @@ private:
  *
  * \todo ...
  */
-class StandardRegister::RegField
+class StandardRegister::RegField                                                        // cppcheck-suppress noConstructor symbolName=RegField
 {
 public:
     RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs);   ///< Constructor.

@@ -754,7 +754,7 @@ const RegField& RegField::operator[](const std::string_view pFieldName) const
 /*!
  * \brief Access a specific bit in the field.
  *
- * \throws std::invalid_argument If \p pIdx exceeds the register size.
+ * \throws std::invalid_argument If \p pIdx exceeds the field size.
  *
  * \param pIdx Field-local bit number, assuming least significant bit first.
  * \return Proxy class instance for register field's bit \p pIdx.

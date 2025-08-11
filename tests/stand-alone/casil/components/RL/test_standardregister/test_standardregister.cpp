@@ -563,9 +563,101 @@ BOOST_AUTO_TEST_CASE(Test8_zeroSize)
     }
 }
 
-/*BOOST_AUTO_TEST_CASE(Test9_fieldConfExceptions)
+BOOST_AUTO_TEST_CASE(Test9_fieldConfExceptions)
 {
-}*/
+    int exceptionCtr = 0;
+
+    const std::string confStr1 = "{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                                 "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 12}],"
+                                 "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 12, ";
+    const std::string confStr2 = "}]}";
+
+    try { Device d(confStr1 + "fields: 2" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: []" + confStr2); (void)d; }      //OK
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [1, 2]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: COMP1, offset: 11, size: 2, unknownKey: 7}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{offset: 11, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: COMP1, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: COMP1, offset: 11}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: [1, 2, 3], offset: 11, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: \"\", offset: 11, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: COMP1, offset: number, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: COMP1, offset: 11, size: 0}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: COMP1, offset: 11, size: 2, repeat: 0}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: \"#COMP1\", offset: 11, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { Device d(confStr1 + "fields: [{name: \"CO.MP1\", offset: 11, size: 2}]" + confStr2); (void)d; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device d(confStr1 + "fields: ["
+                                "{name: COMP1, offset: 11, size: 2, repeat: 3, fields: ["
+                                    "{name: R0, size: 1, offset: 1},"
+                                    "{name: R0, size: 1, offset: 0}"
+                                "]}"
+                            "]" + confStr2);
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device d(confStr1 + "fields: [{name: COMP1, offset: 11, size: 12, fields: ["
+                                        "{name: R0, size: 2, offset: 11, repeat: 7}"
+                                    "]}"
+                            "]" + confStr2);
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device d(confStr1 + "fields: [{name: COMP1, offset: 11, size: 12, fields: ["
+                                        "{name: R0, size: 13, offset: 11}"
+                                    "]}"
+                            "]" + confStr2);
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        Device d(confStr1 + "fields: [{name: COMP1, offset: 11, size: 12, fields: ["
+                                        "{name: R0, size: 2, offset: 15}"
+                                    "]}"
+                            "]" + confStr2);
+        (void)d;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 17);
+}
 
 BOOST_AUTO_TEST_CASE(Test10_otherExceptions)
 {

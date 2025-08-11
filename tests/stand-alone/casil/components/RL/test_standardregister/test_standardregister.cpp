@@ -92,10 +92,13 @@ BOOST_AUTO_TEST_CASE(Test2_flatLayout)
 
     BOOST_CHECK_EQUAL(reg.root().getSize(), 11);
     BOOST_CHECK_EQUAL(reg.root().getOffset(), 10);
+    BOOST_CHECK_EQUAL(reg.root().getTotalOffset(), 10);
     BOOST_CHECK_EQUAL(reg["Reg1"].getSize(), 6);
     BOOST_CHECK_EQUAL(reg["Reg1"].getOffset(), 10);
+    BOOST_CHECK_EQUAL(reg["Reg1"].getTotalOffset(), 10);
     BOOST_CHECK_EQUAL(reg["Reg2"].getSize(), 3);
     BOOST_CHECK_EQUAL(reg["Reg2"].getOffset(), 2);
+    BOOST_CHECK_EQUAL(reg["Reg2"].getTotalOffset(), 2);
 
     BOOST_CHECK_EQUAL(reg[10].get(), false);
     BOOST_CHECK_EQUAL(reg[9].get(), false);
@@ -255,10 +258,25 @@ BOOST_AUTO_TEST_CASE(Test4_nestedSubFields)
 
     BOOST_CHECK_EQUAL(reg["SomeRegister"].getSize(), 10);
     BOOST_CHECK_EQUAL(reg["SomeRegister"].getOffset(), 9);
+    BOOST_CHECK_EQUAL(reg["SomeRegister"].getTotalOffset(), 9);
     BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0"].getSize(), 5);
     BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0"].getOffset(), 9);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0"].getTotalOffset(), 9);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0.Thr"].getSize(), 3);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0.Thr"].getOffset(), 4);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0.Thr"].getTotalOffset(), 9);
     BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0.Bias"].getSize(), 2);
     BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0.Bias"].getOffset(), 1);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf0.Bias"].getTotalOffset(), 6);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1"].getSize(), 5);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1"].getOffset(), 4);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1"].getTotalOffset(), 4);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1.Thr"].getSize(), 3);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1.Thr"].getOffset(), 4);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1.Thr"].getTotalOffset(), 4);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1.Bias"].getSize(), 2);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1.Bias"].getOffset(), 1);
+    BOOST_CHECK_EQUAL(reg["SomeRegister.Conf1.Bias"].getTotalOffset(), 1);
 
     reg["SomeRegister.Conf0.Thr"][2] = true;
     reg["SomeRegister.Conf0.Thr"][1] = false;
@@ -476,6 +494,21 @@ BOOST_AUTO_TEST_CASE(Test7_repeat)
     BOOST_CHECK_EQUAL(reg["COMP1"].n(0)["R0"].getOffset(), 1);
     BOOST_CHECK_EQUAL(reg["COMP1"].n(1)["R0"].getSize(), 1);
     BOOST_CHECK_EQUAL(reg["COMP1"].n(1)["R0"].getOffset(), 1);
+
+    BOOST_CHECK_EQUAL(reg["COMP1"].getTotalOffset(), 11);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(0).getTotalOffset(), 11);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(0)["R0"].getTotalOffset(), 11);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(0)["L0"].getTotalOffset(), 10);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(1).getTotalOffset(), 9);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(1)["R0"].getTotalOffset(), 9);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(1)["L0"].getTotalOffset(), 8);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(2).getTotalOffset(), 7);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(2)["R0"].getTotalOffset(), 7);
+    BOOST_CHECK_EQUAL(reg["COMP1"].n(2)["L0"].getTotalOffset(), 6);
+    BOOST_CHECK_EQUAL(reg["COMP2"].getTotalOffset(), 5);
+    BOOST_CHECK_EQUAL(reg["COMP2.En0"].getTotalOffset(), 3);
+    BOOST_CHECK_EQUAL(reg["COMP2.En1"].getTotalOffset(), 2);
+    BOOST_CHECK_EQUAL(reg["COMP2.CTR"].getTotalOffset(), 1);
 
     reg[11] = true;
 

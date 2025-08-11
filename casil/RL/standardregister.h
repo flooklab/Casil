@@ -202,6 +202,8 @@ public:
     std::uint64_t getSize() const;                                                          ///< Get the size of the field.
     std::uint64_t getOffset() const;                                                        ///< \brief Get the field's offset
                                                                                             ///  with respect to its parent field.
+    std::uint64_t getTotalOffset() const;                                                   ///< \brief Get the field's total offset
+                                                                                            ///  with respect to the whole register.
 
 private:
     void setChildFields(std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> pChildFields);
@@ -217,6 +219,9 @@ private:
     //
     const std::uint64_t size;                   ///< Size of the field in number of bits.
     const std::uint64_t offs;                   ///< Index of the field's most significant bit in the parent field.
+    //
+    const std::uint64_t parentSize;             ///< Size of the parent field in number of bits.
+    const std::uint64_t parentTotalOffs;        ///< Index of the parent field's most significant bit in the register's top level bitset.
     //
     const std::vector<BoolRef> dataRefs;        ///< Proxy references to all of the field's bits (least significant bit at front).
     //

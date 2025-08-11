@@ -551,10 +551,13 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, con
     name(pName),
     size(pSize),
     offs(pOffs),
+    parentSize(pBits.size()),
+    parentTotalOffs(pBits.size()-1),
     dataRefs(::createBitRefs(pBits, size, offs)),
     childFields(),
     repetitionKeys()
 {
+    //TODO check sizes etc.
 }
 
 /*!
@@ -572,10 +575,13 @@ RegField::RegField(const RegField& pParent, const std::string& pName, const std:
     name(pName),
     size(pSize),
     offs(pOffs),
+    parentSize(pParent.getSize()),
+    parentTotalOffs(pParent.getTotalOffset()),
     dataRefs(::createBitRefs(pParent, size, offs)),
     childFields(),
     repetitionKeys()
 {
+    //TODO check sizes etc.
 }
 
 //Public
@@ -772,6 +778,16 @@ std::uint64_t RegField::getSize() const
 std::uint64_t RegField::getOffset() const
 {
     return offs;
+}
+
+/*!
+ * \brief Get the field's total offset with respect to the whole register.
+ *
+ * \return Field's most significant bit index as seen from the register's top level.
+ */
+std::uint64_t RegField::getTotalOffset() const
+{
+    return parentTotalOffs - (parentSize-1) + offs;
 }
 
 //Private

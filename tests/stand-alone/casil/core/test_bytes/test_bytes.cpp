@@ -126,67 +126,69 @@ BOOST_AUTO_TEST_CASE(Test3_composeUIntNTypesException)
 BOOST_AUTO_TEST_CASE(Test4_bitsetFromBytes)
 {
     using Bytes::bitsetFromBytes;
+    using boost::dynamic_bitset;
 
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1010101u}, 7), boost::dynamic_bitset(std::string("1010101")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 7), boost::dynamic_bitset(std::string("1100111")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 11), boost::dynamic_bitset(std::string("00001100111")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 3), boost::dynamic_bitset(std::string("111")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 0), boost::dynamic_bitset(std::string("")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1010101u}, 7), dynamic_bitset(std::string("1010101")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 7), dynamic_bitset(std::string("1100111")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 11), dynamic_bitset(std::string("00001100111")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 3), dynamic_bitset(std::string("111")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b1100111u}, 0), dynamic_bitset(std::string("")));
 
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11010101u}, 8), boost::dynamic_bitset(std::string("11010101")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11001111u}, 8), boost::dynamic_bitset(std::string("11001111")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11001111u}, 5), boost::dynamic_bitset(std::string("01111")));
-    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11001111u}, 9), boost::dynamic_bitset(std::string("011001111")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11010101u}, 8), dynamic_bitset(std::string("11010101")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11001111u}, 8), dynamic_bitset(std::string("11001111")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11001111u}, 5), dynamic_bitset(std::string("01111")));
+    BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11001111u}, 9), dynamic_bitset(std::string("011001111")));
 
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b101011, 0b10001001}, 14),
-                      boost::dynamic_bitset(std::string("10101110001001")));
+                      dynamic_bitset(std::string("10101110001001")));
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b111100, 0b00100011}, 14),
-                      boost::dynamic_bitset(std::string("11110000100011")));
+                      dynamic_bitset(std::string("11110000100011")));
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b111100, 0b00100011}, 24),
-                      boost::dynamic_bitset(std::string("000000000011110000100011")));
+                      dynamic_bitset(std::string("000000000011110000100011")));
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b111100, 0b00100011}, 6),
-                      boost::dynamic_bitset(std::string("100011")));
+                      dynamic_bitset(std::string("100011")));
 
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b11111011, 0b10110110, 0b10001001}, 24),
-                      boost::dynamic_bitset(std::string("111110111011011010001001")));
+                      dynamic_bitset(std::string("111110111011011010001001")));
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b00010010, 0b01011011, 0b10100010}, 24),
-                      boost::dynamic_bitset(std::string("000100100101101110100010")));
+                      dynamic_bitset(std::string("000100100101101110100010")));
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b00010010, 0b01011011, 0b10100010}, 25),
-                      boost::dynamic_bitset(std::string("0000100100101101110100010")));
+                      dynamic_bitset(std::string("0000100100101101110100010")));
     BOOST_CHECK_EQUAL(bitsetFromBytes(std::vector<std::uint8_t>{0b00010010, 0b01011011, 0b10100010}, 23),
-                      boost::dynamic_bitset(std::string("00100100101101110100010")));
+                      dynamic_bitset(std::string("00100100101101110100010")));
 }
 
 BOOST_AUTO_TEST_CASE(Test5_bytesFromBitset)
 {
     using Bytes::bytesFromBitset;
+    using boost::dynamic_bitset;
 
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("1010101")), 1), (std::vector<std::uint8_t>{0b1010101u}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("1100111")), 1), (std::vector<std::uint8_t>{0b1100111u}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("1100111")), 0), (std::vector<std::uint8_t>{}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("1100111")), 2), (std::vector<std::uint8_t>{0b0, 0b1100111u}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("1010101")), 1), (std::vector<std::uint8_t>{0b1010101u}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("1100111")), 1), (std::vector<std::uint8_t>{0b1100111u}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("1100111")), 0), (std::vector<std::uint8_t>{}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("1100111")), 2), (std::vector<std::uint8_t>{0b0, 0b1100111u}));
 
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11010101")), 1), (std::vector<std::uint8_t>{0b11010101u}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11001111")), 1), (std::vector<std::uint8_t>{0b11001111u}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11001111")), 0), (std::vector<std::uint8_t>{}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11001111")), 2), (std::vector<std::uint8_t>{0b0, 0b11001111u}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11010101")), 1), (std::vector<std::uint8_t>{0b11010101u}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11001111")), 1), (std::vector<std::uint8_t>{0b11001111u}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11001111")), 0), (std::vector<std::uint8_t>{}));
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11001111")), 2), (std::vector<std::uint8_t>{0b0, 0b11001111u}));
 
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("10101110001001")), 2),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("10101110001001")), 2),
                       (std::vector<std::uint8_t>{0b101011, 0b10001001}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11110000100011")), 2),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11110000100011")), 2),
                       (std::vector<std::uint8_t>{0b111100, 0b00100011}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11110000100011")), 1),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11110000100011")), 1),
                       (std::vector<std::uint8_t>{0b00100011}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("11110000100011")), 5),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("11110000100011")), 5),
                       (std::vector<std::uint8_t>{0b0, 0b0, 0b0, 0b111100, 0b00100011}));
 
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("111110111011011010001001")), 3),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("111110111011011010001001")), 3),
                       (std::vector<std::uint8_t>{0b11111011, 0b10110110, 0b10001001}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("000100100101101110100010")), 3),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("000100100101101110100010")), 3),
                       (std::vector<std::uint8_t>{0b00010010, 0b01011011, 0b10100010}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("000100100101101110100010")), 2),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("000100100101101110100010")), 2),
                       (std::vector<std::uint8_t>{0b01011011, 0b10100010}));
-    BOOST_CHECK_EQUAL(bytesFromBitset(boost::dynamic_bitset(std::string("000100100101101110100010")), 4),
+    BOOST_CHECK_EQUAL(bytesFromBitset(dynamic_bitset(std::string("000100100101101110100010")), 4),
                       (std::vector<std::uint8_t>{0b0, 0b00010010, 0b01011011, 0b10100010}));
 }
 

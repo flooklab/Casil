@@ -53,6 +53,7 @@ BOOST_AUTO_TEST_CASE(Test1_zeroSize)
         Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
                   "hw_drivers: [{name: drv, type: GPIO, interface: intf, base_addr: 0x0, size: 0}],"
                   "registers: []}");
+        (void)d;
 
         BOOST_CHECK(false);
     }

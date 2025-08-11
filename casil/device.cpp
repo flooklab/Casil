@@ -42,7 +42,7 @@ using casil::HL::Driver;
 using casil::RL::Register;
 
 /*!
- * \brief Constructor.
+ * \brief Base constructor.
  *
  * Base constructor that should be called from the other constructors.
  */

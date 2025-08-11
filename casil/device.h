@@ -51,7 +51,7 @@ namespace casil
 class Device
 {
 private:
-    Device();                                                       ///< Constructor.
+    Device();                                                       ///< Base constructor.
 
 public:
     explicit Device(const boost::property_tree::ptree& pConfig);    ///< Constructor.

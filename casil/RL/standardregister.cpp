@@ -75,7 +75,7 @@ using BoolRef = casil::Layers::RL::StandardRegister::BoolRef;
  * The indexing is hence such that returnValue[(pSize-1):0] ^= pBits[pOffs:(pOffs-(pSize-1))].
  * Boundaries are not checked here.
  */
-std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, std::uint64_t pSize, std::uint64_t pOffs)
+std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, const std::uint64_t pSize, const std::uint64_t pOffs)
 {
     std::vector<BoolRef> retVal;
     retVal.reserve(pSize);
@@ -90,7 +90,7 @@ std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, std::uint64_t
  * The indexing is hence such that returnValue[(pSize-1):0] ^= pParent[pOffs:(pOffs-(pSize-1))].
  * Boundaries are not checked here.
  */
-std::vector<BoolRef> createBitRefs(const RegField& pParent, std::uint64_t pSize, std::uint64_t pOffs)
+std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs)
 {
     std::vector<BoolRef> retVal;
     retVal.reserve(pSize);

@@ -552,7 +552,7 @@ BOOST_AUTO_TEST_CASE(Test7_repeat)
 BOOST_AUTO_TEST_CASE(Test8_initApplyDefaults)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
-              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 12}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 28}],"
               "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 28, fields: ["
                                 "{name: COMP0, offset: 27, size: 4, repeat: 2, fields: ["
                                     "{name: R0, size: 2, offset: 3},"
@@ -656,7 +656,7 @@ BOOST_AUTO_TEST_CASE(Test8_initApplyDefaults)
     int exceptionCtr = 0;
 
     const std::string confStr1 = "{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
-                                  "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 12}],"
+                                  "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 10}],"
                                   "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 10, fields: ["
                                                     "{name: MainField, offset: 9, size: 10}"
                                                 "], init: ";
@@ -686,7 +686,7 @@ BOOST_AUTO_TEST_CASE(Test8_initApplyDefaults)
 BOOST_AUTO_TEST_CASE(Test9_bitOrder)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
-              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 109}],"
               "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 109, fields: ["
                                 "{name: COL0, offset: 108, size: 15, fields: ["
                                     "{name: Trim1, offset: 14, size: 5},"

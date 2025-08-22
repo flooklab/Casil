@@ -834,28 +834,34 @@ BOOST_AUTO_TEST_CASE(Test10_advancedSelect)
 
     BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b100011111u);
 
-    reg.root()(6, 3) = reg.root()[{3, 4, 5, 6}].toBits();
-    //TODO replace by
-    //reg.root()(6, 3) = reg.root()(3, 6).toBits();
-    //if/once reverse selection gets implemented
+    reg.root()(6, 3) = reg.root()(3, 6).toBits();   //Reverse some bits
 
     BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b101100111u);
 
     int exceptionCtr = 0;
 
-    try { (void)reg.root()(1, 2); }
+    try { (void)reg.root()[{7, 1, 0}]; }                        //OK
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()(9, 1); }
+    try { (void)reg.root()(2, 1); }                             //OK
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()[std::vector<std::size_t>{}]; }
+    try { (void)reg.root()(1, 2); }                             //OK
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()[{9, 1, 0}]; }
+    try { (void)reg.root()(9, 1); }                             //Most significant bit out of range
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()[{0, 1, 1}]; }
+    try { (void)reg.root()(1, 9); }                             //Least significant bit out of range
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()[std::vector<std::size_t>{}]; }       //Set is empty
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()[{9, 1, 0}]; }                        //Index out of range
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.root()[{0, 1, 1}]; }                        //Duplicate index
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
     BOOST_CHECK_EQUAL(exceptionCtr, 5);

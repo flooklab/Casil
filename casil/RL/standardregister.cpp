@@ -1117,16 +1117,18 @@ const BoolRef& RegField::operator[](const std::size_t pIdx) const
  * Creates (and returns) a custom register field on demand for a contiguous
  * slice of bits between (and including) indices \p pMsbIdx and \p pLsbIdx.
  *
+ * If \p pLsbIdx is larger than \p pMsbIdx, the slice will be reversed (least significant bit first).
+ *
  * \note The returned field only \e references its parent field (i.e. the field this function is called on)
  *       and consequently all parents thereof and ultimately the containing StandardRegister.
  *       Hence take their scope into account when trying to access the data through it.
  *
  * \throws std::invalid_argument If \p pMsbIdx exceeds the field size.
- * \throws std::invalid_argument If \p pLsbIdx is larger than \p pMsbIdx.
+ * \throws std::invalid_argument If \p pLsbIdx exceeds the field size.
  *
  * \param pMsbIdx Field-local bit number for the \e most significant bit of the selected slice.
  * \param pLsbIdx Field-local bit number for the \e least significant bit of the selected slice.
- * \return New proxy class instance for <tt>field[pMsbIdx:plsbIdx]</tt>.
+ * \return New proxy class instance for <tt>field[pMsbIdx:pLsbIdx]</tt>.
  */
 RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx) const
 {
@@ -1137,17 +1139,21 @@ RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbI
         throw std::invalid_argument("Most significant bit index " + std::to_string(pMsbIdx) +
                                     " is out of range for register field \"" + name + "\".");
     }
-
-    //TODO can maybe allow reverse order by using bit_order or sth.???
-    if (pLsbIdx > pMsbIdx)
-        throw std::invalid_argument("Least significant bit index must not be larger than most significant bit index.");
-    /*if (pLsbIdx >= size)                  this check is redundant otherwise
+    if (pLsbIdx >= size)
     {
         throw std::invalid_argument("Least significant bit index " + std::to_string(pLsbIdx) +
                                     " is out of range for register field \"" + name + "\".");
-    }*/
+    }
 
-    return RegField(*this, "", pMsbIdx-pLsbIdx+1, pMsbIdx);
+    if (pLsbIdx > pMsbIdx)  //Make reverse slice by applying inverse bit order
+    {
+        const std::uint64_t sliceSize = pLsbIdx-pMsbIdx+1;
+        std::vector<std::uint64_t> reverseBitOrder(sliceSize, 0);
+        std::generate_n(reverseBitOrder.begin(), sliceSize, [bitNum = 0]() mutable { return bitNum++; });
+        return RegField(*this, "", sliceSize, pLsbIdx, reverseBitOrder);
+    }
+    else
+        return RegField(*this, "", pMsbIdx-pLsbIdx+1, pMsbIdx);
 }
 
 /*!

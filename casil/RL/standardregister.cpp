@@ -507,10 +507,11 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             throw std::runtime_error("Invalid register field configuration for " + getSelfDescription() + ".");
 
         //Handle unknown field description elements
+        static constexpr std::array<const char*, 6> knownFieldElems = {"name", "size", "offset", "fields", "repeat", "bit_order"};
         for (const auto& [fieldKey, fieldVal] : field)
         {
             (void)fieldVal;
-            if (fieldKey != "name" && fieldKey != "size" && fieldKey != "offset" && fieldKey != "fields" && fieldKey != "repeat")
+            if (std::find(knownFieldElems.begin(), knownFieldElems.end(), fieldKey) == knownFieldElems.end())
                 throw std::runtime_error("Unknown key \"" + fieldKey + "\" in register field definition for " + getSelfDescription() + ".");
         }
 

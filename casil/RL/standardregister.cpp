@@ -150,6 +150,8 @@ std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::vector<st
     return retVal;
 }
 
+//
+
 /*
  * This is a helper function for RegField::RegField().
  *
@@ -204,6 +206,32 @@ std::vector<std::uint64_t> checkBitOrder(const std::vector<std::uint64_t>& pBitO
             throw std::invalid_argument("Bit number exceeds field's extent.");
 
     return pBitOrder;
+}
+
+//
+
+/*
+ * Converts 'pBitStr', which must be a string of zeros and ones with a "0b" prefix,
+ * to a corresponding bitset of matching length and returns that.
+ *
+ * Throws std::invalid_argument if the number of bits differs from 'pSize',
+ * if 'pBitStr' does not start with the prefix or if it contains invalid characters.
+ */
+boost::dynamic_bitset<> parseBitStr(const std::string& pBitStr, const std::uint64_t pSize)
+{
+    if (!pBitStr.starts_with("0b"))
+        throw std::invalid_argument("Bit sequence string does not start with \"0b\" prefix.");
+
+    const std::string bitSeqStr = pBitStr.substr(2);
+
+    //Bit sequence string must consist of '0's and '1's
+    if (std::any_of(bitSeqStr.begin(), bitSeqStr.end(), [](const char c){ return (c != '0' && c != '1'); }))
+        throw std::invalid_argument("Bit sequence string contains invalid characters.");
+
+    if (bitSeqStr.size() != pSize)
+        throw std::invalid_argument("Bit sequence has wrong size.");
+
+    return boost::dynamic_bitset(bitSeqStr);
 }
 
 } // namespace
@@ -361,29 +389,17 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
             if (bitSeqStr == "")    //(Need to) ignore empty nodes as most likely just intermediate nodes not actually set in the init map
                 continue;
 
-            if (!bitSeqStr.starts_with("0b"))
-            {
-                throw std::runtime_error("Invalid init bit sequence for register field \"" + fieldPath + "\" "
-                                         "of  standard register \"" + name + "\".");
-            }
-
-            const std::string bitStr = bitSeqStr.substr(2);
-
-            //Assume bit sequence, which must consist of '0's and '1's
-            if (std::any_of(bitStr.begin(), bitStr.end(), [](const char c){ return (c != '0' && c != '1'); }))
-            {
-                throw std::runtime_error("Invalid init bit sequence for register field \"" + fieldPath + "\" "
-                                         "of  standard register \"" + name + "\".");
-            }
-
             const RegField& field = *(fields.get_child(fieldPath).data());
-            if (bitStr.size() != field.getSize())
-            {
-                throw std::runtime_error("Init bit sequence for register field \"" + fieldPath + "\" of standard register "
-                                         "\"" + name + "\" has wrong size.");
-            }
 
-            value = boost::dynamic_bitset(std::string(bitStr));
+            try
+            {
+                value = ::parseBitStr(bitSeqStr, field.getSize());
+            }
+            catch (const std::invalid_argument& exc)
+            {
+                throw std::runtime_error("Invalid init bit sequence for register field \"" + fieldPath + "\" "
+                                         "of standard register \"" + name + "\": " + exc.what());
+            }
         }
     }
 }
@@ -785,28 +801,6 @@ bool StandardRegister::closeImpl()
 bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 {
     /*
-     * Converts string ('pBitStr') of zeros and ones with "0b" prefix to a corresponding bitset of
-     * matching length and returns that. Throws std::invalid_argument if number of bits differs from
-     * 'pSize', if 'pBitStr' does not start with the prefix or if it contains invalid characters.
-     */
-    auto parseBitStr = [](const std::string& pBitStr, const std::uint64_t pSize) -> boost::dynamic_bitset<>
-    {
-        if (!pBitStr.starts_with("0b"))
-            throw std::invalid_argument("Invalid bit sequence string.");
-
-        const std::string bitSeqStr = pBitStr.substr(2);
-
-        //Bit sequence string must consist of '0's and '1's
-        if (std::any_of(bitSeqStr.begin(), bitSeqStr.end(), [](const char c){ return (c != '0' && c != '1'); }))
-            throw std::invalid_argument("Invalid characters in bit sequence string.");
-
-        if (bitSeqStr.size() != pSize)
-            throw std::invalid_argument("Bit sequence length does not match register size.");
-
-        return boost::dynamic_bitset(bitSeqStr);
-    };
-
-    /*
      * Recursively traverses 'pConfTree' in order to find the eventual branch tip and then sets 'pBitStr'
      * to its value and 'pPath' to its path. Each node of 'pConfTree' must have either exactly
      * one child node or a non-empty value/data. std::runtime_error is thrown otherwise.
@@ -848,7 +842,7 @@ bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
         {
             try
             {
-                root() = parseBitStr(subTree.data(), size);
+                root() = ::parseBitStr(subTree.data(), size);
             }
             catch (const std::invalid_argument& exc)
             {
@@ -863,7 +857,7 @@ bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
             try
             {
                 const RegField& field = this->operator[](fieldPath);
-                field = parseBitStr(bitStr, field.getSize());
+                field = ::parseBitStr(bitStr, field.getSize());
             }
             catch (const std::invalid_argument& exc)
             {

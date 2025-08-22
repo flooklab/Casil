@@ -200,7 +200,7 @@ std::vector<std::uint64_t> checkBitOrder(const std::vector<std::uint64_t>& pBitO
         throw std::invalid_argument("Bit order sequence contains duplicate bit numbers.");
 
     for (const auto num : pBitOrder)
-        if (num >= pSize)
+        if (num >= pSize)                                                                               // cppcheck-suppress useStlAlgorithm
             throw std::invalid_argument("Bit number exceeds field's extent.");
 
     return pBitOrder;

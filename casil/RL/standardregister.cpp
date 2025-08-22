@@ -796,9 +796,8 @@ bool StandardRegister::closeImpl()
  * \throws std::runtime_error If a register field does not exist.
  *
  * \param pConf Desired runtime configuration tree.
- * \return If successful.
  */
-bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
+void StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 {
     /*
      * Recursively traverses 'pConfTree' in order to find the eventual branch tip and then sets 'pBitStr'
@@ -867,8 +866,6 @@ bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
         else
             throw std::runtime_error("Node has multiple child nodes.");
     }
-
-    return true;
 }
 
 /*!

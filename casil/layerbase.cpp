@@ -189,7 +189,8 @@ bool LayerBase::loadRuntimeConfiguration(const std::string& pConf)
     try
     {
         boost::property_tree::ptree tTree = Auxil::propertyTreeFromYAML(pConf);
-        return loadRuntimeConfImpl(std::move(tTree));
+        loadRuntimeConfImpl(std::move(tTree));
+        return true;
     }
     catch (const std::runtime_error& exc)
     {
@@ -251,20 +252,23 @@ const std::string& LayerBase::getSelfDescription() const
 /*!
  * \brief Perform component-specific loading of runtime configuration.
  *
- * Does nothing, just returns true (override for specific components if applicable).
+ * Does nothing (override for specific components if applicable).
+ *
+ * \throws std::runtime_error On failure (implementation-defined, see the specific component).
  *
  * \param pConf Desired runtime configuration tree.
- * \return If successful.
  */
-bool LayerBase::loadRuntimeConfImpl(boost::property_tree::ptree&&)
+void LayerBase::loadRuntimeConfImpl(boost::property_tree::ptree&&)
 {
-    return true;
+    //(sic!)
 }
 
 /*!
  * \brief Perform component-specific saving of runtime configuration.
  *
  * Does nothing, just returns an empty tree (override for specific components if applicable).
+ *
+ * \throws std::runtime_error On failure (implementation-defined, see the specific component).
  *
  * \return Current runtime configuration tree.
  */

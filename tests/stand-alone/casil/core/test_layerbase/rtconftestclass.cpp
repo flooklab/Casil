@@ -51,16 +51,15 @@ bool RTConfTestClass::closeImpl()
 
 //
 
-bool RTConfTestClass::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
+void RTConfTestClass::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 {
     try
     {
         someNumber = pConf.get_child("some_number").get_value<int>();
-        return true;
     }
-    catch (const boost::property_tree::ptree_error&)
+    catch (const boost::property_tree::ptree_error& exc)
     {
-        return false;
+        throw std::runtime_error(exc.what());
     }
 }
 

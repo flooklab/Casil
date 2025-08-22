@@ -87,7 +87,7 @@ private:
      */
     virtual bool closeImpl() = 0;
     //
-    virtual bool loadRuntimeConfImpl(boost::property_tree::ptree&& pConf);  ///< Perform component-specific loading of runtime configuration.
+    virtual void loadRuntimeConfImpl(boost::property_tree::ptree&& pConf);  ///< Perform component-specific loading of runtime configuration.
     virtual boost::property_tree::ptree dumpRuntimeConfImpl() const;        ///< Perform component-specific saving of runtime configuration.
 
 protected:

@@ -129,7 +129,7 @@ private:
     bool initImpl() override;
     bool closeImpl() override;
     //
-    bool loadRuntimeConfImpl(boost::property_tree::ptree&& pConf) override;
+    void loadRuntimeConfImpl(boost::property_tree::ptree&& pConf) override;
     boost::property_tree::ptree dumpRuntimeConfImpl() const override;
     //
     typedef boost::property_tree::basic_ptree<std::string, std::shared_ptr<RegField>> FieldTree;    ///< \brief Property tree for register

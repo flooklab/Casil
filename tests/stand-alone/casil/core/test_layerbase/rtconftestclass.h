@@ -40,7 +40,7 @@ private:
     bool initImpl() override;
     bool closeImpl() override;
     //
-    bool loadRuntimeConfImpl(boost::property_tree::ptree&& pConf) override;
+    void loadRuntimeConfImpl(boost::property_tree::ptree&& pConf) override;
     boost::property_tree::ptree dumpRuntimeConfImpl() const override;
 
 private:

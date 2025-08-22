@@ -51,8 +51,20 @@ namespace casil::Auxil
  * - In case of a sequence, these sub-trees are assigned to made-up keys "#0", "#1", etc...
  * - Scalar elements are represented as a sub-tree with a value (see \c boost::property_tree::ptree::data() ) and no childs.
  * - Elements of sequence/map type are recursively parsed sub-trees.
+ * - Map keys that contain periods ('.') will be split and result in nested sub-trees, see the attention note below.
  *
- * Note: An empty \p pYAMLString will result in an empty Property Tree.
+ * An empty \p pYAMLString will result in an empty Property Tree.
+ *
+ * \attention An \e exceptional, probably unexpedted case are map keys that contain periods ('.').
+ *            They will be interpreted as nested sub-trees with the periods serving as separators between
+ *            the nested keys, i.e. <tt>{foo: {key.with.periods: 456}, bar: 123}</tt> would lead to a
+ *            tree structure analog to <tt>{foo: {key: {with: {periods: 456}}}, bar: 123}</tt>.
+ *            This is due to the default separator of the Property Tree and is not mitigated
+ *            as it comes in handy at other places in the code anyway.
+ *            Also note that this is/can not be reversed by propertyTreeToYAML().
+ *
+ * \note To prevent confusion with the generated sequence keys, \e map keys starting with '#' should perhaps be avoided,
+ *       especially since propertyTreeToYAML() always converts the ordered keys {"#0", "#1", ...} back to \e sequences.
  *
  * \throws std::runtime_error If parsing of the YAML document \p pYAMLString fails.
  *
@@ -122,16 +134,22 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
 /*!
  * \brief Generate a YAML document from a Boost Property Tree.
  *
- * Provides the inverse operation to propertyTreeFromYAML().
+ * Provides an inverse operation to propertyTreeFromYAML() (with some specifics/exceptions, see below).
  *
- * Note: Sub-trees within \p pTree will result into a YAML \e sequence if and only if
- * the respective branch keys are exactly as specified in propertyTreeFromYAML(),
- * i.e. "#0", "#1", etc... (in that order). Otherwise a YAML \e map will be generated.
+ * Note: Sub-trees within \p pTree will result into a YAML \e sequence if and only if the respective
+ * branch keys are exactly as specified in propertyTreeFromYAML(), i.e. "#0", "#1", etc... (in that order).
+ * Otherwise a YAML \e map will be generated. If a YAML \e sequence is not desired for such a numbered tree key sequence
+ * (e.g. if it originally stems from a YAML \e map), then the '#' prefixes should simply be avoided altogether for map keys
+ * (see also propertyTreeFromYAML()).
  *
  * Note: An empty (default-constructed) \p pYAMLTree will result in an empty string.
  *
  * Note: The data string at the root of \p pYAMLTree will be ignored, i.e. there
  * must be at least one child branch for \p pYAMLTree not to count as empty.
+ *
+ * Note: As mentioned in propertyTreeFromYAML(), \e that function splits nodes with keys that
+ * contain periods into nested sub-trees. \e This function can of course not distinguish those
+ * cases and hence will leave the tree structure as is, i.e. cannot reverse the splitting.
  *
  * \throws std::runtime_error If the conversion of the generated YAML node tree to the needed YAML document string fails.
  *

@@ -747,28 +747,160 @@ bool StandardRegister::closeImpl()
 /*!
  * \copybrief Register::loadRuntimeConfImpl()
  *
- * ...
+ * Sets the register content (whole register and/or individual fields) according to the values specified in \p pConf.
  *
- * \todo ...
+ * \p pConf is expected to be an ordered list (at the top level) of register/field to value assignments where
+ * each of the list nodes can be either a node with just a value (to assign to the whole register) or a node
+ * with just one child node (to assign to a specific register field), which can in turn have another single
+ * child node or a value (and so forth). The child node keys determine the path of the to be assigned register field.
+ * Every value must be a string of zeros and ones with "0b" prefix as direct representation of the referred bit sequence.
+ *
+ * To provide an example, \p pConf might look similar to this:
+ * - \c pConf: no %data() at node
+ *  - #0: "0b101010101010"
+ *  - #1: no %data() at node
+ *   - Some: no %data() at node
+ *    - Field: no %data() at node
+ *     - Path: "0b111"
+ *  - #2: no %data() at node
+ *   - AnotherField: "0b1010"
+ *
+ * Note that this can be optimally achieved for LayerBase::loadRuntimeConfiguration() by using a YAML sequence,
+ * such as <tt>["0b101010101010", {Some.Field.Path: "0b111"}, {AnotherField: "0b1010"}]</tt>.
+ *
+ * The register/field assignments will be made in the specified order and using RegField::operator=(const boost::dynamic_bitset<>&) const.
+ *
+ * Note: The length of every bit sequence must exactly match the register/field size.
+ *
+ * \throws std::runtime_error If a node in \p pConf has neither non-empty data nor a child node.
+ * \throws std::runtime_error If a node in \p pConf has \e both non-empty data and a child node.
+ * \throws std::runtime_error If a node in \p pConf has multiple child nodes.
+ * \throws std::runtime_error If a bit sequence string has invalid format (missing prefix, invalid characters).
+ * \throws std::runtime_error If the bit sequence length differs from the register or register field size.
+ * \throws std::runtime_error If a register field does not exist.
  *
  * \param pConf Desired runtime configuration tree.
  * \return If successful.
  */
 bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 {
+    /*
+     * Converts string ('pBitStr') of zeros and ones with "0b" prefix to a corresponding bitset of
+     * matching length and returns that. Throws std::invalid_argument if number of bits differs from
+     * 'pSize', if 'pBitStr' does not start with the prefix or if it contains invalid characters.
+     */
+    auto parseBitStr = [](const std::string& pBitStr, const std::uint64_t pSize) -> boost::dynamic_bitset<>
+    {
+        if (!pBitStr.starts_with("0b"))
+            throw std::invalid_argument("Invalid bit sequence string.");
+
+        const std::string bitSeqStr = pBitStr.substr(2);
+
+        //Bit sequence string must consist of '0's and '1's
+        if (std::any_of(bitSeqStr.begin(), bitSeqStr.end(), [](const char c){ return (c != '0' && c != '1'); }))
+            throw std::invalid_argument("Invalid characters in bit sequence string.");
+
+        if (bitSeqStr.size() != pSize)
+            throw std::invalid_argument("Bit sequence length does not match register size.");
+
+        return boost::dynamic_bitset(bitSeqStr);
+    };
+
+    /*
+     * Recursively traverses 'pConfTree' in order to find the eventual branch tip and then sets 'pBitStr'
+     * to its value and 'pPath' to its path. Each node of 'pConfTree' must have either exactly
+     * one child node or a non-empty value/data. std::runtime_error is thrown otherwise.
+     */
+    std::function<void(const boost::property_tree::ptree&, std::string&, std::string&)> recurseConfTree =
+            [&recurseConfTree](const boost::property_tree::ptree& pConfTree, std::string& pPath, std::string& pBitStr) -> void
+    {
+        if (pConfTree.empty() && pConfTree.data() == "")
+            throw std::runtime_error("Node has neither non-empty data nor a child node.");
+        else if (!pConfTree.empty() && pConfTree.data() != "")
+            throw std::runtime_error("Node must have either non-empty data or a child node.");
+        else if (pConfTree.empty())
+        {
+            pBitStr = pConfTree.data();
+            return;
+        }
+        else if (pConfTree.size() == 1)
+        {
+            const auto [key, subTree] = pConfTree.front();
+
+            if (pPath == "")
+                pPath.append(key);
+            else
+                pPath.append("." + key);
+
+            recurseConfTree(subTree, pPath, pBitStr);
+        }
+        else
+            throw std::runtime_error("Node has multiple child nodes.");
+    };
+
+    for (const auto& [key, subTree] : pConf)
+    {
+        if (subTree.empty() && subTree.data() == "")
+            throw std::runtime_error("Node has neither non-empty data nor a child node.");
+        else if (!subTree.empty() && subTree.data() != "")
+            throw std::runtime_error("Node must have either non-empty data or a child node.");
+        else if (subTree.empty())
+        {
+            try
+            {
+                root() = parseBitStr(subTree.data(), size);
+            }
+            catch (const std::invalid_argument& exc)
+            {
+                throw std::runtime_error(exc.what());
+            }
+        }
+        else if (subTree.size() == 1)
+        {
+            std::string fieldPath;
+            std::string bitStr;
+            recurseConfTree(subTree, fieldPath, bitStr);
+            try
+            {
+                const RegField& field = this->operator[](fieldPath);
+                field = parseBitStr(bitStr, field.getSize());
+            }
+            catch (const std::invalid_argument& exc)
+            {
+                throw std::runtime_error(exc.what());
+            }
+        }
+        else
+            throw std::runtime_error("Node has multiple child nodes.");
+    }
+
+    return true;
 }
 
 /*!
  * \copybrief Register::dumpRuntimeConfImpl()
  *
- * ...
+ * Takes the current register content as bit sequence (see e.g. get()), converts this to a string, adds a "0b" prefix and
+ * constructs a "configuration tree" with a single child (at key "#0") that has its data set to this very "bit sequence string".
  *
- * \todo ...
+ * Note: According to Auxil::propertyTreeFromYAML() the returned tree is equivalent
+ * to a YAML sequence with a single element, such as <tt>["0b101010101010"]</tt>.
+ * See also the example in loadRuntimeConfImpl().
  *
  * \return Current runtime configuration tree.
  */
 boost::property_tree::ptree StandardRegister::dumpRuntimeConfImpl() const
 {
+    std::string bitStr;
+    boost::to_string(root().toBits(), bitStr);
+
+    boost::property_tree::ptree subTree;
+    subTree.data() = "0b" + bitStr;
+
+    boost::property_tree::ptree confTree;
+    confTree.push_back({"#0", subTree});
+
+    return confTree;
 }
 
 //

@@ -1289,16 +1289,91 @@ BOOST_AUTO_TEST_CASE(Test16_writeReadAndReadTree)
 BOOST_AUTO_TEST_CASE(Test17_loadDumpConf)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
-              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
-              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 9, fields: ["
-                                "{name: some_field, offset: 8, size: 9}"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 109}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 109, fields: ["
+                                "{name: COL0, offset: 108, size: 15, fields: ["
+                                    "{name: Trim1, offset: 14, size: 5},"
+                                    "{name: Trim2, offset: 9, size: 5, bit_order: [4, 3, 2, 1, 0]},"
+                                    "{name: Trim3, offset: 4, size: 5, bit_order: [0, 1, 3, 4, 2]}"
+                                "]},"
+                                "{name: ROW, offset: 93, size: 11, repeat: 8, bit_order: [8, 9, 10, 4, 5, 6, 7, 0, 1, 2, 3], fields: ["
+                                    "{name: En0, offset: 10, size: 1},"
+                                    "{name: En1, offset: 9, size: 1},"
+                                    "{name: En2, offset: 8, size: 1},"
+                                    "{name: InL, offset: 7, size: 4, bit_order: [0, 1, 2, 3]},"
+                                    "{name: InR, offset: 3, size: 4}"
+                                "]},"
+                                "{name: Test, offset: 5, size: 6, bit_order: [5, 3, 1, 4, 2, 0], fields: ["
+                                    "{name: Upper, offset: 5, size: 3},"
+                                    "{name: Lower, offset: 2, size: 3, bit_order: [1, 0, 2]}"
+                                "]}"
                             "]}]}");
 
     BOOST_REQUIRE(d["reg"].init());
 
     StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
 
-    //TODO
+    reg.root() = boost::dynamic_bitset(std::string("1011100110111110000011010000000110001000000001110110011"
+                                                   "001101011110111001100001010010010100110010110100101011"));
+
+    BOOST_REQUIRE_EQUAL(reg.get(), boost::dynamic_bitset(std::string("1011100110111110000011010000000110001000000001110110011"
+                                                                     "001101011110111001100001010010010100110010110100101011")));
+
+    const std::string rconf = reg.dumpRuntimeConfiguration();
+
+    reg.setAll(false);
+
+    BOOST_REQUIRE_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("0000000000000000000000000000000000000000000000000000000"
+                                                                               "000000000000000000000000000000000000000000000000000000")));
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration(rconf));
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("1011100110111110000011010000000110001000000001110110011"
+                                                                             "001101011110111001100001010010010100110010110100101011")));
+
+    reg.setAll(false);
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{Test: \"0b111111\"},"
+                                             "\"0b0000000000000000000000000000000000000000000000000000000"
+                                               "000000000000000000000000000000000000000000000000000000\""
+                                             "]"));
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("0000000000000000000000000000000000000000000000000000000"
+                                                                             "000000000000000000000000000000000000000000000000000000")));
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "\"0b0101010101010101010101010101010101010101010101010101010"
+                                               "101010101010101010101010101010101010101010101010101010\","
+                                             "{COL0: \"0b111111111111111\"},"
+                                             "{COL0.Trim2: \"0b00000\"},"
+                                             "{COL0.Trim3: \"0b01111\"},"
+                                             "{COL0.Trim3: \"0b00111\"},"
+                                             "{ROW.#1.En1: \"0b0\"},"
+                                             "{ROW.#1.En2: \"0b1\"},"
+                                             "{ROW.#0.InR: \"0b1101\"},"
+                                             "{Test.Lower: \"0b111\"},"
+                                             "{Test: \"0b000000\"}"
+                                             "]"));
+
+    BOOST_CHECK_NE(reg.root().toBits(), boost::dynamic_bitset(std::string("0101010101010101010101010101010101010101010101010101010"
+                                                                          "101010101010101010101010101010101010101010101010101010")));
+
+    BOOST_CHECK_EQUAL(reg["COL0.Trim1"].toBits(), boost::dynamic_bitset(std::string("11111")));
+    BOOST_CHECK_EQUAL(reg["COL0.Trim2"].toBits(), boost::dynamic_bitset(std::string("00000")));
+    BOOST_CHECK_EQUAL(reg["COL0.Trim3"].toBits(), boost::dynamic_bitset(std::string("00111")));
+
+    BOOST_CHECK_EQUAL(reg["ROW.#1.En0"].toBits(), boost::dynamic_bitset(std::string("0")));
+    BOOST_CHECK_EQUAL(reg["ROW.#1.En1"].toBits(), boost::dynamic_bitset(std::string("0")));
+    BOOST_CHECK_EQUAL(reg["ROW.#1.En2"].toBits(), boost::dynamic_bitset(std::string("1")));
+    BOOST_CHECK_EQUAL(reg["ROW.#1.InL"].toBits(), boost::dynamic_bitset(std::string("1010")));
+    BOOST_CHECK_EQUAL(reg["ROW.#1.InR"].toBits(), boost::dynamic_bitset(std::string("0101")));
+    BOOST_CHECK_EQUAL(reg["ROW.#0.InR"].toBits(), boost::dynamic_bitset(std::string("1101")));
+    BOOST_CHECK_EQUAL(reg["ROW"](65, 0).toBits(),   //[ROW.#2, ..., ROW.#7]
+                      boost::dynamic_bitset(std::string("101010101010101010101010101010101010101010101010101010101010101010")));
+
+    BOOST_CHECK_EQUAL(reg["Test.Upper"].toBits(), boost::dynamic_bitset(std::string("000")));
+    BOOST_CHECK_EQUAL(reg["Test.Lower"].toBits(), boost::dynamic_bitset(std::string("000")));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -356,6 +356,12 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
 
     //Initially fill init value map for every register field with no value (i.e. std::monostate) set
 
+    /*
+     * Recursively traverses 'pFieldTree' and adds an std::monostate{} instance to 'pInitValues' for every node in the tree, except
+     * for the root node if 'pKey' is empty. The keys for the inserted values will be the paths leading to those individual nodes
+     * in the tree, where keys from adjacent recursion levels get concatenated with a period ('.') and every path will be prefixed
+     * by the initially passed value of 'pPath' (again, separated by a period), unless initial 'pPath' is empty (no prefix then).
+     */
     std::function<void(std::map<std::string, VariantValueType>&, const FieldTree&, const std::string&)> fillInitValues =
             [&fillInitValues](std::map<std::string, VariantValueType>& pInitValues, const FieldTree& pFieldTree,
                               const std::string& pKey) -> void

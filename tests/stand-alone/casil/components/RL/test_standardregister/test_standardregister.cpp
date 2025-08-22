@@ -681,7 +681,121 @@ BOOST_AUTO_TEST_CASE(Test8_initApplyDefaults)
     BOOST_CHECK_EQUAL(exceptionCtr, 4);
 }
 
-BOOST_AUTO_TEST_CASE(Test9_advancedSelect)
+BOOST_AUTO_TEST_CASE(Test9_bitOrder)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 109, fields: ["
+                                "{name: COL0, offset: 108, size: 15, fields: ["
+                                    "{name: Trim1, offset: 14, size: 5},"
+                                    "{name: Trim2, offset: 9, size: 5, bit_order: [4, 3, 2, 1, 0]},"
+                                    "{name: Trim3, offset: 4, size: 5, bit_order: [0, 1, 3, 4, 2]}"
+                                "]},"
+                                "{name: ROW, offset: 93, size: 11, repeat: 8, bit_order: [8, 9, 10, 4, 5, 6, 7, 0, 1, 2, 3], fields: ["
+                                    "{name: En0, offset: 10, size: 1},"
+                                    "{name: En1, offset: 9, size: 1},"
+                                    "{name: En2, offset: 8, size: 1},"
+                                    "{name: InL, offset: 7, size: 4, bit_order: [0, 1, 2, 3]},"
+                                    "{name: InR, offset: 3, size: 4}"
+                                "]},"
+                                "{name: Test, offset: 5, size: 6, bit_order: [5, 3, 1, 4, 2, 0], fields: ["
+                                    "{name: Upper, offset: 5, size: 3},"
+                                    "{name: Lower, offset: 2, size: 3, bit_order: [1, 0, 2]}"
+                                "]}"
+                            "]}]}");
+
+    BOOST_REQUIRE(d["reg"].init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+
+    reg["COL0"] = 0b10110'10110'10110u;
+    reg["ROW"] = boost::dynamic_bitset(std::string("11010101010" "11010101010" "11010101010" "11010101010"
+                                                   "11010101010" "11010101010" "11010101010" "11010101010"));
+    reg["Test"] = 0b110100u;
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string(
+                          "10110" "10110" "10110"
+                          "11010101010" "11010101010" "11010101010" "11010101010" "11010101010" "11010101010" "11010101010" "11010101010"
+                          "111000"
+                          )));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(0).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(1).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(2).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(3).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(4).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(5).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(6).toBits(), boost::dynamic_bitset(std::string("01101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7).toUInt(),                                  0b01101010101u);
+
+    reg.root() = boost::dynamic_bitset(std::string(
+                   "01001" "01001" "01001"
+                   "00101010101" "00101010101" "00101010101" "00101010101" "00101010101" "00101010101" "00101010101" "00101010101"
+                   "000111"
+                    ));
+
+    BOOST_CHECK_EQUAL(reg["COL0"].toUInt(), 0b01001'01001'01001u);
+    BOOST_CHECK_EQUAL(reg["ROW"].toBits(), boost::dynamic_bitset(std::string("00101010101" "00101010101" "00101010101" "00101010101"
+                                                                             "00101010101" "00101010101" "00101010101" "00101010101")));
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7).toUInt(),                             0b10010101010u);
+    BOOST_CHECK_EQUAL(reg["Test"].toUInt(), 0b001011u);
+
+    BOOST_CHECK_EQUAL(reg["COL0"]["Trim1"].toUInt(), 0b01001u);
+    BOOST_CHECK_EQUAL(reg["COL0"]["Trim2"].toUInt(), 0b01001u);
+    BOOST_CHECK_EQUAL(reg["COL0"]["Trim3"].toUInt(), 0b10100u);
+
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7)["En0"].toUInt(), 0b1u);
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7)["En1"].toUInt(), 0b0u);
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7)["En2"].toUInt(), 0b0u);
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7)["InL"].toUInt(), 0b0101u);
+    BOOST_CHECK_EQUAL(reg["ROW"].n(7)["InR"].toUInt(), 0b1010u);
+
+    BOOST_CHECK_EQUAL(reg["Test.Upper"].toUInt(), 0b001u);
+    BOOST_CHECK_EQUAL(reg["Test.Lower"].toUInt(), 0b110u);
+
+    reg["COL0"]["Trim2"] = 0b11010u;
+    reg["COL0"]["Trim3"] = 0b01010u;
+    reg["ROW"].n(1)["InL"] = 0b1110u;
+    reg["Test.Lower"] = 0b010u;
+
+    BOOST_CHECK_EQUAL(reg["COL0"]["Trim2"].toUInt(), 0b11010u);
+    BOOST_CHECK_EQUAL(reg["COL0"]["Trim3"].toUInt(), 0b01010u);
+    BOOST_CHECK_EQUAL(reg["COL0"].toUInt(), 0b01001'11010'10010u);
+    BOOST_CHECK_EQUAL(reg["ROW"].n(1)["InL"].toUInt(), 0b1110u);
+    BOOST_CHECK_EQUAL(reg["ROW"].n(1).toUInt(), 0b10001111010u);
+    BOOST_CHECK_EQUAL(reg["Test.Lower"].toUInt(), 0b010u);
+    BOOST_CHECK_EQUAL(reg["Test"].toUInt(), 0b001001u);
+
+    //Test exceptions
+
+    int exceptionCtr = 0;
+
+    const std::string confStr1 = "{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                                  "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 12}],"
+                                  "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 12, fields: ["
+                                    "{name: Test2, offset: 11, size: 4, repeat: 2, fields: ["
+                                        "{name: Inner, offset: 3, size: 4, bit_order: ";
+
+    const std::string confStr2 = "}]},"
+                                    "{name: Test1, offset: 3, size: 4, fields: ["
+                                        "{name: Inner, offset: 3, size: 4, bit_order: ";
+
+    const std::string confStr3 = "}]}]}]}";
+
+    for (const auto& bitOrderStr : std::vector<std::string>{"[3, 1, 2, 0]",     //OK
+                                                            "[0, 1, 2, 3]",     //OK
+                                                            "[0, 0, 2, 3]",     //Duplicate bit
+                                                            "[0, 1, 4, 3]",     //Index out of range
+                                                            "[0, 1, 2, 3, 4]",  //Wrong size (and index out of range)
+                                                            "[0, 1, 2]"})       //Wrong size
+    {
+        try { Device d2(confStr1 + bitOrderStr + confStr2 + bitOrderStr + confStr3); (void)d2; }
+        catch (const std::runtime_error&) { ++exceptionCtr; }
+    }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 4);
+}
+
+BOOST_AUTO_TEST_CASE(Test10_advancedSelect)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
               "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
@@ -747,7 +861,7 @@ BOOST_AUTO_TEST_CASE(Test9_advancedSelect)
     BOOST_CHECK_EQUAL(exceptionCtr, 5);
 }
 
-BOOST_AUTO_TEST_CASE(Test10_zeroSize)
+BOOST_AUTO_TEST_CASE(Test11_zeroSize)
 {
     try
     {
@@ -764,7 +878,7 @@ BOOST_AUTO_TEST_CASE(Test10_zeroSize)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Test11_fieldConfExceptions)
+BOOST_AUTO_TEST_CASE(Test12_fieldConfExceptions)
 {
     int exceptionCtr = 0;
 
@@ -860,7 +974,7 @@ BOOST_AUTO_TEST_CASE(Test11_fieldConfExceptions)
     BOOST_CHECK_EQUAL(exceptionCtr, 17);
 }
 
-BOOST_AUTO_TEST_CASE(Test12_otherExceptions)
+BOOST_AUTO_TEST_CASE(Test13_otherExceptions)
 {
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
               "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"

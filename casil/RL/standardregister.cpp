@@ -106,6 +106,34 @@ std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t 
 }
 
 /*
+ * Creates and returns a 'pSize' long vector of proxy class instances for bit manipulation of a contiguous range of
+ * 'pSize' bits from (and in turn indirectly referenced by) 'pParent' at a most significant bit offset of 'pOffs'.
+ * The actual bit indices are permuted according to 'pBitOrder', which must be a 'pSize' long vector with unique indices between
+ * 0 and 'pSize'-1. The indexing is hence such that returnValue[pBitOrder[0:(pSize-1)]] ^= pParent[pOffs:(pOffs-(pSize-1))],
+ * which for regular bit ordering with pBitOrder = [(pSize-1), ..., 0] would simplify to
+ * returnValue[(pSize-1):0] ^= pParent[pOffs:(pOffs-(pSize-1))] just as in
+ * createBitRefs(const RegField&, std::uint64_t, std::uint64_t) above.
+ *
+ * Boundaries and bit order conditions are not checked here but the used BoolRef::BoolRef()
+ * will at least throw std::invalid_argument if an index exceeds the referenced field.
+ */
+std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs,
+                                   const std::vector<std::uint64_t>& pBitOrder)
+{
+    std::vector<std::size_t> idxs;
+    idxs.reserve(pSize);
+    for (std::size_t i = pOffs-(pSize-1); i <= pOffs; ++i)
+        idxs.push_back(i);
+
+    std::vector<BoolRef> retVal;
+    retVal.reserve(pSize);
+    for (std::size_t i = 0; i < pSize; ++i)
+        retVal.emplace_back(pParent, idxs[pBitOrder[(pSize-1)-i]]);
+
+    return retVal;
+}
+
+/*
  * Creates and returns a vector of proxy class instances for bit manipulation of an arbitrarily
  * ordered set of bits (with indices 'pIdxs') from (and in turn indirectly referenced by) 'pParent'.
  * The indexing is such that returnValue[(pIdxs.size()-1):0] ^= pParent[pIdxs[0]:pIdxs[pIdxs.size()-1]].
@@ -153,6 +181,31 @@ std::uint64_t checkFieldOffset(const std::uint64_t pOffs, const std::uint64_t pS
     return pOffs;
 }
 
+/*
+ * This is a helper function for RegField::RegField() (and StandardRegister::populateFieldTree()).
+ *
+ * Checks if the bit order permutation 'pBitOrder' has 'pSize' index elements with each index having a
+ * value between 0 and 'pSize'-1 and if there are no duplicates (which overall implies that 'pBitOrder'
+ * contains every index from 0 to 'pSize'-1) and throws std::invalid_argument otherwise.
+ *
+ * Returns 'pBitOrder'.
+ */
+std::vector<std::uint64_t> checkBitOrder(const std::vector<std::uint64_t>& pBitOrder, const std::uint64_t pSize)
+{
+    if (pBitOrder.size() != pSize)
+        throw std::invalid_argument("Bit order sequence length differs from field size.");
+
+    const std::set<std::uint64_t> tSet(pBitOrder.begin(), pBitOrder.end());
+    if (tSet.size() != pSize)
+        throw std::invalid_argument("Bit order sequence contains duplicate bit numbers.");
+
+    for (const auto num : pBitOrder)
+        if (num >= pSize)
+            throw std::invalid_argument("Bit number exceeds field's extent.");
+
+    return pBitOrder;
+}
+
 } // namespace
 
 using casil::Layers::RL::StandardRegister;
@@ -177,13 +230,26 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * Every field can optionally define its own nested field sequence (key "fields") to further define sub-fields,
  * which all have to be fully contained within the defining field.
  *
- * If the unsigned integer value "repeat" is defined and larger than 1, an intermediate layer (between the field and possibly
- * sub-fields) of sub-fields is automatically inserted, representing identical (except bit shifted) repetitions/copies of the
- * given field configuration including its sub-fields. The actual size of the field then becomes \c repeat \c * \c size, while
+ * If the unsigned integer value "repeat" is defined for a field and larger than 1, an intermediate layer (between the field and
+ * possibly sub-fields) of sub-fields is automatically inserted, representing identical (except bit shifted) repetitions/copies of
+ * the given field configuration including its sub-fields. The actual size of the field then becomes \c repeat \c * \c size, while
  * each of the repetitions has a size of \c size and has an accordingly shifted offset with respect to the full repeated field.
  * The n-th repetition can be accessed via RegField::n() or the regular RegField::operator[](std::string_view) const /
  * StandardRegister::operator[](const std::string&) const using "#0", "#1", etc. as keys.
  * Note that here the zeroth repetition is the one starting at the highest offset (as inherited from basil).
+ *
+ * If the unsigned integer sequence "bit_order" is defined for a field, the order in which the parent field's bits get
+ * referenced is changed according to the permutation that is specified by this sequence. This does not change the field's
+ * properties (such as its offset) otherwise nor which bit range of the parent field gets referenced, just the internal
+ * mapping/order of which field bit points to which of the parent field's bits. The regular order (most significant bit
+ * points to most significant bit) is equivalent to a descending bit order sequence as <tt>[size-1, size-2, ..., 0]</tt>.
+ *
+ * The bit order sequence must have the same size as the field and contain every index out of <tt>[0, size)</tt>,
+ * which implies that duplicate bit assignments are not possible. Note that if the field gets repeated (see above) the
+ * specified bit order applies to each field repetition independently. Setting a bit order for the \e whole field is then not
+ * possible. Also note that child fields access their parent field's bits via RegField::operator[](std::size_t pIdx) const,
+ * i.e. the parent's bit order is transparent and implicitly applies to its childs. For more details on the bit order see
+ * also RegField(const RegField&, const std::string&, std::uint64_t, std::uint64_t, const std::vector<std::uint64_t>&).
  *
  * An optional "init" map can be specified in \p pConfig in order to define default values for specific register fields.
  * The keys in that map define the fields by their paths (as used in the argument to operator[](const std::string&) const).
@@ -199,7 +265,6 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * bit sequence the sequence/string length must be equal to the field length. Also note that there must not be multiple/conflicting
  * assignments for overlapping/nested fields as no guarantee is made about the order in which the fields will be set.
  *
- * \todo bit_order...
  * \todo auto_start...
  *
  * \internal \sa populateFieldTree() \endinternal
@@ -211,9 +276,11 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * \throws std::runtime_error If a field node definition is missing an essential value (need "name", "size", "offset").
  * \throws std::runtime_error If one of the "value"-keys (such as "name", "size", etc.) in a field node definition does not
  *                            hold a \e value or has child nodes.
- * \throws std::runtime_error If parsing of one of the integer values (size, offset, repeat) fails.
+ * \throws std::runtime_error If parsing of one of the integer values ("size", "offset", "repeat") fails.
+ * \throws std::runtime_error If parsing of a "bit_order" sequence fails (no sequence, invalid format).
  * \throws std::runtime_error If a field size is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field repetition count is set to zero or the corresponding unsigned integer conversion fails.
+ * \throws std::runtime_error If a field's bit order is invalid (wrong length, duplicate indices, index out of range).
  * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
  * \throws std::runtime_error If the same field name is defined multiple times within a group of child fields.
  * \throws std::runtime_error If a field exceeds the parent field's extent.
@@ -232,7 +299,7 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
     fields(),
     initValues()
 {
-    //TODO process "auto_start", "bit_order" (field)
+    //TODO process "auto_start"
 
     if (size == 0)
         throw std::runtime_error("Invalid register size set for " + getSelfDescription() + ".");
@@ -463,8 +530,9 @@ bool StandardRegister::closeImpl()
  *   - offset: 7
  *   - repeat: 3
  *
- * As can be seen, the "repeat" and "bit_order" entries are optional. For more information on \p pConfTree,
- * allowed values and their effects please refer to StandardRegister().
+ * As can be seen, the "repeat" and "bit_order" entries are optional. Note that "bit_order" is actually supposed to be a \e sequence,
+ * hence if a map \e is used (as in the example above) the key names have no effect because only the order matters (most significant
+ * field bit index first). For more information on \p pConfTree, allowed values and their effects please refer to StandardRegister().
  *
  * This function inserts a proxy instance as child into \p pFieldTree for every field description from \p pConfTree, and for every
  * child that has a nested "fields" sequence, does that recursively for the child branch. Proxy instance here means that the fields in
@@ -483,13 +551,15 @@ bool StandardRegister::closeImpl()
  * \throws std::runtime_error If a field node definition is missing an essential value (need "name", "size", "offset").
  * \throws std::runtime_error If one of the "value"-keys (such as "name", "size", etc.) in a field node definition does not
  *                            hold a \e value or has child nodes.
- * \throws std::runtime_error If parsing of one of the integer values (size, offset, repeat) fails.
+ * \throws std::runtime_error If parsing of one of the integer values ("size", "offset", "repeat") fails.
+ * \throws std::runtime_error If parsing of a "bit_order" sequence fails (no sequence, invalid format).
  * \throws std::runtime_error If a field size is set to zero or the corresponding unsigned integer conversion fails.
  * \throws std::runtime_error If a field repetition count is set to zero or the corresponding unsigned integer conversion fails.
+ * \throws std::runtime_error If a field's bit order is invalid (wrong length, duplicate indices, index out of range).
  * \throws std::runtime_error If a field name is invalid (contains '.' or starts with '#').
  * \throws std::runtime_error If the same field name is defined multiple times within a group of child fields.
  * \throws std::runtime_error If a field exceeds the parent field's extent.
- * \throws std::runtime_error Possibly/effectively if \p pParentKey is wrong (might cause on of the other exceptions).
+ * \throws std::runtime_error Possibly/effectively if \p pParentKey is wrong (might cause one of the other exceptions).
  *
  * \param pFieldTree Tree to be filled with proxies for every register field as defined in \p pConfTree.
  * \param pConfTree Configuration tree describing the register fields structure/hierarchy.
@@ -525,11 +595,15 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         //Field repetition number defined? (optional)
         const bool repsDefined = (field.find("repeat") != field.not_found());
 
+        //Field repetition number defined? (optional)
+        const bool orderDefined = (field.find("bit_order") != field.not_found());
+
         //Handle missing/invalid data of field description elements
         if (!field.get_child("name").empty() || field.get_child("name").data() == "" ||
             !field.get_child("size").empty() || field.get_child("size").data() == "" ||
             !field.get_child("offset").empty() || field.get_child("offset").data() == "" ||
-            (repsDefined && (!field.get_child("repeat").empty() || field.get_child("repeat").data() == "")))
+            (repsDefined && (!field.get_child("repeat").empty() || field.get_child("repeat").data() == "")) ||
+            (orderDefined && (field.get_child("bit_order").empty() || field.get_child("bit_order").data() != "")))
         {
             throw std::runtime_error("Invalid register field configuration for " + getSelfDescription() + ".");
         }
@@ -538,10 +612,12 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         const std::string fullKey = pParentKey + "." + key;
 
         //Parse field description elements
+
         const std::string tName = config.getStr(fullKey + ".name");
         const std::optional<std::uint64_t> tSizeOpt = config.getUIntOpt(fullKey + ".size");
         const std::optional<std::uint64_t> tOffsOpt = config.getUIntOpt(fullKey + ".offset");
         const std::optional<std::uint64_t> tRepsOpt = repsDefined ? config.getUIntOpt(fullKey + ".repeat") : 1;
+        const std::optional<std::vector<std::uint64_t>> tOrderOpt = orderDefined ? config.getUIntSeqOpt(fullKey + ".bit_order") : std::nullopt;
 
         if (!tSizeOpt)
             throw std::runtime_error("Could not parse size value for register field \"" + tName + "\" of " + getSelfDescription() + ".");
@@ -549,10 +625,14 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             throw std::runtime_error("Could not parse offset value for register field \"" + tName + "\" of " + getSelfDescription() + ".");
         if (!tRepsOpt)
             throw std::runtime_error("Could not parse repetition count for register field \"" + tName + "\" of " + getSelfDescription() + ".");
+        if (orderDefined && !tOrderOpt)
+            throw std::runtime_error("Could not parse bit order for register field \"" + tName + "\" of " + getSelfDescription() + ".");
 
         const std::uint64_t tSize = tSizeOpt.value();
         const std::uint64_t tOffs = tOffsOpt.value();
         const std::uint64_t tReps = tRepsOpt.value();
+        const std::vector<std::uint64_t> tOrder = orderDefined ? tOrderOpt.value() : std::vector<std::uint64_t>{};
+                                                                                    //Passing empty vector to RegField() yields regular order
 
         //Handle invalid values
 
@@ -560,6 +640,19 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             throw std::runtime_error("Zero size set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
         if (tReps == 0)
             throw std::runtime_error("Zero repetitions set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
+
+        if (orderDefined)
+        {
+            try
+            {
+                ::checkBitOrder(tOrder, tSize);
+            }
+            catch (const std::invalid_argument& exc)
+            {
+                throw std::runtime_error("Invalid bit order sequence for register field \"" + tName + "\" "
+                                         "of " + getSelfDescription() + ": " + exc.what());
+            }
+        }
 
         if (tName.find('.') != tName.npos || tName.starts_with('#'))
             throw std::runtime_error("Invalid name set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
@@ -590,7 +683,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
                 FieldTree tSubSubTree;
 
                 //Add proxy instance for current field repetition
-                tSubSubTree.data() = std::make_shared<RegField>(parentFieldForReps, tSubName, tSize, tSize*(tReps-i)-1);
+                tSubSubTree.data() = std::make_shared<RegField>(parentFieldForReps, tSubName, tSize, tSize*(tReps-i)-1, tOrder);
 
                 //Recurse, if any sub-fields specified
                 if (field.find("fields") != field.not_found())
@@ -616,7 +709,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         else
         {
             //Add proxy instance for current field
-            tSubTree.data() = std::make_shared<RegField>(parentField, tName, tSize, tOffs);
+            tSubTree.data() = std::make_shared<RegField>(parentField, tName, tSize, tOffs, tOrder);
 
             //Recurse, if any sub-fields specified
             if (field.find("fields") != field.not_found())
@@ -823,27 +916,45 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, con
  * \brief Constructor.
  *
  * Binds the instance's register field access functions to the field (with name \p pName) that corresponds to the sequence of bits
- * within \p pParent with size \p pSize and offset \p pOffs, i.e. <tt>field[(pSize-1):0] = pParent[pOffs:(pOffs-(pSize-1))]</tt>.
+ * within \p pParent with size \p pSize and offset \p pOffs, with individual bits possibly permuted by \p pBitOrder if set, i.e.:
+ * - <tt>field[(pSize-1):0] = pParent[pOffs:(pOffs-(pSize-1))]</tt>, for \p pBitOrder empty (default), or
+ * - <tt>field[pBitOrder[0:(pSize-1)]] = pParent[pOffs:(pOffs-(pSize-1))]</tt>, for specific, non-empty \p pBitOrder.
+ *
+ * If set to a non-empty vector, \p pBitOrder must have a size of \p pSize and contain every index out of <tt>[0, pSize)</tt>,
+ * which defines the field-local bit permutation. For example, \p pBitOrder = <tt>{(pSize-1), (pSize-2), ..., 0}</tt> yields a regular
+ * bit order with most significant bit first (as if \p pBitOrder was empty) and \p pBitOrder = <tt>{0, ..., (pSize-2), (pSize-1)}</tt>
+ * yields an inversed bit order. Note that the bit order does not change the handling of the field itself but only the actual order of
+ * the referenced bits from the \p pParent. When value \c x is assigned to the field then reading its value gives you \c x again.
+ * However, reading the contiguous bit section for the field from \p pParent will be affected by the bit order (and vice versa).
+ * Also note that possible \e child fields reference the field's bits independently of the field's bit \e order (it's "transparent")
+ * and thus a field's bit order affects the \e relationship between its parent and its childs (the parent's grandchilds) in the same way.
  *
  * \throws std::invalid_argument If \p pSize is zero.
  * \throws std::invalid_argument If the field would exceed the extent of \p pParent (given values of \p pSize and \p pOffs).
+ * \throws std::invalid_argument If length of \p pBitOrder differs from \p pSize.
+ * \throws std::invalid_argument If \p pBitOrder contains duplicate indices.
+ * \throws std::invalid_argument If an index in \p pBitOrder exceeds the field's extent (given value of \p pSize).
  *
  * \param pParent Parent register field that itself references the bits of the referenced bit sequence.
  * \param pName Name of the referenced register field.
  * \param pSize Size of the referenced field in number of bits.
  * \param pOffs Index of the referenced field's most significant bit in \p pParent.
+ * \param pBitOrder Order/permutation of the \p pSize field bits with respect to \p pParent, or empty for regular order.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-RegField::RegField(const RegField& pParent, const std::string& pName, /*const */std::uint64_t pSize, /*const */std::uint64_t pOffs) :
+RegField::RegField(const RegField& pParent, const std::string& pName, /*const */std::uint64_t pSize, /*const */std::uint64_t pOffs,
+                   const std::vector<std::uint64_t>& pBitOrder) :
 #else
-RegField::RegField(const RegField& pParent, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs) :
+RegField::RegField(const RegField& pParent, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs,
+                   const std::vector<std::uint64_t>& pBitOrder) :
 #endif
     name(pName),
     size(::checkFieldSize(pSize)),
     offs(::checkFieldOffset(pOffs, pSize, pParent.getSize())),
     parentSize(pParent.getSize()),
     parentTotalOffs(pParent.getTotalOffset()),
-    dataRefs(::createBitRefs(pParent, pSize, pOffs)),
+    dataRefs(pBitOrder.empty() ? ::createBitRefs(pParent, pSize, pOffs) :
+                                 ::createBitRefs(pParent, pSize, pOffs, ::checkBitOrder(pBitOrder, pSize))),
     childFields(),
     repetitionKeys()
 {

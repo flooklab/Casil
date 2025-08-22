@@ -178,7 +178,9 @@ BOOST_AUTO_TEST_CASE(Test6_runtimeConfiguration)
     BOOST_CHECK(rtConfTestClass.loadRuntimeConfiguration("{some_number: 107}") == true);
     BOOST_CHECK_EQUAL(rtConfTestClass.dumpRuntimeConfiguration(), "some_number: 107");
 
-    BOOST_REQUIRE(rtConfTestClass.loadRuntimeConfiguration("{some_number: 59}") == true);   //Dumping should deliberately fail now
+    BOOST_CHECK(rtConfTestClass.loadRuntimeConfiguration("{some_number: abc}") == false);   //Conversion error
+
+    BOOST_REQUIRE(rtConfTestClass.loadRuntimeConfiguration("{some_number: 59}") == true);   //Dumping should deliberately fail after this
     bool exceptionThrown = false;
 
     try

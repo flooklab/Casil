@@ -353,6 +353,10 @@ BOOST_AUTO_TEST_CASE(Test7_runtimeConfiguration)
                                                      {"reg2", ""}                           //Valid empty YAML code and loading is
                                                     }) == true);                            //ignored by default implementation anyway
 
+    BOOST_CHECK(exampleDev.loadRuntimeConfiguration({{"runtimeDrv", "{some_number: abc}"},  //Conversion error
+                                                     {"reg2", ""}
+                                                    }) == false);
+
     BOOST_CHECK(exampleDev.loadRuntimeConfiguration({{"runtimeDrv", "{some_number: 0}"},
                                                      {"reg2", "{init: "}        //Fails because of invalid YAML code for existing component
                                                     }) == false);

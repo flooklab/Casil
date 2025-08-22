@@ -819,7 +819,7 @@ bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
         }
         else if (pConfTree.size() == 1)
         {
-            const auto [key, subTree] = pConfTree.front();
+            const auto& [key, subTree] = pConfTree.front();
 
             if (pPath == "")
                 pPath.append(key);

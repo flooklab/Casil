@@ -393,9 +393,9 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
      *
      * Each node of 'pInitTree' must have child nodes or a non-empty value/data or both. std::runtime_error is thrown otherwise.
      */
-    std::function<void(const boost::property_tree::ptree&, std::map<std::string, std::string>&, std::string)> parseInitTree =
+    std::function<void(const boost::property_tree::ptree&, std::map<std::string, std::string>&, const std::string&)> parseInitTree =
             [&parseInitTree](const boost::property_tree::ptree& pInitTree, std::map<std::string, std::string>& pInitMap,
-                             const std::string pPath) -> void
+                             const std::string& pPath) -> void
     {
         if (pInitTree.empty() && pInitTree.data() == "")
             throw std::runtime_error("Node has neither non-empty data nor a child node.");

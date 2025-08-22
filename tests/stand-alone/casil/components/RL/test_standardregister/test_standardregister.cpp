@@ -27,9 +27,11 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using casil::Device;
 using casil::RL::StandardRegister;

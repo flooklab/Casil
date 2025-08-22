@@ -358,17 +358,17 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
 
     std::function<void(std::map<std::string, VariantValueType>&, const FieldTree&, const std::string&)> fillInitValues =
             [&fillInitValues](std::map<std::string, VariantValueType>& pInitValues, const FieldTree& pFieldTree,
-                              const std::string& pParentKey) -> void
+                              const std::string& pKey) -> void
     {
-        if (pParentKey != "")
-            pInitValues[pParentKey] = std::monostate{};
+        if (pKey != "")
+            pInitValues[pKey] = std::monostate{};
 
         for (const auto& [key, subTree] : pFieldTree)
         {
-            if (pParentKey == "")
+            if (pKey == "")
                 fillInitValues(pInitValues, subTree, key);
             else
-                fillInitValues(pInitValues, subTree, pParentKey + "." + key);
+                fillInitValues(pInitValues, subTree, pKey + "." + key);
         }
     };
 

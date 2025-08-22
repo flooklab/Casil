@@ -1374,6 +1374,46 @@ BOOST_AUTO_TEST_CASE(Test17_loadDumpConf)
 
     BOOST_CHECK_EQUAL(reg["Test.Upper"].toBits(), boost::dynamic_bitset(std::string("000")));
     BOOST_CHECK_EQUAL(reg["Test.Lower"].toBits(), boost::dynamic_bitset(std::string("000")));
+
+    //Test errors
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "\"0b0101010101010101010101010101010101010101010101010101010"
+                                                 "101010101010101010101010101010101010101010101010101010\","
+                                             "{COL0: \"0b111111111111111\"},"
+                                             "{COL0: {Trim2: \"0b00000\"}},"
+                                             "{COL0: {Trim3: \"0b01111\"}},"
+                                             "{Test: \"0b000000\"}"
+                                             "]") == true);             //OK
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "\"0x0101010101010101010101010101010101010101010101010101010"
+                                                 "101010101010101010101010101010101010101010101010101010\""
+                                             "]") == false);            //Invalid prefix
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{COL0: \"111111111111111\"}"
+                                             "]") == false);            //Missing prefix
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{Test: \"0b00F000\"}"
+                                             "]") == false);            //Invalid character
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{Test: \"0b0000000\"}"
+                                             "]") == false);            //Wrong size
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{Col: \"0b111111111111111\"}"
+                                             "]") == false);            //No such register
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{COL0: \"0b111111111111111\", Test: \"0b000000\"}"
+                                             "]") == false);            //Multiple child nodes
+
+    BOOST_CHECK(reg.loadRuntimeConfiguration("["
+                                             "{COL0: {Trim2: \"0b00000\", Trim3: \"0b01111\"}}"
+                                             "]") == false);            //Multiple child nodes
 }
 
 BOOST_AUTO_TEST_SUITE_END()

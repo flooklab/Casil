@@ -455,9 +455,9 @@ private:
      *
      * Generates and adds the YAML code (a map) for the <tt>N</tt>-th component configuration out of \p ComponentConfTs
      * to the layer configuration sequence \p pYAMLLayerSeq, assuming that \p ComponentConfTs are from layer \p layer,
-     * and recursively calls the function itself for the next component \p N+1 until the last element of \p ComponentConfTs.
+     * and recursively calls the function itself for the next component <tt>N+1</tt> until the last element of \p ComponentConfTs.
      *
-     * For the first and last components (i.e. if \p N equals \p 0 or <tt>sizeof...(ComponentConfTs)-1</tt>) opening and
+     * For the first and last components (i.e. if \p N equals 0 or <tt>sizeof...(ComponentConfTs)-1</tt>) opening and
      * closing brackets are added to \p pYAMLLayerSeq such that calling this function with <tt>N = 0</tt> results in a
      * full YAML sequence for layer component configurations \p ComponentConfTs for layer \p layer, as needed for Device.
      *

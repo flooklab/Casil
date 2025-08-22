@@ -118,8 +118,8 @@ boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes,
 /*!
  * \brief Convert a dynamic bitset to a sequence of bytes.
  *
- * Assumes that \p pBits (as an integer number) can be represented by a \p pByteSize long byte sequence \p seq and returns it.
- * \p seq will be in big endian byte order (i.e. \p pBits[0] ends up in \p seq[pByteSize-1], which is the least significant byte).
+ * Assumes that \p pBits (as an integer number) can be represented by a \p pByteSize long byte sequence \c seq and returns it.
+ * \c seq will be in big endian byte order (i.e. \p pBits[0] ends up in <tt>seq[pByteSize-1]</tt>, which is the least significant byte).
  *
  * \note 8 * \p pByteSize should of course not be smaller than the size of \p pBits; this is not checked here.
  *

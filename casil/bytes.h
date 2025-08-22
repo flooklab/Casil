@@ -133,7 +133,7 @@ std::string formatUInt64Vec(const std::vector<std::uint64_t>& pVec);            
  * The sequence is composed from all \p pArgs... in passed order and each \p pArgs is treated according to the endianness \p pBigEndian.
  *
  * That means for \p pArgs... = <tt>{val_1, ..., val_m}</tt>, \p Ts... = <tt>{T_1, ..., T_m}</tt>,
- * \p MSB_i = <tt>mostSignificantByte(T_i)</tt>, \p LSB_i = <tt>leastSignificantByte(T_i)</tt> the returned sequence is:
+ * \c MSB_i = <tt>mostSignificantByte(T_i)</tt>, \c LSB_i = <tt>leastSignificantByte(T_i)</tt> the returned sequence is:
  * - <tt>{val_1[MSB_1], ..., val_1[LSB_1], ..., val_m[MSB_m], ..., val_m[LSB_m]}</tt>, for \p pBigEndian = true
  * - <tt>{val_1[LSB_1], ..., val_1[MSB_1], ..., val_m[LSB_m], ..., val_m[MSB_m]}</tt>, for \p pBigEndian = false
  *
@@ -245,11 +245,11 @@ concept TypeMatchesByteLength = (std::is_same_v<std::integral_constant<std::size
 /*!
  * \brief Create an unsigned integer of specific type from a matching byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], ..., pBytes[N-1]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[N-1], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \tparam T Unsigned integer type equivalent to one of \c std::uint16_t, \c std::uint32_t or \c std::uint64_t.
  * \tparam N Length of \p pBytes, which must equal the byte width of \p T.
@@ -308,11 +308,11 @@ constexpr T composeUInt(const bool pBigEndian, const std::span<const std::uint8_
 /*!
  * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], pBytes[1]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[1], pBytes[0]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \throws std::invalid_argument If \p pBytes has a size other than 2.
  *
@@ -330,11 +330,11 @@ constexpr std::uint16_t composeUInt16(const std::vector<std::uint8_t>& pBytes, c
 /*!
  * \brief Create a 16 bit unsigned integer from a two byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], pBytes[1]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[1], pBytes[0]}</tt> --> <tt>{val[MSB], val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \param pBytes The two byte long sequence representing the value to be returned.
  * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
@@ -348,11 +348,11 @@ constexpr std::uint16_t composeUInt16(const std::span<const std::uint8_t, 2> pBy
 /*!
  * \brief Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], ..., pBytes[3]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[3], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \throws std::invalid_argument If \p pBytes has a size other than 4.
  *
@@ -370,11 +370,11 @@ constexpr std::uint32_t composeUInt32(const std::vector<std::uint8_t>& pBytes, c
 /*!
  * \brief Create a 32 bit unsigned integer from a four byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], ..., pBytes[3]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[3], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \param pBytes The four byte long sequence representing the value to be returned.
  * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.
@@ -388,11 +388,11 @@ constexpr std::uint32_t composeUInt32(const std::span<const std::uint8_t, 4> pBy
 /*!
  * \brief Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], ..., pBytes[7]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[7], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \throws std::invalid_argument If \p pBytes has a size other than 8.
  *
@@ -410,11 +410,11 @@ constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, c
 /*!
  * \brief Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.
  *
- * The sequence \p pBytes is interpreted as an unsigned integer number \p val as follows:
+ * The sequence \p pBytes is interpreted as an unsigned integer number \c val as follows:
  * - <tt>{pBytes[0], ..., pBytes[7]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = true
  * - <tt>{pBytes[7], ..., pBytes[0]}</tt> --> <tt>{val[MSB], ..., val[LSB]}</tt>, for \p pBigEndian = false
  *
- * Here \p MSB denotes the most significant byte of \p val and \p LSB its least significant byte.
+ * Here \c MSB denotes the most significant byte of \c val and \c LSB its least significant byte.
  *
  * \param pBytes The eight byte long sequence representing the value to be returned.
  * \param pBigEndian Assume big endian byte order for \p pBytes if true and little endian order else.

@@ -21,6 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
+#include "testreadbackdriver.h"
+
 #include <casil/bytes.h>
 #include <casil/device.h>
 #include <casil/RL/standardregister.h>
@@ -35,6 +37,10 @@
 
 using casil::Device;
 using casil::RL::StandardRegister;
+
+namespace Bytes = casil::Bytes;
+
+namespace boost { using Bytes::operator<<; }
 
 //
 
@@ -397,8 +403,8 @@ BOOST_AUTO_TEST_CASE(Test5_uintAssignConvert)
 
 BOOST_AUTO_TEST_CASE(Test6_bitsetAssignConvert)
 {
-    using casil::Bytes::bitsetFromBytes;
-    using casil::Bytes::composeByteVec;
+    using Bytes::bitsetFromBytes;
+    using Bytes::composeByteVec;
     using boost::dynamic_bitset;
 
     Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
@@ -1096,6 +1102,203 @@ BOOST_AUTO_TEST_CASE(Test13_otherExceptions)
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
     BOOST_CHECK_EQUAL(exceptionCtr, 2);
+}
+
+BOOST_AUTO_TEST_CASE(Test14_getSetFunctions)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 9, fields: ["
+                                "{name: some_field, offset: 8, size: 9}"
+                            "]}]}");
+
+    BOOST_REQUIRE(d["reg"].init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+
+    BOOST_REQUIRE_EQUAL(reg.root().toUInt(), 0u);
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("000000000")));
+
+    reg.root() = 0x16Eu;
+
+    BOOST_REQUIRE_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("101101110")));
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("101101110")));
+
+    reg.set(boost::dynamic_bitset(std::string("000111011")));
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("000111011")));
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("000111011")));
+
+    reg.set(0x1C2u);
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("111000010")));
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("111000010")));
+
+    reg.setAll(true);
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("111111111")));
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("111111111")));
+
+    reg.setAll(false);
+
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("000000000")));
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("000000000")));
+
+    reg.root().setAll(true);
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("111111111")));
+    reg.root().setAll(false);
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("000000000")));
+
+    reg.root().set(0x1C2u);
+    BOOST_CHECK_EQUAL(reg.root().toBits(), boost::dynamic_bitset(std::string("111000010")));
+
+    reg.root().set(boost::dynamic_bitset(std::string("101101110")));
+    BOOST_CHECK_EQUAL(reg.root().toUInt(), 0x16Eu);
+}
+
+BOOST_AUTO_TEST_CASE(Test15_toFromBytes)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 11}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 11},"
+                          "{name: reg2, type: StandardRegister, hw_driver: GPIO, size: 11, lsb_side_padding: False}]}");
+
+    BOOST_REQUIRE(d["reg"].init());
+    BOOST_REQUIRE(d["reg2"].init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+    StandardRegister& reg2 = dynamic_cast<StandardRegister&>(d.reg("reg2"));
+
+    reg.fromBytes({0b10110111u, 0b00100000u});
+    reg2.fromBytes({0b00000101u, 0b10111001u});
+
+    BOOST_CHECK_EQUAL(reg.get(), boost::dynamic_bitset(std::string("10110111001")));
+    BOOST_CHECK_EQUAL((reg.toBytes()), (std::vector<std::uint8_t>{0b10110111u, 0b00100000u}));
+
+    BOOST_CHECK_EQUAL(reg2.get(), boost::dynamic_bitset(std::string("10110111001")));
+    BOOST_CHECK_EQUAL((reg2.toBytes()), (std::vector<std::uint8_t>{0b00000101u, 0b10111001u}));
+
+    reg.set(boost::dynamic_bitset(std::string("01001000110")));
+    reg2.set(boost::dynamic_bitset(std::string("01001000110")));
+
+    BOOST_CHECK_EQUAL((reg.toBytes()), (std::vector<std::uint8_t>{0b01001000u, 0b11000000u}));
+    BOOST_CHECK_EQUAL((reg2.toBytes()), (std::vector<std::uint8_t>{0b00000010u, 0b01000110u}));
+}
+
+BOOST_AUTO_TEST_CASE(Test16_writeReadAndReadTree)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: TestReadbackDriver, interface: intf, base_addr: 0x0, size: 11},"
+                           "{name: GPIO2, type: TestReadbackDriver, interface: intf, base_addr: 0x0, size: 11},"
+                           "{name: GPIO3, type: TestReadbackDriver, interface: intf, base_addr: 0x0, size: 11}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 11},"
+                          "{name: reg2, type: StandardRegister, hw_driver: GPIO2, size: 11, lsb_side_padding: False},"
+                          "{name: reg3, type: StandardRegister, hw_driver: GPIO3, size: 11, auto_start: True}]}");
+
+    BOOST_REQUIRE(d.init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+    StandardRegister& reg2 = dynamic_cast<StandardRegister&>(d.reg("reg2"));
+    StandardRegister& reg3 = dynamic_cast<StandardRegister&>(d.reg("reg3"));
+
+    reg.set(boost::dynamic_bitset(std::string("10110111001")));
+    reg2.set(boost::dynamic_bitset(std::string("10110111001")));
+    reg3.set(boost::dynamic_bitset(std::string("10110111001")));
+
+    reg.write();
+    reg2.write();
+    reg3.write();
+
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("00000000000")));
+    BOOST_CHECK_EQUAL(reg2.getRead(), boost::dynamic_bitset(std::string("00000000000")));
+    BOOST_CHECK_EQUAL(reg3.getRead(), boost::dynamic_bitset(std::string("00000000000")));
+
+    BOOST_CHECK_EQUAL(reg.rootRead().toBits(), boost::dynamic_bitset(std::string("00000000000")));
+
+    reg.read();
+    reg2.read();
+    reg3.read();
+
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("10110111001")));
+    BOOST_CHECK_EQUAL(reg2.getRead(), boost::dynamic_bitset(std::string("10110111001")));
+    BOOST_CHECK_EQUAL(reg3.getRead(), boost::dynamic_bitset(std::string("11111111111")));
+
+    BOOST_CHECK_EQUAL(reg.rootRead().toBits(), boost::dynamic_bitset(std::string("10110111001")));
+
+    dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO"]).exec();
+
+    BOOST_CHECK_EQUAL(dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO"]).isDone(), true);
+    BOOST_CHECK_EQUAL(dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO2"]).isDone(), false);
+    BOOST_CHECK_EQUAL(dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO3"]).isDone(), true);
+
+    reg.read();
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("11111111111")));
+
+    reg.rootRead() = 0x2D6u;
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("01011010110")));
+
+    reg.set(boost::dynamic_bitset(std::string("10010111101")));
+    reg.write(1);
+
+    BOOST_CHECK_EQUAL((dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO"]).getData(1)), (std::vector<std::uint8_t>{0b10010111u}));
+    bool wrongSizeThrown = false;
+    try { (void)dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO"]).getData(2); }
+    catch (const std::invalid_argument&) { wrongSizeThrown = true; }
+    BOOST_CHECK(wrongSizeThrown);
+
+    reg.read(1);
+
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("10010111000")));
+
+    reg.set(boost::dynamic_bitset(std::string("10010111101")));
+    reg.write();
+    reg.read(1);
+
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("10010111000")));
+
+    reg.read(2);
+
+    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("10010111101")));
+
+    //Test exceptions
+
+    int exceptionCtr = 0;
+
+    try { (void)reg.read(3); }                                  //Larger than register byte size
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.read(); }                                   //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    dynamic_cast<casil::Layers::HL::TestReadbackDriver&>(d["GPIO"]).setData({0b10101010u, 0b10101010u});    //Make read calls fail
+
+    try { (void)reg.read(); }                                   //Fails with std::runtime_error due to wrong size returned from driver
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try { (void)reg.write(1); }                                 //OK
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    try { (void)reg.write(3); }                                 //Larger than register byte size
+    catch (const std::invalid_argument&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 3);
+}
+
+BOOST_AUTO_TEST_CASE(Test17_loadDumpConf)
+{
+    Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+              "hw_drivers: [{name: GPIO, type: GPIO, interface: intf, base_addr: 0x0, size: 9}],"
+              "registers: [{name: reg, type: StandardRegister, hw_driver: GPIO, size: 9, fields: ["
+                                "{name: some_field, offset: 8, size: 9}"
+                            "]}]}");
+
+    BOOST_REQUIRE(d["reg"].init());
+
+    StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
+
+    //TODO
 }
 
 BOOST_AUTO_TEST_SUITE_END()

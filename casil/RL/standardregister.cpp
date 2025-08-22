@@ -326,6 +326,9 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * \throws std::runtime_error If an init value or init bit sequence from \p pConfig has an invalid format for one of the register fields.
  * \throws std::runtime_error If the length of an init bit sequence from \p pConfig (string length excluding prefix)
  *                            does not match the field size for one of the register fields.
+ * \throws std::runtime_error If an init value/sequence from \p pConfig refers to a non-existent register field.
+ * \throws std::runtime_error If the init map from \p pConfig contains data at the root (i.e. no field path specified).
+ * \throws std::runtime_error If a node in the init map from \p pConfig contains neither data nor any child nodes.
  *
  * \param pName Component instance name.
  * \param pDriver %Driver instance to be used.
@@ -382,24 +385,77 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
 
     //Collect default values from "init" map of configuration YAML
 
-    for (auto& [fieldPath, value] : initValues)
+    /*
+     * Recursively traverses 'pInitTree' in order to add every non-empty data string to 'pInitMap' with
+     * the keys being the paths leading to those individual nodes in the tree, where keys from adjacent
+     * recursion levels get concatenated with a period ('.') and every path will be prefixed by the initially
+     * passed value of 'pPath' (again, separated by a period), unless initial 'pPath' is empty (no prefix then).
+     *
+     * Each node of 'pInitTree' must have child nodes or a non-empty value/data or both. std::runtime_error is thrown otherwise.
+     */
+    std::function<void(const boost::property_tree::ptree&, std::map<std::string, std::string>&, std::string)> parseInitTree =
+            [&parseInitTree](const boost::property_tree::ptree& pInitTree, std::map<std::string, std::string>& pInitMap,
+                             const std::string pPath) -> void
     {
-        if (config.contains(LayerConfig::fromYAML("{init: {" + fieldPath + ": uint}}"), true))
+        if (pInitTree.empty() && pInitTree.data() == "")
+            throw std::runtime_error("Node has neither non-empty data nor a child node.");
+
+        if (pInitTree.data() != "")     //Ignore empty nodes as most likely just intermediate nodes not actually set in the init map
+            pInitMap.insert(std::make_pair(pPath, pInitTree.data()));
+
+        for (const auto& [key, subTree] : pInitTree)
         {
-            value = config.getUInt("init." + fieldPath);
+            if (pPath == "")
+                parseInitTree(subTree, pInitMap, key);
+            else
+                parseInitTree(subTree, pInitMap, pPath + "." + key);
         }
-        else if (config.contains(LayerConfig::fromYAML("{init: {" + fieldPath + ": }}"), false))
+    };
+
+    const boost::property_tree::ptree initConfig = config.getRawTreeAt("init");
+    if (initConfig.data() != "")
+        throw std::runtime_error("Invalid init value map set for " + getSelfDescription() + ": Root node contains scalar data.");
+
+    std::map<std::string, std::string> initMap;
+
+    if (!initConfig.empty())
+    {
+        try
         {
-            const std::string bitSeqStr = config.getStr("init." + fieldPath);
+            parseInitTree(initConfig, initMap, "");
+        }
+        catch (const std::runtime_error& exc)
+        {
+            throw std::runtime_error("Invalid init value map set for " + getSelfDescription() + ": " + exc.what());
+        }
+    }
 
-            if (bitSeqStr == "")    //(Need to) ignore empty nodes as most likely just intermediate nodes not actually set in the init map
-                continue;
+    for (const auto& [fieldPath, initStr] : initMap)
+    {
+        if (initValues.find(fieldPath) == initValues.end())
+            throw std::runtime_error("The register field \"" + fieldPath + "\" is not available for " + getSelfDescription() + ".");
 
+        //Try parsing integer type first, fall back to parsing bit sequence else (see below)
+
+        std::optional<std::uint64_t> uIntVal;
+        try
+        {
+            uIntVal = LayerConfig::fromYAML("[" + initStr + "]").getUIntOpt("#0");
+        }
+        catch (const std::runtime_error&)
+        {
+            throw std::runtime_error("Parsing init map value back into YAML failed. THIS SHOULD NEVER HAPPEN!");
+        }
+
+        if (uIntVal)
+            initValues.at(fieldPath) = uIntVal.value();
+        else
+        {
             const RegField& field = *(fields.get_child(fieldPath).data());
 
             try
             {
-                value = ::parseBitStr(bitSeqStr, field.getSize());
+                initValues.at(fieldPath) = ::parseBitStr(initStr, field.getSize());
             }
             catch (const std::invalid_argument& exc)
             {

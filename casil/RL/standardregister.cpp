@@ -243,6 +243,8 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * properties (such as its offset) otherwise nor which bit range of the parent field gets referenced, just the internal
  * mapping/order of which field bit points to which of the parent field's bits. The regular order (most significant bit
  * points to most significant bit) is equivalent to a descending bit order sequence as <tt>[size-1, size-2, ..., 0]</tt>.
+ * It is important to note that this implementation is different from the one in basil (which only applies the order on assignments),
+ * because the symmetric solution seems to make much more sense and the feature seems to have been rarely used anyway.
  *
  * The bit order sequence must have the same size as the field and contain every index out of <tt>[0, size)</tt>,
  * which implies that duplicate bit assignments are not possible. Note that if the field gets repeated (see above) the

@@ -106,21 +106,31 @@ public:
     const BoolRef& operator[](std::size_t pIdx) const;                              ///< Access a specific bit in the register.
     //
     const RegField& root() const;                                                   ///< Get the root field node.
+    const RegField& rootRead() const;                                               ///< Get the root field node for driver readback data.
     //
     std::uint64_t getSize() const;                                                  ///< Get the size of the register.
     //
     void applyDefaults();                                                           ///< Set register fields to configured default/init values.
-/*    //
-    void set(const boost::dynamic_bitset<>& pBits);
-    boost::dynamic_bitset<> getWr() const;
-    boost::dynamic_bitset<> getRd() const;
     //
-    void write() const;
-    void read() const;*/
+    void set(std::uint64_t pValue) const;                                           ///< Assign equivalent integer value to the register.
+    void set(const boost::dynamic_bitset<>& pBits) const;                           ///< Assign a raw bit sequence to the register.
+    void setAll(bool pValue = true) const;                                          ///< Set/unset all register bits at once.
+    //
+    boost::dynamic_bitset<> get() const;                                            ///< Get the register data as raw bit sequence.
+    boost::dynamic_bitset<> getRead() const;                                        ///< Get the driver readback data as a bit sequence.
+    //
+    void write(std::size_t pNumBytes = 0) const;                                    ///< Write the register data to the driver.
+    void read(std::size_t pNumBytes = 0);                                           ///< Read from the driver and assign to the readback data.
+    //
+    std::vector<std::uint8_t> toBytes() const;                                      ///< Convert the register data to a byte sequence.
+    void fromBytes(std::vector<std::uint8_t> pBytes);                               ///< Load/assign the register data from a byte sequence.
 
 private:
     bool initImpl() override;
     bool closeImpl() override;
+    //
+    bool loadRuntimeConfImpl(boost::property_tree::ptree&& pConf) override;
+    boost::property_tree::ptree dumpRuntimeConfImpl() const override;
     //
     typedef boost::property_tree::basic_ptree<std::string, std::shared_ptr<RegField>> FieldTree;    ///< \brief Property tree for register
                                                                                                     ///  fields that reference parts of the
@@ -130,12 +140,16 @@ private:
                                                                                                 ///  recursing through the field configuration.
 
 private:
-    const std::uint64_t size;       ///< Size of the register in number of bits.
-    const bool autoStart;           ///< Automatically call Driver::exec() from within write().
+    const std::uint64_t size;           ///< Size of the register in number of bits.
     //
-    boost::dynamic_bitset<> data;   ///< Register content.
+    const bool autoStart;               ///< Automatically call Driver::exec() from within write().
+    const bool lsbSidePadding;          ///< Use/expect left-alignment of byte vectors (i.e. with LSB-side zero padding!) as is done in basil.
     //
-    FieldTree fields;               ///< Tree representing the hierarchy of named register fields for convenient access to them.
+    boost::dynamic_bitset<> data;       ///< Register content (for writing).
+    boost::dynamic_bitset<> readData;   ///< Driver readback data (like above register content but for reading).
+    //
+    FieldTree fields;                   ///< Tree representing the hierarchy of named register fields for convenient access to them.
+    FieldTree readFields;               ///< Equivalent field tree that points to the driver readback data instead.
     //
     typedef std::variant<std::monostate, std::uint64_t, boost::dynamic_bitset<>> VariantValueType;
                                                             ///< Variant to optionally store the two possible register field assignment types.
@@ -200,6 +214,10 @@ public:
     //
     std::uint64_t operator=(std::uint64_t pValue) const;                                    ///< Assign equivalent integer value to the field.
     const boost::dynamic_bitset<>& operator=(const boost::dynamic_bitset<>& pBits) const;   ///< Assign a raw bit sequence to the field.
+    //
+    void set(std::uint64_t pValue) const;                                                   ///< Assign equivalent integer value to the field.
+    void set(const boost::dynamic_bitset<>& pBits) const;                                   ///< Assign a raw bit sequence to the field.
+    void setAll(bool pValue = true) const;                                                  ///< Set/unset all field bits at once.
     //
     explicit operator std::uint64_t() const;                                                ///< Get the integer equivalent of field's content.
     explicit operator boost::dynamic_bitset<>() const;                                      ///< Get the field's content as raw bitset.

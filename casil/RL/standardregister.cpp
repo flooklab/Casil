@@ -225,6 +225,14 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * Also gets the optional "auto_start" value from \p pConfig (boolean value, default: false), which
  * defines whether write() shall automatically call Driver::exec() (see write() for more information).
  *
+ * Also gets the optional "lsb_side_padding" value from \p pConfig (boolean value, default: true), which defines
+ * whether bits in byte sequences (as used in write(), read(), toBytes() and fromBytes()) shall be "left-aligned",
+ * meaning that the respective \e most significant byte (first byte of vector, index 0) always immediately starts
+ * with the most significant bit of the corresponding bit sequence and possible zero-padding bits (for complete bytes)
+ * are inserted on the side of the \e least significant bit/byte. If "lsb_side_padding" is set to false, possible
+ * zero-padding bits will be inserted on the side of the \e most significant bit/byte. For some reason the former
+ * is the fixed behavior in basil but can be configured here to facilitate working with drivers such as HL::GPIO.
+ *
  * Any field in the abovementioned field configuration sequence is a map consisting of at least a field name (key "name"),
  * bit offset (key "offset") and bit size (key "size"). The offset denotes the index that the field's most significant bit has
  * in the parent field (assuming the most significant bit always has the highest index, i.e. the register and each of its fields
@@ -299,20 +307,24 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
     Register(typeName, std::move(pName), pDriver, std::move(pConfig), LayerConfig::fromYAML("{size: uint}")),
     size(config.getUInt("size", 0)),
     autoStart(config.getBool("auto_start", false)),
+    lsbSidePadding(config.getBool("lsb_side_padding", true)),
     data(size, 0),
+    readData(size, 0),
     fields(),
+    readFields(),
     initValues()
 {
     if (size == 0)
         throw std::runtime_error("Invalid register size set for " + getSelfDescription() + ".");
 
     //Fill property tree with register field hierarchy, starting with unnamed root field
-
     fields.data() = std::make_shared<RegField>(data, "", size, size-1);
-
     const boost::property_tree::ptree fieldsConfig = config.getRawTreeAt("fields");
-
     populateFieldTree(fields, fieldsConfig, "fields");
+
+    //Also fill field tree for driver readback data
+    readFields.data() = std::make_shared<RegField>(readData, "", size, size-1);
+    populateFieldTree(readFields, fieldsConfig, "fields");
 
     //Initially fill init value map for every register field with no value (i.e. std::monostate) set
 
@@ -430,6 +442,16 @@ const StandardRegister::RegField& StandardRegister::root() const
     return *(fields.data());
 }
 
+/*!
+ * \brief Get the root field node for driver readback data.
+ *
+ * \return The top-level register field for readback data, which represents the \e entire readback data.
+ */
+const StandardRegister::RegField& StandardRegister::rootRead() const
+{
+    return *(readFields.data());
+}
+
 //
 
 /*!
@@ -463,21 +485,248 @@ void StandardRegister::applyDefaults()
     }
 }
 
+//
+
+/*!
+ * \brief Assign equivalent integer value to the register.
+ *
+ * Assigns the binary equivalent of \p pValue to the register bits, in the same way as
+ * assigning to the root() field via RegField::operator=(std::uint64_t) const (see there).
+ *
+ * \param pValue Value to be assigned.
+ */
+void StandardRegister::set(const std::uint64_t pValue) const
+{
+    root() = pValue;
+}
+
+/*!
+ * \brief Assign a raw bit sequence to the register.
+ *
+ * Assigns \p pBits to the register bits, in the same way as assigning to the root()
+ * field via RegField::operator=(const boost::dynamic_bitset<>&) const (see there).
+ *
+ * \throws std::invalid_argument If RegField::operator=(const boost::dynamic_bitset<>&) const throws \c std::invalid_argument
+ *                               (i.e. if the size of \p pBits differs from the register size).
+ *
+ * \param pBits Bit sequence to be assigned.
+ */
+void StandardRegister::set(const boost::dynamic_bitset<>& pBits) const
+{
+    root() = pBits;
+}
+
+/*!
+ * \brief Set/unset all register bits at once.
+ *
+ * Assigns \p pValue to every register bit (same as calling RegField::setAll() for the root() field).
+ *
+ * \param pValue True for bits high (1) and false for bits low (0).
+ */
+void StandardRegister::setAll(const bool pValue) const
+{
+    root().setAll(pValue);
+}
+
+//
+
+/*!
+ * \brief Get the register data as raw bit sequence.
+ *
+ * Returns the current state of the register content as bit sequence.
+ *
+ * \return <tt>register[(size-1):0]</tt>.
+ */
+boost::dynamic_bitset<> StandardRegister::get() const
+{
+    return data;
+}
+
+/*!
+ * \brief Get the driver readback data as a bit sequence.
+ *
+ * Returns the current state of the driver readback data (as set by read()) as bit sequence.
+ *
+ * \return <tt>readback[(size-1):0]</tt>.
+ */
+boost::dynamic_bitset<> StandardRegister::getRead() const
+{
+    return readData;
+}
+
+//
+
+/*!
+ * \brief Write the register data to the driver.
+ *
+ * Calls Driver::setData() on the register's driver instance with the register data passed as argument (in form
+ * of a byte sequence as in toBytes(), possibly truncated to a smaller length \p pNumBytes). If the "auto_start"
+ * setting was enabled in the component configuration (see StandardRegister()), calls Driver::exec() afterwards.
+ *
+ * \throws std::invalid_argument If \p pNumBytes exceeds the register byte size (full byte count occupied by all register bits).
+ *
+ * \param pNumBytes Number of bytes of the byte sequence to actually use, or zero to use the full length.
+ */
+void StandardRegister::write(std::size_t pNumBytes) const
+{
+    if (size % 8 > 0)
+    {
+        if (pNumBytes > (size / 8) + 1)
+            throw std::invalid_argument("Number of bytes exceeds register byte size for " + getSelfDescription() + ".");
+        else if (pNumBytes == 0)
+            pNumBytes = (size / 8) + 1;
+    }
+    else
+    {
+        if (pNumBytes > size / 8)
+            throw std::invalid_argument("Number of bytes exceeds register byte size for " + getSelfDescription() + ".");
+        else if (pNumBytes == 0)
+            pNumBytes = size / 8;
+    }
+
+    if (lsbSidePadding && (size % 8) > 0)   //Need to add LSB-side padding bits (as is done in basil)
+    {
+        const std::uint64_t numPadBits = 8 - size % 8;
+        boost::dynamic_bitset<> paddedData = data;
+        paddedData.resize(size + numPadBits);
+        paddedData <<= numPadBits;
+        std::vector<std::uint8_t> tBytes = Bytes::bytesFromBitset(paddedData, (size / 8) + 1);
+        tBytes.resize(pNumBytes);
+        driver.setData(tBytes);
+    }
+    else
+    {
+        std::vector<std::uint8_t> tBytes = Bytes::bytesFromBitset(data, ((size - 1) / 8) + 1);
+        tBytes.resize(pNumBytes);
+        driver.setData(tBytes);
+    }
+
+    if (autoStart)
+        driver.exec();
+}
+
+/*!
+ * \brief Read from the driver and assign to the readback data.
+ *
+ * Calls Driver::getData() on the register's driver instance with \p pNumBytes as argument in order to get a byte sequence
+ * of length \p pNumBytes (automatically set to <tt>((regBitSize - 1) / 8) + 1</tt> if zero). If \p pNumBytes is smaller
+ * than <tt>((regBitSize - 1) / 8) + 1</tt>, zeros will be appended to that byte sequence to obtain a length of
+ * <tt>((regBitSize - 1) / 8) + 1</tt>. The driver readback data will then be set to the bit sequence that is
+ * represented by the byte sequence (as is done in fromBytes() for the regular register data).
+ *
+ * \throws std::invalid_argument If \p pNumBytes exceeds the register byte size (full byte count occupied by all register bits).
+ * \throws std::runtime_error If the driver instance returns the wrong number of bytes (see \p pNumBytes).
+ *
+ * \param pNumBytes Number of bytes to actually get from the driver, or zero to get bytes for the full register size.
+ */
+void StandardRegister::read(std::size_t pNumBytes)
+{
+    if (size % 8 > 0)
+    {
+        if (pNumBytes > (size / 8) + 1)
+            throw std::invalid_argument("Number of bytes exceeds register byte size for " + getSelfDescription() + ".");
+        else if (pNumBytes == 0)
+            pNumBytes = (size / 8) + 1;
+    }
+    else
+    {
+        if (pNumBytes > size / 8)
+            throw std::invalid_argument("Number of bytes exceeds register byte size for " + getSelfDescription() + ".");
+        else if (pNumBytes == 0)
+            pNumBytes = size / 8;
+    }
+
+    std::vector<std::uint8_t> rawData = driver.getData(pNumBytes);
+
+    if (rawData.size() != pNumBytes)
+        throw std::runtime_error("Driver returned wrong number of bytes for " + getSelfDescription() + ".");
+
+    rawData.resize(((size - 1) / 8) + 1);
+
+    boost::dynamic_bitset<> tBits = Bytes::bitsetFromBytes(rawData, rawData.size() * 8);
+
+    if (lsbSidePadding)     //Expect raw data bytes to be left-aligned (i.e. with LSB-side zero padding, according to component configuration)
+        tBits >>= tBits.size() - size;
+
+    tBits.resize(size);
+
+    readData = tBits;
+}
+
+//
+
+/*!
+ * \brief Convert the register data to a byte sequence.
+ *
+ * Converts the sequence of register bits into a byte sequence in big endian byte order (i.e. least significant register
+ * \c bit[0] ends up in <tt>byteSeq[byteSize-1]</tt>, which is the least significant byte). The bit alignment is made such that
+ * zero-padding bits are either inserted at the front of the most significant byte or at the back of the least significant byte,
+ * depending on the "lsb_side_padding" setting from the component configuration (see StandardRegister()).
+ *
+ * See also Bytes::bytesFromBitset().
+ *
+ * \return Register bits as (aligned) byte sequence.
+ */
+std::vector<std::uint8_t> StandardRegister::toBytes() const
+{
+    if (size % 8 > 0)
+    {
+        if (lsbSidePadding)     //Need to add LSB-side padding bits (as is done in basil)
+        {
+            const std::uint64_t numPadBits = 8 - size % 8;
+            boost::dynamic_bitset<> paddedData = data;
+            paddedData.resize(size + numPadBits);
+            paddedData <<= numPadBits;
+            return Bytes::bytesFromBitset(paddedData, (size / 8) + 1);
+        }
+        else
+            return Bytes::bytesFromBitset(data, (size / 8) + 1);
+    }
+    else
+        return Bytes::bytesFromBitset(data, size / 8);
+}
+
+/*!
+ * \brief Load/assign the register data from a byte sequence.
+ *
+ * Sets the register content to the bit sequence equivalent of \p pBytes in terms of the inverse operation to toBytes().
+ * This means that \p pBytes must be a byte sequence representation of the wanted register bit sequence in in big endian
+ * byte order (i.e. least significant register \c bit[0] is in <tt>byteSeq[byteSize-1]</tt>, which is the least significant byte).
+ * The bit alignment must be such that zero-padding bits are either at the front of the most significant byte or at the back of the
+ * least significant byte, depending on the "lsb_side_padding" setting from the component configuration (see StandardRegister()).
+ *
+ * See also Bytes::bitsetFromBytes().
+ *
+ * \throws std::invalid_argument If length of \p pBytes differs from the register byte size (full byte count occupied by all register bits).
+ *
+ * \param pBytes Desired register bits as (aligned) byte sequence.
+ */
+void StandardRegister::fromBytes(const std::vector<std::uint8_t> pBytes)
+{
+    if (pBytes.size() != ((size - 1) / 8) + 1)
+        throw std::invalid_argument("Byte sequence length differs from register byte size for " + getSelfDescription() + ".");
+
+    boost::dynamic_bitset<> tBits = Bytes::bitsetFromBytes(pBytes, pBytes.size() * 8);
+
+    if (lsbSidePadding)     //Expect raw data bytes to be left-aligned (i.e. with LSB-side zero padding, according to component configuration)
+        tBits >>= tBits.size() - size;
+
+    tBits.resize(size);
+
+    data = tBits;
+}
+
 //Private
 
 /*!
  * \copybrief Register::initImpl()
  *
- * ...
+ * Sets the register fields to possibly configured default/init values, see applyDefaults().
  *
- * \todo ...
- *
- * \return True if successful.
+ * \return True.
  */
 bool StandardRegister::initImpl()
 {
-    //TODO
-
     applyDefaults();
 
     return true;
@@ -486,16 +735,40 @@ bool StandardRegister::initImpl()
 /*!
  * \copybrief Register::closeImpl()
  *
+ * \return True.
+ */
+bool StandardRegister::closeImpl()
+{
+    return true;
+}
+
+//
+
+/*!
+ * \copybrief Register::loadRuntimeConfImpl()
+ *
  * ...
  *
  * \todo ...
  *
- * \return True if successful.
+ * \param pConf Desired runtime configuration tree.
+ * \return If successful.
  */
-bool StandardRegister::closeImpl()
+bool StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 {
-    //TODO
-    return true;
+}
+
+/*!
+ * \copybrief Register::dumpRuntimeConfImpl()
+ *
+ * ...
+ *
+ * \todo ...
+ *
+ * \return Current runtime configuration tree.
+ */
+boost::property_tree::ptree StandardRegister::dumpRuntimeConfImpl() const
+{
 }
 
 //
@@ -1005,6 +1278,47 @@ const boost::dynamic_bitset<>& RegField::operator=(const boost::dynamic_bitset<>
         dataRefs[i] = pBits[i];
 
     return pBits;
+}
+
+//
+
+/*!
+ * \brief Assign equivalent integer value to the field.
+ *
+ * See operator=(std::uint64_t) const.
+ *
+ * \param pValue Value to be assigned.
+ */
+void RegField::set(const std::uint64_t pValue) const
+{
+    *this = pValue;
+}
+
+/*!
+ * \brief Assign a raw bit sequence to the field.
+ *
+ * See operator=(const boost::dynamic_bitset<>&) const.
+ *
+ * \throws std::invalid_argument If operator=(const boost::dynamic_bitset<>&) const throws \c std::invalid_argument.
+ *
+ * \param pBits Bit sequence to be assigned.
+ */
+void RegField::set(const boost::dynamic_bitset<>& pBits) const
+{
+    *this = pBits;
+}
+
+/*!
+ * \brief Set/unset all field bits at once.
+ *
+ * Assigns \p pValue to every bit that is referenced by the field.
+ *
+ * \param pValue True for bits high (1) and false for bits low (0).
+ */
+void RegField::setAll(const bool pValue) const
+{
+    for (std::size_t i = 0; i < size; ++i)
+        dataRefs[i] = pValue;
 }
 
 //

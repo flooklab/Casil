@@ -84,6 +84,9 @@ namespace casil::Bytes
  * Assumes that \p pBytes represents a \p pBitSize long bit sequence (an integer number) in big endian byte order
  * (i.e. \p pBytes[0] is the most significant byte) and returns these \p pBitSize bits as a dynamic bitset.
  *
+ * An "MSB-side padding" is assumed: Potential zero-padding bits (alignment due to multiples of
+ * 8 bits in \p pBytes) are expected to be on the side of the \e most significant byte (and bit).
+ *
  * \note \p pBitSize should of course not be larger than eight times the size of \p pBytes; this is not checked here.
  *
  * \param pBytes The byte sequence to convert.
@@ -120,6 +123,9 @@ boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes,
  *
  * Assumes that \p pBits (as an integer number) can be represented by a \p pByteSize long byte sequence \c seq and returns it.
  * \c seq will be in big endian byte order (i.e. \p pBits[0] ends up in <tt>seq[pByteSize-1]</tt>, which is the least significant byte).
+ *
+ * Alignment (need multiples of 8 bits in the byte sequence) is done in terms of an "MSB-side padding":
+ * Potential zero-padding bits will be inserted on the side of the \e most significant byte (and bit).
  *
  * \note 8 * \p pByteSize should of course not be smaller than the size of \p pBits; this is not checked here.
  *

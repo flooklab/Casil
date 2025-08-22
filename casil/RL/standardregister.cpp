@@ -222,10 +222,13 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * register bits, constructs an accordingly sized bit storage and creates a proxy class tree for a simple
  * structured access to any named register \e fields as defined in the optional "fields" sequence in \p pConfig.
  *
- * Any field in that configuration sequence is a map consisting of at least a field name (key "name"), bit offset (key "offset")
- * and bit size (key "size"). The offset denotes the index that the field's most significant bit has in the parent field
- * (assuming the most significant bit always has the highest index, i.e. the register and each of its fields are ordered
- * with least significant bit first). The field name must not begin with '#' and must not contain any periods ('.').
+ * Also gets the optional "auto_start" value from \p pConfig (boolean value, default: false), which
+ * defines whether write() shall automatically call Driver::exec() (see write() for more information).
+ *
+ * Any field in the abovementioned field configuration sequence is a map consisting of at least a field name (key "name"),
+ * bit offset (key "offset") and bit size (key "size"). The offset denotes the index that the field's most significant bit has
+ * in the parent field (assuming the most significant bit always has the highest index, i.e. the register and each of its fields
+ * are ordered with least significant bit first). The field name must not begin with '#' and must not contain any periods ('.').
  *
  * Every field can optionally define its own nested field sequence (key "fields") to further define sub-fields,
  * which all have to be fully contained within the defining field.
@@ -267,8 +270,6 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * bit sequence the sequence/string length must be equal to the field length. Also note that there must not be multiple/conflicting
  * assignments for overlapping/nested fields as no guarantee is made about the order in which the fields will be set.
  *
- * \todo auto_start...
- *
  * \internal \sa populateFieldTree() \endinternal
  *
  * \throws std::runtime_error If "size" is not defined or set to zero.
@@ -297,12 +298,11 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
 StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig) :
     Register(typeName, std::move(pName), pDriver, std::move(pConfig), LayerConfig::fromYAML("{size: uint}")),
     size(config.getUInt("size", 0)),
+    autoStart(config.getBool("auto_start", false)),
     data(size, 0),
     fields(),
     initValues()
 {
-    //TODO process "auto_start"
-
     if (size == 0)
         throw std::runtime_error("Invalid register size set for " + getSelfDescription() + ".");
 

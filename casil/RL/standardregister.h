@@ -131,6 +131,7 @@ private:
 
 private:
     const std::uint64_t size;       ///< Size of the register in number of bits.
+    const bool autoStart;           ///< Automatically call Driver::exec() from within write().
     //
     boost::dynamic_bitset<> data;   ///< Register content.
     //

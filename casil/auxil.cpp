@@ -56,12 +56,13 @@ namespace casil::Auxil
  * An empty \p pYAMLString will result in an empty Property Tree.
  *
  * \attention An \e exceptional, probably unexpedted case are map keys that contain periods ('.').
- *            They will be interpreted as nested sub-trees with the periods serving as separators between
- *            the nested keys, i.e. <tt>{foo: {key.with.periods: 456}, bar: 123}</tt> would lead to a
- *            tree structure analog to <tt>{foo: {key: {with: {periods: 456}}}, bar: 123}</tt>.
- *            This is due to the default separator of the Property Tree and is not mitigated
- *            as it comes in handy at other places in the code anyway.
- *            Also note that this is/can not be reversed by propertyTreeToYAML().
+ *            They will be interpreted as nested sub-trees with the periods serving as separators between the nested
+ *            keys, i.e. <tt>{foo: {key.with.periods: 456}, bar: 123}</tt> would lead to a tree structure analog to
+ *            <tt>{foo: {key: {with: {periods: 456}}}, bar: 123}</tt>. This is due to the default separator of the
+ *            Property Tree and is not mitigated as it comes in handy at other places in the code anyway. Note that the
+ *            returned Property Tree might contain duplicate child nodes if there are neighboring such keys that share
+ *            some of their separated elements (e.g. <tt>{foo: {some.key: 456, some: 7}, bar: 123}</tt>), which can
+ *            complicate the lookup later on. Also note that this is/can not be reversed by propertyTreeToYAML().
  *
  * \note To prevent confusion with the generated sequence keys, \e map keys starting with '#' should perhaps be avoided,
  *       especially since propertyTreeToYAML() always converts the ordered keys {"#0", "#1", ...} back to \e sequences.

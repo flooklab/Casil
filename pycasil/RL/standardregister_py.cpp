@@ -29,6 +29,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -36,6 +37,43 @@
 
 using casil::RL::StandardRegister;
 using RegField = StandardRegister::RegField;
+
+/*
+ * This is a wrapper for read-only RegField access as pybind11 mapping breaks constness of returned 'const T&'.
+ */
+class PyConstRegField
+{
+public:
+    PyConstRegField(const RegField& pRegField, const bool pCopy) :
+        consumedRegField(pCopy ? std::make_optional(pRegField) : std::nullopt),
+        regField(pCopy ? consumedRegField.value() : pRegField) {}
+    PyConstRegField(const PyConstRegField& pOther) = default;
+    PyConstRegField(PyConstRegField&&) = delete;
+    ~PyConstRegField() = default;
+    //
+    PyConstRegField& operator=(const PyConstRegField&) = delete;
+    PyConstRegField& operator=(PyConstRegField&&) = delete;
+    //
+    std::uint64_t toUInt() const { return regField.toUInt(); }
+    boost::dynamic_bitset<> toBits() const { return regField.toBits(); }
+    //
+    PyConstRegField operator[](const std::string_view pFieldName) const { return PyConstRegField(regField.operator[](pFieldName), false); }
+    bool operator[](const std::size_t pIdx) const { return regField.operator[](pIdx).get(); }
+    PyConstRegField operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx) const
+        { return PyConstRegField(const_cast<RegField&>(regField).operator()(pMsbIdx, pLsbIdx), true); }
+    PyConstRegField operator[](const std::vector<std::size_t>& pIdxs) const
+        { return PyConstRegField(const_cast<RegField&>(regField).operator[](pIdxs), true); }
+    //
+    PyConstRegField n(const std::size_t pFieldRepIdx) const { return PyConstRegField(regField.n(pFieldRepIdx), false); }
+    //
+    std::uint64_t getSize() const { return regField.getSize(); }
+    std::uint64_t getOffset() const { return regField.getOffset(); }
+    std::uint64_t getTotalOffset() const { return regField.getTotalOffset(); }
+
+private:
+    const std::optional<RegField> consumedRegField;
+    const RegField& regField;
+};
 
 void bindRL_StandardRegister(py::module& pM)
 {
@@ -165,6 +203,33 @@ void bindRL_StandardRegister(py::module& pM)
             .def("getOffset", &RegField::getOffset, "Get the field's offset with respect to its parent field.")
             .def("getTotalOffset", &RegField::getTotalOffset, "Get the field's total offset with respect to the whole register.");
 
+    py::class_<PyConstRegField>(pM, "PyConstRegField", "Proxy class for accessing an individual register field (read-only field tree).")
+            .def("__getitem__", [](const PyConstRegField& pThis, const std::size_t pIdx) -> bool
+                                { return pThis.operator[](pIdx); }, "Access a specific bit in the field.", py::arg("idx"), py::is_operator())
+            .def("__getitem__", [](const PyConstRegField& pThis, const std::string_view pFieldName) -> PyConstRegField
+                                { return pThis.operator[](pFieldName); }, "Access an immediate child field.",
+                                py::arg("fieldName"), py::is_operator())
+            .def("__getitem__", [](const PyConstRegField& pThis, const py::slice& pSlice) -> PyConstRegField
+                                {
+                                    const std::size_t msbIdx = pSlice.attr("start").cast<std::size_t>();
+                                    const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
+                                    if (!pSlice.attr("step").is_none())
+                                        throw std::invalid_argument("Step size definition for slices is unsupported.");
+                                    return pThis.operator()(msbIdx, lsbIdx);
+                                }, "Access a slice of bits in the field.", py::arg("idxSlice"), py::is_operator())
+            .def("__getitem__", [](const PyConstRegField& pThis, const std::vector<std::size_t>& pIdxs) -> PyConstRegField
+                                { return pThis.operator[](pIdxs); }, "Access a set of unique bits in the field.",
+                                py::arg("idxs"), py::is_operator())
+            .def("toUInt", &PyConstRegField::toUInt, "Get the integer equivalent of field's content.")
+            .def("toBits", [](const PyConstRegField& pThis) -> std::vector<bool>
+                           { return PyCasilUtils::boolVecFromBitset(pThis.toBits()); }, "Get the field's data as raw bitset.")
+            .def("n", [](const PyConstRegField& pThis, const std::size_t pFieldRepIdx) -> PyConstRegField
+                      { return pThis.n(pFieldRepIdx); }, "Access the n-th repetition of the field.", py::arg("fieldRepIdx"))
+            .def("getSize", &PyConstRegField::getSize, "Get the size of the field.")
+            .def("__len__", &PyConstRegField::getSize, "Get the size of the field.", py::is_operator())
+            .def("getOffset", &PyConstRegField::getOffset, "Get the field's offset with respect to its parent field.")
+            .def("getTotalOffset", &PyConstRegField::getTotalOffset, "Get the field's total offset with respect to the whole register.");
+
     py::class_<StandardRegister, casil::RL::Register>(pM, "StandardRegister", "Basic register implementation for accessing raw "
                                                                               "driver data through a structured register view.")
             .def(py::init<std::string, casil::HL::Driver&, casil::LayerConfig>(), "Constructor.",
@@ -212,8 +277,8 @@ void bindRL_StandardRegister(py::module& pM)
                                 py::arg("fieldPath"), py::arg("arg"), py::is_operator())
             .def("root", [](StandardRegister& pThis) -> RegField& { return pThis.root(); }, "Get the root field node.",
                  py::return_value_policy::reference)
-            .def("rootRead", &StandardRegister::rootRead, "Get the root field node for driver readback data.",
-                 py::return_value_policy::reference)
+            .def("rootRead", [](const StandardRegister& pThis) -> PyConstRegField { return PyConstRegField(pThis.rootRead(), false); },
+                 "Get the root field node for driver readback data.")
             .def("getSize", &StandardRegister::getSize, "Get the size of the register.")
             .def("__len__", &StandardRegister::getSize, "Get the size of the register.", py::is_operator())
             .def("applyDefaults", &StandardRegister::applyDefaults, "Set register fields to configured default/init values.")

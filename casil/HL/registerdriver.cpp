@@ -844,10 +844,29 @@ bool RegisterDriver::closeImpl()
 /*!
  * \copybrief Register::loadRuntimeConfImpl()
  *
- * ...
+ * Writes values/bytes to the registers as specified in \p pConf.
  *
- * \todo ...
+ * \p pConf is expected to be a map (at the top level) of register to value assignments where each of
+ * the map nodes can be either a node with just a value (to assign to a value register) or a node with
+ * child nodes (to assign to a byte array register, each child defining one byte of the whole byte sequence),
+ * which must in turn have just a value each. The child node keys (at the top level) determine the name of the
+ * to be assigned register. Every individual value and every value out of a byte sequence must be an integer.
+ * The first child node of a byte sequence will be used as most significant byte of the register.
+ * Note that \e only \ref AccessMode::ReadWrite "read-write" registers can be specified.
  *
+ * To provide an example, \p pConf might look similar to this:
+ * - \c pConf: no %data() at node
+ *  - REG_1: 0xABCD
+ *  - ANOTHER_REG: no %data() at node
+ *   - #0: 0xFF
+ *   - #1: 0x00
+ *
+ * Note that this can be optimally achieved for LayerBase::loadRuntimeConfiguration() by using a YAML map,
+ * such as <tt>{REG_1: 0xABCD, ANOTHER_REG: [0xFF, 0x00]}</tt>.
+ *
+ * The register assignments/writes will be made in the order as found in \p pConf and using setValue() and setBytes().
+ *
+ * Note: The length of every byte sequence must exactly match the register size/length.
  *
  * \throws std::runtime_error If a node in \p pConf has neither non-empty data nor a child node.
  * \throws std::runtime_error If a node in \p pConf has \e both non-empty data and a child node.
@@ -856,7 +875,7 @@ bool RegisterDriver::closeImpl()
  * \throws std::runtime_error If the to be set value/sequence does not match the data type of the register.
  * \throws std::runtime_error If the parsing of a value/sequence fails due to invalid formatting.
  * \throws std::runtime_error If a byte sequence length does not match the register size/length.
- * \throws std::runtime_error If writing to the interface fails (see also setValue(), setBytes()).
+ * \throws std::runtime_error If writing to the interface fails (see also setValue() and setBytes()).
  *
  * \param pConf Desired runtime configuration tree.
  */
@@ -919,9 +938,17 @@ void RegisterDriver::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 /*!
  * \copybrief Register::dumpRuntimeConfImpl()
  *
- * ...
+ * Constructs and returns a "configuration tree" with one child node for each \ref AccessMode::ReadWrite "read-write"
+ * register at keys equal to the respective register names and node content set to the current register status as retrieved
+ * by getValue() and getBytes() (depending on their DataType). In case of a value register the node data is set to the value
+ * formatted as hexadecimal literal (see Bytes::formatHex()) and in case of a byte array register analogously formatted
+ * child nodes are added to the node for every byte, starting with the most significant byte at key "#0" and so forth.
  *
- * \todo ...
+ * Note: According to Auxil::propertyTreeFromYAML() the returned tree is equivalent to a YAML map with either
+ * integers or sequences of integers as map values, such as <tt>{REG_1: 0xABCD, ANOTHER_REG: [0xFF, 0x00]}</tt>.
+ * See also the example in loadRuntimeConfImpl().
+ *
+ * \throws std::runtime_error If reading from the interface fails (see also getValue() and getBytes()).
  *
  * \return Current runtime configuration tree.
  */

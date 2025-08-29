@@ -42,7 +42,7 @@
 /// #include <casil/templatedevicemacros.h>
 /// #include <casil/HL/Muxed/gpio.h>
 /// #include <casil/HL/Muxed/sitcpfifo.h>
-/// #include <casil/RL/dummyregister.h>
+/// #include <casil/RL/standardregister.h>
 /// #include <casil/TL/Muxed/sitcp.h>
 ///
 /// #include <boost/dynamic_bitset.hpp>
@@ -74,15 +74,21 @@
 /// };
 ///
 /// //Can use macros to simplify declaration of component configuration structs:
-/// CASIL_DEFINE_REGISTER(casil::RL::DummyRegister, SomeRegister, "some_register", "GPIO", "")
+/// CASIL_DEFINE_REGISTER(casil::RL::StandardRegister, SomeRegister, "some_register", "GPIO", "size: 128, "
+///                                                                                           "lsb_side_padding: False, "
+///                                                                                           "fields: [ {name: TakeData, size: 1, offset: 5} ], "
+///                                                                                           "init: { TakeData: 0 }")
 ///
 /// //Above macro is equivalent to:
 /// //
-/// // struct SomeRegister : public casil::TmplDev::RegisterConf<casil::RL::DummyRegister>
+/// // struct SomeRegister : public casil::TmplDev::RegisterConf<casil::RL::StandardRegister>
 /// // {
 /// //     static constexpr char name[] = "some_register";
 /// //     static constexpr char driver[] = "GPIO";
-/// //     static constexpr char conf[] = "";
+/// //     static constexpr char conf[] = "size: 128, "
+/// //                                    "lsb_side_padding: False, "
+/// //                                    "fields: [ {name: TakeData, size: 1, offset: 5} ], "
+/// //                                    "init: { TakeData: 0 }";
 /// // };
 ///
 /// typedef casil::TemplateDevice<
@@ -111,19 +117,17 @@
 ///
 ///         exampleDev.init();
 ///
-///         auto& gpio = exampleDev.driver<GPIO>();
-///
-///         auto gpioBits = gpio.bitsetFromBytes(gpio.getData());
+///         auto& gpioReg = exampleDev.reg<SomeRegister>();
 ///
 ///         //Start taking data
-///         gpioBits[5] = 1;
-///         gpio.setData(gpio.bytesFromBitset(gpioBits));
+///         gpioReg["TakeData"][0] = true;
+///         gpioReg.write();
 ///
 ///         std::this_thread::sleep_for(std::chrono::seconds{3});
 ///
 ///         //Stop taking data
-///         gpioBits[5] = 0;
-///         gpio.setData(gpio.bytesFromBitset(gpioBits));
+///         gpioReg["TakeData"][0] = false;
+///         gpioReg.write();
 ///
 ///         std::this_thread::sleep_for(std::chrono::milliseconds{200});
 ///

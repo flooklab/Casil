@@ -848,12 +848,72 @@ bool RegisterDriver::closeImpl()
  *
  * \todo ...
  *
+ *
+ * \throws std::runtime_error If a node in \p pConf has neither non-empty data nor a child node.
+ * \throws std::runtime_error If a node in \p pConf has \e both non-empty data and a child node.
+ * \throws std::runtime_error If a register does not exist.
+ * \throws std::runtime_error If a register is read-only or write-only.
+ * \throws std::runtime_error If the to be set value/sequence does not match the data type of the register.
+ * \throws std::runtime_error If the parsing of a value/sequence fails due to invalid formatting.
+ * \throws std::runtime_error If a byte sequence length does not match the register size/length.
+ * \throws std::runtime_error If writing to the interface fails (see also setValue(), setBytes()).
+ *
  * \param pConf Desired runtime configuration tree.
  */
 void RegisterDriver::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 {
-    (void)pConf;
-    //TODO
+    const LayerConfig tConf(pConf);
+
+    for (const auto& [key, subTree] : pConf)
+    {
+        if (subTree.empty() && subTree.data() == "")
+            throw std::runtime_error("Node has neither non-empty data nor a child node.");
+        else if (!subTree.empty() && subTree.data() != "")
+            throw std::runtime_error("Node must have either non-empty data or a child node.");
+
+        const auto regIt = registers.find(key);
+
+        if (regIt == registers.end())
+            throw std::runtime_error("Register \"" + key + "\" is not available.");
+
+        if (regIt->second.mode != AccessMode::ReadWrite)
+        {
+            throw std::runtime_error("Register \"" + key + "\" is " +
+                                     ((regIt->second.mode == AccessMode::ReadOnly) ? "read" : "write") + "-only.");
+        }
+
+        if (subTree.empty())
+        {
+            if (regIt->second.type != DataType::Value)
+                throw std::runtime_error("Integer value is defined for register \"" + key + "\" but byte sequence is required.");
+
+            const std::optional<std::uint64_t> val = tConf.getUIntOpt(key);
+            if (val)
+                setValue(key, val.value());
+            else
+                throw std::runtime_error("Could not parse value for register \"" + key + "\".");
+        }
+        else
+        {
+            if (regIt->second.type != DataType::ByteArray)
+                throw std::runtime_error("Byte sequence is defined for register \"" + key + "\" but integer value is required.");
+
+            const std::optional<std::vector<std::uint8_t>> seq = tConf.getByteSeqOpt(key);
+            if (seq)
+            {
+                try
+                {
+                    setBytes(key, seq.value());
+                }
+                catch (const std::invalid_argument& exc)
+                {
+                    throw std::runtime_error(exc.what());
+                }
+            }
+            else
+                throw std::runtime_error("Could not parse byte sequence for register \"" + key + "\".");
+        }
+    }
 }
 
 /*!
@@ -867,11 +927,33 @@ void RegisterDriver::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
  */
 boost::property_tree::ptree RegisterDriver::dumpRuntimeConfImpl() const
 {
-    //TODO
+    using boost::property_tree::ptree;
+    ptree confTree;
 
-    boost::property_tree::ptree confTree;
+    for (const auto& [regName, regDescr] : registers)
+    {
+        if (regDescr.mode != AccessMode::ReadWrite)
+            continue;
 
-    //TODO
+        ptree valTree;
+
+        if (regDescr.type == DataType::Value)
+        {
+            valTree.data() = casil::Bytes::formatHex(getValue(regName));
+        }
+        else
+        {
+            std::size_t byteNum = 0;
+            for (const std::uint8_t byte : getBytes(regName))
+            {
+                ptree numberNode;
+                numberNode.data() = Bytes::formatHex(byte);
+                valTree.add_child("#" + std::to_string(byteNum++), numberNode);
+            }
+        }
+
+        confTree.add_child(regName, valTree);
+    }
 
     return confTree;
 }

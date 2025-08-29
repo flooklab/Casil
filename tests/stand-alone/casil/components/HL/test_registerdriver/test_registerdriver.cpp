@@ -712,6 +712,110 @@ BOOST_AUTO_TEST_CASE(Test14_validRegisterNames)
     }
 }
 
+BOOST_AUTO_TEST_CASE(Test15_loadDumpConf)
+{
+    Device d("{transfer_layer: [{name: intf, type: FakeInterface}],"
+              "hw_drivers: [{name: drv, type: TestRegDriver, interface: intf, base_addr: 0x135F, "
+                            "init: {"
+                                "FOOBAR: 0x313,"
+                                "OUTPUT: [0x11, 0x22, 0x44],"
+                                "TRIGGER: [0x1F, 0xB3],"
+                                "TESTARR: [0x87, 0x4E],"
+                                "TESTVAL: 0x91A2,"
+                                "TESTVAL_A: 144434,"
+                                "TESTVAL_B: 1465,"
+                                "TESTVAL_C: 1465,"
+                                "TESTVAL_D: 0x291083F,"
+                                "TESTVAL_E: 0x36630C181,"
+                                "TESTVAL_F: 0x3B9C70E0E0701FD,"
+                                "TESTVAL_G: 0x7BCF1E1E0F03C07F"
+                            "}}],"
+              "registers: []}");
+
+    BOOST_REQUIRE(d.init());
+
+    RegisterDriver& drv = dynamic_cast<RegisterDriver&>(d.driver("drv"));
+
+    const std::string rtconf = drv.dumpRuntimeConfiguration();
+
+    drv.reset();
+
+    BOOST_REQUIRE_EQUAL(drv.getValue("VERSION"), 11);
+    BOOST_REQUIRE_EQUAL(drv.getValue("FOOBAR"), 582);
+    BOOST_REQUIRE_EQUAL(drv.getBytes("INPUT"), (std::vector<std::uint8_t>{0b10110001u}));
+    BOOST_REQUIRE_EQUAL(drv.getBytes("OUTPUT"), (std::vector<std::uint8_t>{0x56u, 0x78u, 0x9Au}));
+    BOOST_REQUIRE_EQUAL(drv.getBytes("TESTARR"), (std::vector<std::uint8_t>{0x14u, 0x23u}));
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL"), 0x5867u);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_A"), 0);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_B"), 0);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_C"), 0);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_D"), 0);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_E"), 0);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_F"), 0);
+    BOOST_REQUIRE_EQUAL(drv.getValue("TESTVAL_G"), 0);
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration(rtconf));
+
+    BOOST_CHECK_EQUAL(drv.getValue("VERSION"), 11);
+    BOOST_CHECK_EQUAL(drv.getValue("FOOBAR"), 787);
+    BOOST_CHECK_EQUAL(drv.getBytes("INPUT"), (std::vector<std::uint8_t>{0b10110001u}));
+    BOOST_CHECK_EQUAL(drv.getBytes("OUTPUT"), (std::vector<std::uint8_t>{0x11u, 0x22u, 0x44u}));
+    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR"), (std::vector<std::uint8_t>{0x87u, 0x4Eu}));
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL"), 0x91A2u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_A"), 0x23432u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_B"), 0b10110111001u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_C"), 0b10110111001u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_D"), 0x291083Fu);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_E"), 0x36630C181u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_F"), 0x3B9C70E0E0701FDu);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_G"), 0x7BCF1E1E0F03C07Fu);
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{"
+                                             "FOOBAR: 0xAA,"
+                                             "OUTPUT: [0x33, 0x04, 0xD5],"
+                                             "TESTVAL: 0x179C,"
+                                             "TESTVAL_B: 0x47A,"
+                                             "TESTVAL_D: 0x282B5E0,"
+                                             "TESTVAL_F: 0x3ABAAD2C381F4C9"
+                                             "}"));
+
+    BOOST_CHECK_EQUAL(drv.getValue("VERSION"), 11);
+    BOOST_CHECK_EQUAL(drv.getValue("FOOBAR"), 170);
+    BOOST_CHECK_EQUAL(drv.getBytes("INPUT"), (std::vector<std::uint8_t>{0b10110001}));
+    BOOST_CHECK_EQUAL(drv.getBytes("OUTPUT"), (std::vector<std::uint8_t>{0x33u, 0x04u, 0xD5u}));
+    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR"), (std::vector<std::uint8_t>{0x87u, 0x4Eu}));
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL"), 0x179Cu);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_A"), 0x23432u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_B"), 0x47Au);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_C"), 0b10110111001u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_D"), 0x282B5E0u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_E"), 0x36630C181u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_F"), 0x3ABAAD2C381F4C9u);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_G"), 0x7BCF1E1E0F03C07Fu);
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{}"));    //Should not change anything
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL"), 0x179Cu);
+
+    //Invalid configurations
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{FOOBAR: 0xAA, OUTPUT: [0x33, 0x04, 0xD5]}") == true);    //OK
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{FOOBAR: 0xRG}") == false);                               //Invalid number
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{OUTPUT: [0x33, 0x04, 0xRG]}") == false);                 //Invalid sequence
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{OUTPUT: [0x33, 0xD5]}") == false);                       //Wrong size
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{RESET: 0xAA}") == false);                                //Write-only
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{BARFOO: 0xAA}") == false);                               //Not available
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{OUTPUT: 0xAA}") == false);                               //Wrong data type
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{FOOBAR: [0x33, 0x04, 0xD5]}") == false);                 //Wrong data type
+
+    BOOST_CHECK(drv.loadRuntimeConfiguration("{FOOBAR: }") == false);                                   //Empty node
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

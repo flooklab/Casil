@@ -64,6 +64,8 @@
 
 #include <casil/layerconfig.h>
 
+#include <boost/property_tree/ptree_fwd.hpp>
+
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -177,6 +179,9 @@ public:
 private:
     bool initImpl() override final;
     bool closeImpl() override final;
+    //
+    void loadRuntimeConfImpl(boost::property_tree::ptree&& pConf) override final;
+    boost::property_tree::ptree dumpRuntimeConfImpl() const override final;
     //
     virtual bool initModule();          ///< Perform module-specific initialization steps.
     virtual bool closeModule();         ///< Perform module-specific closing steps.

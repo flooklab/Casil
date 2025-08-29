@@ -764,6 +764,43 @@ bool RegisterDriver::closeImpl()
 //
 
 /*!
+ * \copybrief Register::loadRuntimeConfImpl()
+ *
+ * ...
+ *
+ * \todo ...
+ *
+ * \param pConf Desired runtime configuration tree.
+ */
+void RegisterDriver::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
+{
+    (void)pConf;
+    //TODO
+}
+
+/*!
+ * \copybrief Register::dumpRuntimeConfImpl()
+ *
+ * ...
+ *
+ * \todo ...
+ *
+ * \return Current runtime configuration tree.
+ */
+boost::property_tree::ptree RegisterDriver::dumpRuntimeConfImpl() const
+{
+    //TODO
+
+    boost::property_tree::ptree confTree;
+
+    //TODO
+
+    return confTree;
+}
+
+//
+
+/*!
  * \brief Perform module-specific initialization steps.
  *
  * Does nothing (override for specific drivers if needed).

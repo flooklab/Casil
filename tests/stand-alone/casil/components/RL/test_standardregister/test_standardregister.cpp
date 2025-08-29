@@ -109,6 +109,8 @@ BOOST_AUTO_TEST_CASE(Test2_flatLayout)
     BOOST_CHECK_EQUAL(reg["Reg2"].getSize(), 3);
     BOOST_CHECK_EQUAL(reg["Reg2"].getOffset(), 2);
     BOOST_CHECK_EQUAL(reg["Reg2"].getTotalOffset(), 2);
+    BOOST_CHECK_EQUAL(reg.root()["Reg1"].getSize(), 6);
+    BOOST_CHECK_EQUAL(reg.root()["Reg2"].getSize(), 3);
 
     BOOST_CHECK_EQUAL(reg[10].get(), false);
     BOOST_CHECK_EQUAL(reg[9].get(), false);

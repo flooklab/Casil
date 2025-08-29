@@ -353,9 +353,21 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
     const boost::property_tree::ptree fieldsConfig = config.getRawTreeAt("fields");
     populateFieldTree(fields, fieldsConfig, "fields");
 
+    //Can make root field make aware of its immediate childs
+    std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> childFieldRefs;
+    for (const auto& [subFieldName, subField] : fields)
+        childFieldRefs.emplace(subFieldName, *(subField.data()));
+    fields.data()->setChildFields(std::move(childFieldRefs));
+
     //Also fill field tree for driver readback data
     readFields.data() = std::make_shared<RegField>(readData, "", size, size-1);
     populateFieldTree(readFields, fieldsConfig, "fields");
+
+    //Can make readback root field make aware of its immediate childs
+    std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> readFieldRefs;
+    for (const auto& [subFieldName, subField] : readFields)
+        readFieldRefs.emplace(subFieldName, *(subField.data()));
+    readFields.data()->setChildFields(std::move(readFieldRefs));
 
     //Initially fill init value map for every register field with no value (i.e. std::monostate) set
 

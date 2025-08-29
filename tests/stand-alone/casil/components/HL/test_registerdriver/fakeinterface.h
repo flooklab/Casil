@@ -55,6 +55,7 @@ public:
     void clearReadBuffer() override;
     //
     void fakeFirmwareVersion();
+    std::vector<std::uint8_t> getTriggerRegData() const;
 
 private:
     bool initImpl() override;
@@ -63,6 +64,7 @@ private:
 private:
     std::array<std::uint8_t, 46> buffer;
     std::uint8_t firmwareVersion;
+    std::vector<std::uint8_t> triggerRegData;
 
 private:
     static constexpr std::uint64_t drvBaseAddr = 0x135Fu;

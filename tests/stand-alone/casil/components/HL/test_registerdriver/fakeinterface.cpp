@@ -38,7 +38,8 @@ FakeInterface::FakeInterface(std::string pName, LayerConfig pConfig) :
     buffer({0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u,
             0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u,
             0x0u, 0x0u, 0x0u, 0x0u, 0x0u, 0x0u}),
-    firmwareVersion(11)
+    firmwareVersion(11),
+    triggerRegData({0x00u, 0x00u})
 {
 }
 
@@ -101,7 +102,7 @@ void FakeInterface::write(const std::uint64_t pAddr, const std::vector<std::uint
             buffer[regAddr+i] = pData[i];
     }
     else if (regAddr == 7 && pData.size() == 2)
-        ;   //Do nothing
+        triggerRegData = pData;
     else
         throw std::invalid_argument("Invalid combination of address and write data size.");
 }
@@ -127,6 +128,11 @@ void FakeInterface::clearReadBuffer()
 void FakeInterface::fakeFirmwareVersion()
 {
     firmwareVersion = 74;
+}
+
+std::vector<std::uint8_t> FakeInterface::getTriggerRegData() const
+{
+    return triggerRegData;
 }
 
 //Private

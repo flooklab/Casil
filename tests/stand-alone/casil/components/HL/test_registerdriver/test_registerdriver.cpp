@@ -522,10 +522,32 @@ BOOST_AUTO_TEST_CASE(Test10_triggerWO)
 
     BOOST_REQUIRE(d.init());
 
+    FakeInterface& intf = dynamic_cast<FakeInterface&>(d.interface("intf"));
     RegisterDriver& drv = dynamic_cast<RegisterDriver&>(d.driver("drv"));
 
+    BOOST_REQUIRE_EQUAL(std::uint64_t{drv["TESTVAL_A"]}, 0x0u);
+    drv["TESTVAL_A"] = 0x32123u;
+    BOOST_REQUIRE_EQUAL(std::uint64_t{drv["TESTVAL_A"]}, 0x32123u);
+
     drv.trigger("RESET");
+    BOOST_CHECK_EQUAL(std::uint64_t{drv["TESTVAL_A"]}, 0x0u);
+
+    BOOST_REQUIRE_EQUAL((intf.getTriggerRegData()), (std::vector<std::uint8_t>{0x00u, 0x00u}));
     drv.trigger("TRIGGER");
+    BOOST_CHECK_EQUAL((intf.getTriggerRegData()), (std::vector<std::uint8_t>{0x00u, 0x00u}));
+
+    drv["TESTVAL_A"] = 0x32123u;
+    drv.getValue("RESET");
+    BOOST_CHECK_EQUAL(std::uint64_t{drv["TESTVAL_A"]}, 0x0u);
+
+    drv["TESTVAL_A"] = 0x32123u;
+    static_cast<std::uint64_t>(drv["RESET"]);                   //Trigger via casting from proxy to ensure this does not call the const
+    BOOST_CHECK_EQUAL(std::uint64_t{drv["TESTVAL_A"]}, 0x0u);   //overload of getValue() (which it should not do, but let's be pedantic here)
+
+    drv.setBytes("TRIGGER", {0x12u, 0x34u});
+    BOOST_REQUIRE_EQUAL((intf.getTriggerRegData()), (std::vector<std::uint8_t>{0x12u, 0x34u}));
+    static_cast<std::vector<std::uint8_t>>(drv["TRIGGER"]);
+    BOOST_CHECK_EQUAL((intf.getTriggerRegData()), (std::vector<std::uint8_t>{0x00u, 0x00u}));
 
     Device d2("{transfer_layer: [{name: intf2, type: FakeInterface}],"
                "hw_drivers: [{name: drv2, type: TestRegDriver, interface: intf2, base_addr: 0x135F, "
@@ -537,17 +559,31 @@ BOOST_AUTO_TEST_CASE(Test10_triggerWO)
 
     BOOST_REQUIRE(d2.init());
 
+    FakeInterface& intf2 = dynamic_cast<FakeInterface&>(d2.interface("intf2"));
     RegisterDriver& drv2 = dynamic_cast<RegisterDriver&>(d2.driver("drv2"));
 
-    drv2.trigger("RESET");
-    drv2.trigger("TRIGGER");
+    BOOST_CHECK_EQUAL((intf2.getTriggerRegData()), (std::vector<std::uint8_t>{0x1Fu, 0xB3u}));
 
-    BOOST_CHECK(true);
+    drv2["TESTVAL_A"] = 0x32123u;
+    drv2.get("RESET");
+    BOOST_CHECK_EQUAL(std::uint64_t{drv2["TESTVAL_A"]}, 0x0u);
 
-    const auto& rstReg = drv["RESET"];
+    drv2.setBytes("TRIGGER", {0x00u, 0x00u});
+    BOOST_REQUIRE_EQUAL((intf2.getTriggerRegData()), (std::vector<std::uint8_t>{0x00u, 0x00u}));
+
+    drv2.getBytes("TRIGGER");
+    BOOST_CHECK_EQUAL((intf2.getTriggerRegData()), (std::vector<std::uint8_t>{0x1Fu, 0xB3u}));
+
+    drv2.setBytes("TRIGGER", {0x00u, 0x00u});
+    drv2.get("TRIGGER");
+    BOOST_CHECK_EQUAL((intf2.getTriggerRegData()), (std::vector<std::uint8_t>{0x1Fu, 0xB3u}));
+
+    drv2["TESTVAL_A"] = 0x32123u;
+
+    const auto& rstReg = drv2["RESET"];
+    BOOST_CHECK_EQUAL(std::uint64_t{drv2["TESTVAL_A"]}, 0x32123u);
     rstReg.trigger();
-
-    BOOST_CHECK(true);
+    BOOST_CHECK_EQUAL(std::uint64_t{drv2["TESTVAL_A"]}, 0x0u);
 }
 
 BOOST_AUTO_TEST_CASE(Test11_typeModeSizeMismatch)

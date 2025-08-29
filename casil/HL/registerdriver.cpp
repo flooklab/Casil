@@ -442,7 +442,15 @@ void RegisterDriver::setBytes(const std::string_view pRegName, const std::vector
                                     "of register driver \"" + name + "\".");
     }
 
-    setRegBytes(reg.addr, pData);
+    try
+    {
+        setRegBytes(reg.addr, pData);
+    }
+    catch (const std::runtime_error& exc)
+    {
+        throw std::runtime_error("Could not write byte sequence to register \"" + std::string(pRegName) + "\" " +
+                                 "of register driver \"" + name + "\": " + exc.what());
+    }
 
     registerWrittenCache.find(pRegName)->second = pData;
 }

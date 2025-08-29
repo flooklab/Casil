@@ -88,7 +88,7 @@ namespace Layers::RL
 {
 
 /*!
- * \brief ...
+ * \brief Basic register implementation for accessing raw driver data through a structured register view.
  *
  * \todo ...
  */

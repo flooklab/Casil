@@ -144,7 +144,8 @@ void bindRL_StandardRegister(py::module& pM)
             .def("getOffset", &RegField::getOffset, "Get the field's offset with respect to its parent field.")
             .def("getTotalOffset", &RegField::getTotalOffset, "Get the field's total offset with respect to the whole register.");
 
-    py::class_<StandardRegister, casil::RL::Register>(pM, "StandardRegister", "... TODO ...")
+    py::class_<StandardRegister, casil::RL::Register>(pM, "StandardRegister", "Basic register implementation for accessing raw "
+                                                                              "driver data through a structured register view.")
             .def(py::init<std::string, casil::HL::Driver&, casil::LayerConfig>(), "Constructor.",
                  py::arg("name"), py::arg("driver"), py::arg("config"))
             .def("__getitem__", [](const StandardRegister& pThis, const std::size_t pIdx) -> bool

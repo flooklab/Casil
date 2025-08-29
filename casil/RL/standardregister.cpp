@@ -1504,7 +1504,11 @@ const boost::dynamic_bitset<>& RegField::operator=(const boost::dynamic_bitset<>
  *
  * \param pValue Value to be assigned.
  */
-void RegField::set(const std::uint64_t pValue)
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+void RegField::set(/*const */std::uint64_t pValue)
+#else
+void RegField::set(/*const */std::uint64_t pValue)
+#endif
 {
     *this = pValue;
 }
@@ -1772,7 +1776,11 @@ RegField RegField::operator[](const std::initializer_list<std::size_t> pIdxs)
  *
  * \copydetails n(std::size_t) const
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+RegField& RegField::n(/*const */std::size_t pFieldRepIdx)
+#else
 RegField& RegField::n(const std::size_t pFieldRepIdx)
+#endif
 {
     return const_cast<RegField&>(std::as_const(*this).n(pFieldRepIdx));
 }
@@ -1794,7 +1802,11 @@ RegField& RegField::n(const std::size_t pFieldRepIdx)
  * \param pFieldRepIdx Number of the desired field repetition.
  * \return Proxy class instance for field repetition number \p pFieldRepIdx.
  */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+const RegField& RegField::n(/*const */std::size_t pFieldRepIdx) const
+#else
 const RegField& RegField::n(const std::size_t pFieldRepIdx) const
+#endif
 {
     if (pFieldRepIdx >= repetitionKeys.size())
     {

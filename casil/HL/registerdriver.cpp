@@ -632,7 +632,7 @@ void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64
  * \throws std::runtime_error If getValue(std::string_view) or getBytes(std::string_view) throw \c std::runtime_error.
  *
  * \param pRegName Name of the register.
- * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of \p pRegName.
+ * \return Integer value or byte sequence, depending on the DataType of \p pRegName.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const std::string_view pRegName)
 {
@@ -661,7 +661,7 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const
  * \throws std::runtime_error If getValue(std::string_view) const or getBytes(std::string_view) const throw \c std::runtime_error.
  *
  * \param pRegName Name of the register.
- * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of \p pRegName.
+ * \return Integer value or byte sequence, depending on the DataType of \p pRegName.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const std::string_view pRegName) const
 {
@@ -723,8 +723,7 @@ void RegisterDriver::set(const std::string_view pRegName, const std::vector<std:
  * used, by preference. If there is none of those two, the value zero or a byte sequence consisting of zeros will be written.
  *
  * \throws std::invalid_argument If no register with name \p pRegName is defined.
- * \throws std::invalid_argument If \ref RegisterDescr::AccessMode "AccessMode" of \p pRegName
- *         is \e not \ref RegisterDescr::AccessMode::WriteOnly "WriteOnly".
+ * \throws std::invalid_argument If AccessMode of \p pRegName is \e not \ref casil::HL::RegisterDescr::AccessMode::WriteOnly "WriteOnly".
  * \throws std::runtime_error If setValue() or setBytes() throw \c std::runtime_error.
  *
  * \param pRegName Name of the register.
@@ -899,7 +898,7 @@ bool RegisterDriver::closeImpl()
  * which must in turn have just a value each. The child node keys (at the top level) determine the name of the
  * to be assigned register. Every individual value and every value out of a byte sequence must be an integer.
  * The first child node of a byte sequence will be used as most significant byte of the register.
- * Note that \e only \ref AccessMode::ReadWrite "read-write" registers can be specified.
+ * Note that \e only \ref casil::HL::RegisterDescr::AccessMode::ReadWrite "read-write" registers can be specified.
  *
  * To provide an example, \p pConf might look similar to this:
  * - \c pConf: no %data() at node
@@ -985,10 +984,10 @@ void RegisterDriver::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
 /*!
  * \copybrief Register::dumpRuntimeConfImpl()
  *
- * Constructs and returns a "configuration tree" with one child node for each \ref AccessMode::ReadWrite "read-write"
- * register at keys equal to the respective register names and node content set to the current register status as retrieved
- * by getValue() and getBytes() (depending on their DataType). In case of a value register the node data is set to the value
- * formatted as hexadecimal literal (see Bytes::formatHex()) and in case of a byte array register analogously formatted
+ * Constructs and returns a "configuration tree" with one child node for each \ref casil::HL::RegisterDescr::AccessMode::ReadWrite
+ * "read-write" register at keys equal to the respective register names and node content set to the current register status as
+ * retrieved by getValue() and getBytes() (depending on their DataType). In case of a value register the node data is set to the
+ * value formatted as hexadecimal literal (see Bytes::formatHex()) and in case of a byte array register analogously formatted
  * child nodes are added to the node for every byte, starting with the most significant byte at key "#0" and so forth.
  *
  * Note: According to Auxil::propertyTreeFromYAML() the returned tree is equivalent to a YAML map with either
@@ -1462,7 +1461,7 @@ RegisterProxy::operator std::vector<std::uint8_t>() const
  * \throws std::invalid_argument See RegisterDriver::get().
  * \throws std::runtime_error See RegisterDriver::get().
  *
- * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of the register.
+ * \return Integer value or byte sequence, depending on the \ref casil::HL::RegisterDescr::DataType "DataType" of the register.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get()
 {
@@ -1477,7 +1476,7 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get()
  * \throws std::invalid_argument See RegisterDriver::get() const.
  * \throws std::runtime_error See RegisterDriver::get() const.
  *
- * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of the register.
+ * \return Integer value or byte sequence, depending on the \ref casil::HL::RegisterDescr::DataType "DataType" of the register.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() const
 {

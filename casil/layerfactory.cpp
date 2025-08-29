@@ -42,8 +42,8 @@ using casil::RL::Register;
 /*!
  * \brief Construct a registered interface type.
  *
- * Calls the generator function for the registered type name \p pType (see registerInterfaceType(), registerInterfaceAlias())
- * with forwarded \p pName and \p pConfig arguments and returns a pointer to the generated \ref Layers::TL::Interface "TL::Interface".
+ * Calls the generator function for the registered type name \p pType (see registerInterfaceType(), registerInterfaceAlias()) with
+ * forwarded \p pName and \p pConfig arguments and returns a pointer to the generated \ref casil::Layers::TL::Interface "TL::Interface".
  *
  * Returns \c nullptr if \p pType is not a registered interface type name.
  *
@@ -79,8 +79,8 @@ std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pTyp
 /*!
  * \brief Construct a registered driver type.
  *
- * Calls the generator function for the registered type name \p pType (see registerDriverType(), registerDriverAlias())
- * with forwarded \p pName, \p pInterface and \p pConfig arguments and returns a pointer to the generated \ref Layers::HL::Driver "HL::Driver".
+ * Calls the generator function for the registered type name \p pType (see registerDriverType(), registerDriverAlias()) with forwarded
+ * \p pName, \p pInterface and \p pConfig arguments and returns a pointer to the generated \ref casil::Layers::HL::Driver "HL::Driver".
  *
  * Returns \c nullptr if \p pType is not a registered driver type name.
  *
@@ -89,9 +89,9 @@ std::unique_ptr<Interface> LayerFactory::createInterface(const std::string& pTyp
  *
  * \param pType Registered type name (or alias) of the requested driver type.
  * \param pName Instance name for the new driver component.
- * \param pInterface The interface instance for accessing the \ref Layers::TL "TL".
+ * \param pInterface The interface instance for accessing the \ref casil::Layers::TL "TL".
  * \param pConfig Configuration for the new driver component.
- * \return Pointer to the created \ref Layers::HL::Driver "HL::Driver".
+ * \return Pointer to the created \ref casil::Layers::HL::Driver "HL::Driver".
  */
 std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std::string pName, Interface& pInterface, LayerConfig pConfig)
 {
@@ -117,8 +117,8 @@ std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std
 /*!
  * \brief Construct a registered register type.
  *
- * Calls the generator function for the registered type name \p pType (see registerRegisterType(), registerRegisterAlias()) with
- * forwarded \p pName, \p pDriver and \p pConfig arguments and returns a pointer to the generated \ref Layers::RL::Register "RL::Register".
+ * Calls the generator function for the registered type name \p pType (see registerRegisterType(), registerRegisterAlias()) with forwarded
+ * \p pName, \p pDriver and \p pConfig arguments and returns a pointer to the generated \ref casil::Layers::RL::Register "RL::Register".
  *
  * Returns \c nullptr if \p pType is not a registered register type name.
  *
@@ -127,9 +127,9 @@ std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std
  *
  * \param pType Registered type name (or alias) of the requested register type.
  * \param pName Instance name for the new register component.
- * \param pDriver The driver instance for accessing the \ref Layers::HL "HL".
+ * \param pDriver The driver instance for accessing the \ref casil::Layers::HL "HL".
  * \param pConfig Configuration for the new register component.
- * \return Pointer to the created \ref Layers::RL::Register "RL::Register".
+ * \return Pointer to the created \ref casil::Layers::RL::Register "RL::Register".
  */
 std::unique_ptr<Register> LayerFactory::createRegister(const std::string& pType, std::string pName, Driver& pDriver, LayerConfig pConfig)
 {
@@ -159,7 +159,7 @@ std::unique_ptr<Register> LayerFactory::createRegister(const std::string& pType,
  *
  * Registers an interface type \p T with a "type name" \p pType, which will enable createInterface() to generate
  * \p T based on \p pType. \p pGenerator must construct an instance of the desired interface type and return it
- * as a pointer to \ref Layers::TL::Interface "TL::Interface". See also \ref TLGeneratorFunction.
+ * as a pointer to \ref casil::Layers::TL::Interface "TL::Interface". See also \ref TLGeneratorFunction.
  *
  * \param pType Type name to be used as type identifier for createInterface().
  * \param pGenerator Generator function to construct an instance of the type.
@@ -172,8 +172,9 @@ void LayerFactory::registerInterfaceType(std::string pType, TLGeneratorFunction 
 /*!
  * \brief Register a generator for an driver type.
  *
- * Registers a driver type \p T with a "type name" \p pType, which will enable createDriver() to generate \p T based on \p pType.
- * \p pGenerator must construct an instance of the desired driver type and return it as a pointer to \ref Layers::HL::Driver "HL::Driver".
+ * Registers a driver type \p T with a "type name" \p pType, which will enable createDriver()
+ * to generate \p T based on \p pType. \p pGenerator must construct an instance of the desired
+ * driver type and return it as a pointer to \ref casil::Layers::HL::Driver "HL::Driver".
  * See also \ref HLGeneratorFunction.
  *
  * \param pType Type name to be used as type identifier for createDriver().
@@ -187,8 +188,9 @@ void LayerFactory::registerDriverType(std::string pType, HLGeneratorFunction pGe
 /*!
  * \brief Register a generator for an register type.
  *
- * Registers a register type \p T with a "type name" \p pType, which will enable createRegister() to generate \p T based on \p pType.
- * \p pGenerator must construct an instance of the desired register type and return it as a pointer to \ref Layers::RL::Register "RL::Register".
+ * Registers a register type \p T with a "type name" \p pType, which will enable createRegister()
+ * to generate \p T based on \p pType. \p pGenerator must construct an instance of the desired
+ * register type and return it as a pointer to \ref casil::Layers::RL::Register "RL::Register".
  * See also \ref RLGeneratorFunction.
  *
  * \param pType Type name to be used as type identifier for createRegister().

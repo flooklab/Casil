@@ -80,11 +80,11 @@ namespace Layers::HL
 {
 
 /*!
- * \brief Special driver to access the FIFO of the \ref TL::SiTCP "SiTCP" interface.
+ * \brief Special driver to access the FIFO of the \ref casil::TL::SiTCP "SiTCP" interface.
  *
  * Provides access to the %SiTCP FIFO (see TL::SiTCP) in a way similar to / mimicking the register drivers
  * for the \e bram_fifo and \e sram_fifo firmware modules. Note that no firmware module is available for
- * this driver and that it \e only works in combination with the \ref TL::SiTCP "SiTCP" interface.
+ * this driver and that it \e only works in combination with the \ref casil::TL::SiTCP "SiTCP" interface.
  */
 class SiTCPFifo final : public MuxedDriver
 {
@@ -107,7 +107,7 @@ private:
     bool closeImpl() override;                          ///< Close the driver by doing nothing.
 
 private:
-    using SiTCP = TL::SiTCP;                            ///< \copybrief TL::SiTCP
+    using SiTCP = TL::SiTCP;                            ///< \copybrief casil::Layers::TL::SiTCP
     SiTCP& siTcpIntf;                                   ///< The \ref MuxedDriver::interface "interface" instance casted to needed SiTCP type.
 
 private:

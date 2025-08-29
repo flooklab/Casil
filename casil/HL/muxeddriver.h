@@ -58,7 +58,8 @@ namespace HL
 class MuxedDriver : public Driver
 {
 public:
-    typedef TL::MuxedInterface InterfaceBaseType;   ///< Alias for proper \ref TL::Interface "Interface" sub-type (analog to DirectDriver).
+    typedef TL::MuxedInterface InterfaceBaseType;   ///< \brief Alias for proper \ref casil::TL::Interface "Interface"
+                                                    ///< sub-type (analog to DirectDriver).
 
 public:
     MuxedDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig, const LayerConfig& pRequiredConfig);

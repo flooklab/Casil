@@ -54,7 +54,7 @@ namespace HL
 class DirectDriver : public Driver
 {
 public:
-    typedef TL::DirectInterface InterfaceBaseType;  ///< Alias for proper \ref TL::Interface "Interface" sub-type (analog to MuxedDriver).
+    typedef TL::DirectInterface InterfaceBaseType;  ///< Alias for proper \ref casil::TL::Interface "Interface" sub-type (analog to MuxedDriver).
 
 public:
     DirectDriver(std::string pType, std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig, const LayerConfig& pRequiredConfig);

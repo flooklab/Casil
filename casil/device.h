@@ -44,7 +44,7 @@ namespace casil
  * \brief Configurable container class for interdependent layer components to interact with an arbitrary DAQ setup.
  *
  * Uses a basil YAML configuration document to automatically construct/configure all required components of all three layers
- * (\ref Layers::TL "TL" / \ref Layers::HL "HL" / \ref Layers::RL "RL").
+ * (\ref casil::Layers::TL "TL" / \ref casil::Layers::HL "HL" / \ref casil::Layers::RL "RL").
  *
  * These components can be collectively initialized and then individually accessed and used through this class's interface.
  */

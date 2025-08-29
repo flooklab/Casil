@@ -50,7 +50,7 @@ DummyMuxedDriver::DummyMuxedDriver(std::string pName, InterfaceBaseType& pInterf
 /*!
  * \copybrief MuxedDriver::getData()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \param pSize Number of bytes to get (ignored).
  * \param pAddrOffs Data offset as number of bytes (ignored).
@@ -67,7 +67,7 @@ std::vector<std::uint8_t> DummyMuxedDriver::getData(const int pSize, const std::
 /*!
  * \copybrief MuxedDriver::setData()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \param pData Data to be set as byte sequence (ignored).
  * \param pAddrOffs Data offset as number of bytes (ignored).
@@ -82,7 +82,7 @@ void DummyMuxedDriver::setData(const std::vector<std::uint8_t>& pData, const std
 /*!
  * \copybrief MuxedDriver::exec()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  */
 void DummyMuxedDriver::exec()
 {
@@ -92,7 +92,7 @@ void DummyMuxedDriver::exec()
 /*!
  * \copybrief MuxedDriver::isDone()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return False.
  */
@@ -107,7 +107,7 @@ bool DummyMuxedDriver::isDone()
 /*!
  * \copybrief MuxedDriver::initImpl()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */
@@ -120,7 +120,7 @@ bool DummyMuxedDriver::initImpl()
 /*!
  * \copybrief MuxedDriver::closeImpl()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */

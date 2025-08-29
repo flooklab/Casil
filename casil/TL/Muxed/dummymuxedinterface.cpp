@@ -49,7 +49,7 @@ DummyMuxedInterface::DummyMuxedInterface(std::string pName, LayerConfig pConfig)
 /*!
  * \copybrief MuxedInterface::read()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
  * \param pAddr Bus address (ignored).
  * \param pSize Number of bytes to read (ignored).
@@ -66,7 +66,7 @@ std::vector<std::uint8_t> DummyMuxedInterface::read(const std::uint64_t pAddr, c
 /*!
  * \copybrief MuxedInterface::write()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
  * \param pAddr Bus address (ignored).
  * \param pData %Bytes to be written (ignored).
@@ -81,7 +81,7 @@ void DummyMuxedInterface::write(const std::uint64_t pAddr, const std::vector<std
 /*!
  * \copybrief MuxedInterface::query()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call and the passed arguments.
  *
  * \param pWriteAddr Bus address to write to (ignored).
  * \param pReadAddr Bus address to read from (ignored).
@@ -105,7 +105,7 @@ std::vector<std::uint8_t> DummyMuxedInterface::query(const std::uint64_t pWriteA
 /*!
  * \copybrief MuxedInterface::readBufferEmpty()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */
@@ -118,7 +118,7 @@ bool DummyMuxedInterface::readBufferEmpty() const
 /*!
  * \copybrief MuxedInterface::clearReadBuffer()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  */
 void DummyMuxedInterface::clearReadBuffer()
 {
@@ -130,7 +130,7 @@ void DummyMuxedInterface::clearReadBuffer()
 /*!
  * \copybrief MuxedInterface::initImpl()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */
@@ -143,7 +143,7 @@ bool DummyMuxedInterface::initImpl()
 /*!
  * \copybrief MuxedInterface::closeImpl()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */

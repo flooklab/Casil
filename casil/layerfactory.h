@@ -39,7 +39,8 @@ namespace Layers { namespace HL { class Driver; } }
 namespace Layers { namespace RL { class Register; } }
 
 /*!
- * \brief Factory for LayerBase classes of the three component layers \ref Layers::TL "TL", \ref Layers::HL "HL" and \ref Layers::RL "RL".
+ * \brief Factory for LayerBase classes of the three component layers \ref casil::Layers::TL "TL",
+ * \ref casil::Layers::HL "HL" and \ref casil::Layers::RL "RL".
  *
  * Use createInterface() / createDriver() / createRegister() to construct layer components by their registered type names.
  *
@@ -53,9 +54,9 @@ namespace Layers { namespace RL { class Register; } }
 class LayerFactory
 {
 private:
-    using Interface = Layers::TL::Interface;    ///< \copybrief Layers::TL::Interface
-    using Driver = Layers::HL::Driver;          ///< \copybrief Layers::HL::Driver
-    using Register = Layers::RL::Register;      ///< \copybrief Layers::RL::Register
+    using Interface = Layers::TL::Interface;    ///< \copybrief casil::Layers::TL::Interface
+    using Driver = Layers::HL::Driver;          ///< \copybrief casil::Layers::HL::Driver
+    using Register = Layers::RL::Register;      ///< \copybrief casil::Layers::RL::Register
 
 public:
     typedef std::function<std::unique_ptr<Interface>(std::string, LayerConfig)> TLGeneratorFunction;

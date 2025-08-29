@@ -87,7 +87,7 @@ namespace Layers::HL
  * Available registers:
  *
  * <table>
- * <tr><th>Name</th><th>\ref RegisterDescr::DataType "DataType"</th><th>\ref RegisterDescr::AccessMode "AccessMode"</th>
+ * <tr><th>Name</th><th>\ref casil::HL::RegisterDescr::DataType "DataType"</th><th>\ref casil::HL::RegisterDescr::AccessMode "AccessMode"</th>
  * <th>Size</th><th>Description</th></tr>
  * <tr><td>\c RESET</td>    <td>Value</td>    <td>WriteOnly</td><td>8</td>          <td>Soft reset active on write to address.</td></tr>
  * <tr><td>\c VERSION</td>  <td>Value</td>    <td>ReadOnly</td> <td>8</td>          <td>Firmware module version.</td></tr>

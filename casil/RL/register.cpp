@@ -32,7 +32,7 @@ using casil::Layers::RL::Register;
  *
  * Constructs LayerBase for Layer::RegisterLayer, forwarding \p pType, \p pName, \p pConfig and \p pRequiredConfig.
  *
- * Initializes the internal driver instance (for required access to \ref Layers::HL "HL") from \p pDriver.
+ * Initializes the internal driver instance (for required access to \ref casil::Layers::HL "HL") from \p pDriver.
  *
  * \param pType Registered component type name.
  * \param pName Component instance name.

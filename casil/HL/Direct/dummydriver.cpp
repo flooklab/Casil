@@ -48,7 +48,7 @@ DummyDriver::DummyDriver(std::string pName, InterfaceBaseType& pInterface, Layer
 /*!
  * \copybrief DirectDriver::initImpl()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */
@@ -61,7 +61,7 @@ bool DummyDriver::initImpl()
 /*!
  * \copybrief DirectDriver::closeImpl()
  *
- * Does nothing except \ref Logger::LogLevel::Debug "Debug"-logging the function call.
+ * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
  * \return True.
  */

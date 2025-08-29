@@ -65,7 +65,7 @@ namespace HL
  * This class provides very basic/limited functionality likely common to all drivers.
  * It is not intended to directly derive drivers from this class.
  *
- * Because of the \e direct/muxed interface split in the \ref Layers::TL "TL", drivers must be split into two such groups as well:
+ * Because of the \e direct/muxed interface split in the \ref casil::Layers::TL "TL", drivers must be split into two such groups as well:
  * - "Direct" drivers: Drivers for independent/stand-alone hardware (not using the basil bus)
  * - "Muxed" drivers: Drivers for firmware modules running on FPGA hardware based on the basil bus
  *

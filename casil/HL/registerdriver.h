@@ -141,8 +141,8 @@ public:
 
 protected:
     //Declaring these aliases to make definition of registers in implementations more compact
-    using DataType = RegisterDescr::DataType;       ///< \copybrief RegisterDescr::DataType
-    using AccessMode = RegisterDescr::AccessMode;   ///< \copybrief RegisterDescr::AccessMode
+    using DataType = RegisterDescr::DataType;       ///< \copybrief casil::HL::RegisterDescr::DataType
+    using AccessMode = RegisterDescr::AccessMode;   ///< \copybrief casil::HL::RegisterDescr::AccessMode
 
 public:
     class RegisterProxy;

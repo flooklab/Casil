@@ -1468,6 +1468,8 @@ RegField::RegField(RegField& pParent, const std::string& pName, const std::uint6
  * \brief Copy constructor.
  *
  * Constructs a copy of \p pOther (references the same bits and also child fields).
+ *
+ * \param pOther Instance to be copied from.
  */
 RegField::RegField(const RegField& pOther) :
     name(pOther.name),

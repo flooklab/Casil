@@ -44,11 +44,11 @@ PYBIND11_MODULE(PyCasil, pyCasil)
     pyCasil.doc() = "Python binding of Casil, a reimplementation of the data acquisition framework basil in C++.";
 
     bind_ASIO(pyCasil);
-    bind_ContextualLogger(pyCasil);
     bind_Device(pyCasil);
     bind_LayerBase(pyCasil);
     bind_LayerConfig(pyCasil);
     bind_Logger(pyCasil);
+    bind_ContextualLogger(pyCasil); //Bind after Logger because it needs bound Logger::LogLevel
 
     //
 

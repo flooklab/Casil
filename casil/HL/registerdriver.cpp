@@ -939,7 +939,7 @@ boost::property_tree::ptree RegisterDriver::dumpRuntimeConfImpl() const
 
         if (regDescr.type == DataType::Value)
         {
-            valTree.data() = casil::Bytes::formatHex(getValue(regName));
+            valTree.data() = Bytes::formatHex(getValue(regName));
         }
         else
         {

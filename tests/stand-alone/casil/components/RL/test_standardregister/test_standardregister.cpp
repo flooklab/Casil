@@ -1234,9 +1234,6 @@ BOOST_AUTO_TEST_CASE(Test16_writeReadAndReadTree)
     reg.read();
     BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("11111111111")));
 
-    reg.rootRead() = 0x2D6u;
-    BOOST_CHECK_EQUAL(reg.getRead(), boost::dynamic_bitset(std::string("01011010110")));
-
     reg.set(boost::dynamic_bitset(std::string("10010111101")));
     reg.write(1);
 

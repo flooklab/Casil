@@ -80,12 +80,12 @@ using BoolRef = casil::Layers::RL::StandardRegister::BoolRef;
  *
  * Boundaries are not checked here but used BoolRef::BoolRef() will throw std::invalid_argument if an index exceeds the referenced bitset.
  */
-std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, const std::uint64_t pSize, const std::uint64_t pOffs)
+std::vector<std::unique_ptr<BoolRef>> createBitRefs(boost::dynamic_bitset<>& pBits, const std::uint64_t pSize, const std::uint64_t pOffs)
 {
-    std::vector<BoolRef> retVal;
+    std::vector<std::unique_ptr<BoolRef>> retVal;
     retVal.reserve(pSize);
     for (std::size_t i = pOffs-(pSize-1); i <= pOffs; ++i)
-        retVal.emplace_back(pBits, i);
+        retVal.push_back(std::make_unique<BoolRef>(pBits, i));
     return retVal;
 }
 
@@ -96,12 +96,12 @@ std::vector<BoolRef> createBitRefs(boost::dynamic_bitset<>& pBits, const std::ui
  *
  * Boundaries are not checked here but used BoolRef::BoolRef() will throw std::invalid_argument if an index exceeds the referenced field.
  */
-std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs)
+std::vector<std::unique_ptr<BoolRef>> createBitRefs(RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs)
 {
-    std::vector<BoolRef> retVal;
+    std::vector<std::unique_ptr<BoolRef>> retVal;
     retVal.reserve(pSize);
     for (std::size_t i = pOffs-(pSize-1); i <= pOffs; ++i)
-        retVal.emplace_back(pParent, i);
+        retVal.push_back(std::make_unique<BoolRef>(pParent, i));
     return retVal;
 }
 
@@ -112,23 +112,23 @@ std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t 
  * 0 and 'pSize'-1. The indexing is hence such that returnValue[pBitOrder[0:(pSize-1)]] ^= pParent[pOffs:(pOffs-(pSize-1))],
  * which for regular bit ordering with pBitOrder = [(pSize-1), ..., 0] would simplify to
  * returnValue[(pSize-1):0] ^= pParent[pOffs:(pOffs-(pSize-1))] just as in
- * createBitRefs(const RegField&, std::uint64_t, std::uint64_t) above.
+ * createBitRefs(RegField&, std::uint64_t, std::uint64_t) above.
  *
  * Boundaries and bit order conditions are not checked here but the used BoolRef::BoolRef()
  * will at least throw std::invalid_argument if an index exceeds the referenced field.
  */
-std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs,
-                                   const std::vector<std::uint64_t>& pBitOrder)
+std::vector<std::unique_ptr<BoolRef>> createBitRefs(RegField& pParent, const std::uint64_t pSize, const std::uint64_t pOffs,
+                                                    const std::vector<std::uint64_t>& pBitOrder)
 {
     std::vector<std::size_t> idxs;
     idxs.reserve(pSize);
     for (std::size_t i = pOffs-(pSize-1); i <= pOffs; ++i)
         idxs.push_back(i);
 
-    std::vector<BoolRef> retVal;
+    std::vector<std::unique_ptr<BoolRef>> retVal;
     retVal.reserve(pSize);
     for (std::size_t i = 0; i < pSize; ++i)
-        retVal.emplace_back(pParent, idxs[pBitOrder[(pSize-1)-i]]);
+        retVal.push_back(std::make_unique<BoolRef>(pParent, idxs[pBitOrder[(pSize-1)-i]]));
 
     return retVal;
 }
@@ -141,12 +141,12 @@ std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::uint64_t 
  * Boundaries are not checked here but used RegField::operator[](std::size_t)
  * will throw std::invalid_argument if an index exceeds the referenced field.
  */
-std::vector<BoolRef> createBitRefs(const RegField& pParent, const std::vector<std::size_t>& pIdxs)
+std::vector<std::unique_ptr<BoolRef>> createBitRefs(RegField& pParent, const std::vector<std::size_t>& pIdxs)
 {
-    std::vector<BoolRef> retVal;
+    std::vector<std::unique_ptr<BoolRef>> retVal;
     retVal.reserve(pIdxs.size());
     for (auto idx : (pIdxs | std::views::reverse))
-        retVal.push_back(pParent[idx]);                                                                 // cppcheck-suppress useStlAlgorithm
+        retVal.push_back(std::make_unique<BoolRef>(pParent[idx]));                                      // cppcheck-suppress useStlAlgorithm
     return retVal;
 }
 
@@ -273,8 +273,8 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  * possibly sub-fields) of sub-fields is automatically inserted, representing identical (except bit shifted) repetitions/copies of
  * the given field configuration including its sub-fields. The actual size of the field then becomes \c repeat \c * \c size, while
  * each of the repetitions has a size of \c size and has an accordingly shifted offset with respect to the full repeated field.
- * The n-th repetition can be accessed via RegField::n() or the regular RegField::operator[](std::string_view) const /
- * StandardRegister::operator[](const std::string&) const using "#0", "#1", etc. as keys.
+ * The n-th repetition can be accessed via RegField::n() or the regular RegField::operator[](std::string_view) /
+ * StandardRegister::operator[](const std::string&) using "#0", "#1", etc. as keys.
  * Note that here the zeroth repetition is the one starting at the highest offset (as inherited from basil).
  *
  * If the unsigned integer sequence "bit_order" is defined for a field, the order in which the parent field's bits get
@@ -287,23 +287,23 @@ CASIL_REGISTER_REGISTER_ALIAS("StdRegister")
  *
  * The bit order sequence must have the same size as the field and contain every index out of <tt>[0, size)</tt>,
  * which implies that duplicate bit assignments are not possible. Note that if the field gets repeated (see above) the
- * specified bit order applies to each field repetition independently. Setting a bit order for the \e whole field is then not
- * possible. Also note that child fields access their parent field's bits via RegField::operator[](std::size_t pIdx) const,
- * i.e. the parent's bit order is transparent and implicitly applies to its childs. For more details on the bit order see
- * also RegField(const RegField&, const std::string&, std::uint64_t, std::uint64_t, const std::vector<std::uint64_t>&).
+ * specified bit order applies to each field repetition independently. Setting a bit order for the \e whole field is then
+ * not possible. Also note that child fields access their parent field's bits via RegField::operator[](std::size_t pIdx),
+ * i.e. the parent's bit order is transparent and implicitly applies to its childs. For more details on the bit order
+ * see also RegField(RegField&, const std::string&, std::uint64_t, std::uint64_t, const std::vector<std::uint64_t>&).
  *
  * An optional "init" map can be specified in \p pConfig in order to define default values for specific register fields.
- * The keys in that map define the fields by their paths (as used in the argument to operator[](const std::string&) const).
- * The values can be either unsigned integers (as used in the argument to RegField::operator=(std::uint64_t) const) or strings
- * of zeros and ones with "0b" prefix for directly constructing the underlying bit sequences (represented bit sequence as used
- * in the argument to RegField::operator=(const boost::dynamic_bitset<>&) const). As an example, the format of the init map
- * should be equivalent to <tt>init: {"Path.To.Reg.Field.1": 1234, "Path.To.Another.Field": "0b1011001"}</tt>.
+ * The keys in that map define the fields by their paths (as used in the argument to operator[](const std::string&)).
+ * The values can be either unsigned integers (as used in the argument to RegField::operator=(std::uint64_t)) or strings
+ * of zeros and ones with "0b" prefix for directly constructing the underlying bit sequences (represented bit sequence as
+ * used in the argument to RegField::operator=(const boost::dynamic_bitset<>&)). As an example, the format of the init
+ * map should be equivalent to <tt>init: {"Path.To.Reg.Field.1": 1234, "Path.To.Another.Field": "0b1011001"}</tt>.
  *
  * The fields that appear in the init map will be automatically set to the specified values at initialization of the component
  * (see init()) and can be manually set to their init values again by calling applyDefaults(). Fields without such an init value
  * stay unchanged and init map entries that point to no existing field will be ignored. Setting the values happens as if by calling
- * RegField::operator=(std::uint64_t) const / RegField::operator=(const boost::dynamic_bitset<>&) const. Note that in case of the
- * bit sequence the sequence/string length must be equal to the field length. Also note that there must not be multiple/conflicting
+ * RegField::operator=(std::uint64_t) / RegField::operator=(const boost::dynamic_bitset<>&). Note that in case of the bit sequence
+ * the sequence/string length must be equal to the field length. Also note that there must not be multiple/conflicting
  * assignments for overlapping/nested fields as no guarantee is made about the order in which the fields will be set.
  *
  * \internal \sa populateFieldTree() \endinternal
@@ -471,6 +471,16 @@ StandardRegister::StandardRegister(std::string pName, HL::Driver& pDriver, Layer
 /*!
  * \brief Access a specific register field.
  *
+ * \copydetails operator[](const std::string&) const
+ */
+StandardRegister::RegField& StandardRegister::operator[](const std::string& pFieldPath)
+{
+    return const_cast<RegField&>(std::as_const(*this).operator[](pFieldPath));
+}
+
+/*!
+ * \brief Access a specific register field.
+ *
  * Returns a proxy reference to the register field at node \p pFieldPath in the field tree/hierarchy.
  * The different names of fields and their sub-fields need to be concatenated by periods ('.') and field
  * repetitions are selected by names "#0", "#1", etc. (e.g. "TOP_LEVEL_FIELD_1.SOME_NESTED_COL.#47.CAL").
@@ -495,6 +505,16 @@ const StandardRegister::RegField& StandardRegister::operator[](const std::string
 /*!
  * \brief Access a specific bit in the register.
  *
+ * \copydetails operator[](std::size_t) const
+ */
+StandardRegister::BoolRef& StandardRegister::operator[](const std::size_t pIdx)
+{
+    return const_cast<BoolRef&>(std::as_const(*this).operator[](pIdx));
+}
+
+/*!
+ * \brief Access a specific bit in the register.
+ *
  * \throws std::invalid_argument If \p pIdx exceeds the register size.
  *
  * \param pIdx Bit number, assuming least significant bit first.
@@ -509,6 +529,16 @@ const StandardRegister::BoolRef& StandardRegister::operator[](const std::size_t 
 }
 
 //
+
+/*!
+ * \brief Get the root field node.
+ *
+ * \copydetails root() const
+ */
+StandardRegister::RegField& StandardRegister::root()
+{
+    return const_cast<RegField&>(std::as_const(*this).root());
+}
 
 /*!
  * \brief Get the root field node.
@@ -569,29 +599,29 @@ void StandardRegister::applyDefaults()
  * \brief Assign equivalent integer value to the register.
  *
  * Assigns the binary equivalent of \p pValue to the register bits, in the same way as
- * assigning to the root() field via RegField::operator=(std::uint64_t) const (see there).
+ * assigning to the root() field via RegField::operator=(std::uint64_t) (see there).
  *
  * \param pValue Value to be assigned.
  */
-void StandardRegister::set(const std::uint64_t pValue) const
+void StandardRegister::set(const std::uint64_t pValue)
 {
-    root() = pValue;
+    root() = pValue;        //Do not make the function const as this is effectively not a const operation!
 }
 
 /*!
  * \brief Assign a raw bit sequence to the register.
  *
  * Assigns \p pBits to the register bits, in the same way as assigning to the root()
- * field via RegField::operator=(const boost::dynamic_bitset<>&) const (see there).
+ * field via RegField::operator=(const boost::dynamic_bitset<>&) (see there).
  *
- * \throws std::invalid_argument If RegField::operator=(const boost::dynamic_bitset<>&) const throws \c std::invalid_argument
+ * \throws std::invalid_argument If RegField::operator=(const boost::dynamic_bitset<>&) throws \c std::invalid_argument
  *                               (i.e. if the size of \p pBits differs from the register size).
  *
  * \param pBits Bit sequence to be assigned.
  */
-void StandardRegister::set(const boost::dynamic_bitset<>& pBits) const
+void StandardRegister::set(const boost::dynamic_bitset<>& pBits)
 {
-    root() = pBits;
+    root() = pBits;         //Do not make the function const as this is effectively not a const operation!
 }
 
 /*!
@@ -601,9 +631,9 @@ void StandardRegister::set(const boost::dynamic_bitset<>& pBits) const
  *
  * \param pValue True for bits high (1) and false for bits low (0).
  */
-void StandardRegister::setAll(const bool pValue) const
+void StandardRegister::setAll(const bool pValue)
 {
-    root().setAll(pValue);
+    root().setAll(pValue);  //Do not make the function const as this is effectively not a const operation!
 }
 
 //
@@ -846,7 +876,7 @@ bool StandardRegister::closeImpl()
  * Note that this can be optimally achieved for LayerBase::loadRuntimeConfiguration() by using a YAML sequence,
  * such as <tt>["0b101010101010", {Some.Field.Path: "0b111"}, {AnotherField: "0b1010"}]</tt>.
  *
- * The register/field assignments will be made in the specified order and using RegField::operator=(const boost::dynamic_bitset<>&) const.
+ * The register/field assignments will be made in the specified order and using RegField::operator=(const boost::dynamic_bitset<>&).
  *
  * Note: The length of every bit sequence must exactly match the register/field size.
  *
@@ -917,7 +947,7 @@ void StandardRegister::loadRuntimeConfImpl(boost::property_tree::ptree&& pConf)
             recurseConfTree(subTree, fieldPath, bitStr);
             try
             {
-                const RegField& field = this->operator[](fieldPath);
+                RegField& field = this->operator[](fieldPath);
                 field = ::parseBitStr(bitStr, field.getSize());
             }
             catch (const std::invalid_argument& exc)
@@ -1119,7 +1149,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
         if (pFieldTree.find(tName) != pFieldTree.not_found())
             throw std::runtime_error("Field with name \"" + tName + "\" is defined multiple times for " + getSelfDescription() + ".");
 
-        const RegField& parentField = *(pFieldTree.data());
+        RegField& parentField = *(pFieldTree.data());
 
         //Field must be fully contained within the parent field
         if ((tSize*tReps > tOffs+1) || (tOffs >= parentField.getSize()))
@@ -1133,7 +1163,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             //Add proxy instance for entire current field (i.e. spanning all repetitions)
             tSubTree.data() = std::make_shared<RegField>(parentField, tName, tSize*tReps, tOffs);
 
-            const RegField& parentFieldForReps = *(tSubTree.data());
+            RegField& parentFieldForReps = *(tSubTree.data());
 
             for (std::uint64_t i = 0; i < tReps; ++i)
             {
@@ -1150,7 +1180,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
                     populateFieldTree(tSubSubTree, field.get_child("fields"), fullKey + ".fields");
 
                 //Can make current field repetition make aware of its immediate childs after recursion
-                std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> childFieldRefs;
+                std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> childFieldRefs;
                 for (const auto& [subSubFieldName, subSubField] : tSubSubTree)
                     childFieldRefs.emplace(subSubFieldName, *(subSubField.data()));
                 tSubSubTree.data()->setChildFields(std::move(childFieldRefs));
@@ -1160,7 +1190,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             }
 
             //Can make current field make aware of its repetition-childs after iteration
-            std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>> childFieldRefs;
+            std::vector<std::pair<std::string, const std::reference_wrapper<RegField>>> childFieldRefs;
             childFieldRefs.reserve(tReps);
             for (const auto& [subFieldName, subField] : tSubTree)
                 childFieldRefs.emplace_back(subFieldName, *(subField.data()));
@@ -1176,7 +1206,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
                 populateFieldTree(tSubTree, field.get_child("fields"), fullKey + ".fields");
 
             //Can make current field make aware of its immediate childs after recursion
-            std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> childFieldRefs;
+            std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> childFieldRefs;
             for (const auto& [subFieldName, subField] : tSubTree)
                 childFieldRefs.emplace(subFieldName, *(subField.data()));
             tSubTree.data()->setChildFields(std::move(childFieldRefs));
@@ -1224,9 +1254,9 @@ BoolRef::BoolRef(boost::dynamic_bitset<>& pBits, const std::size_t pIdx) :
  * \param pIdx Index of the referenced bit.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-BoolRef::BoolRef(const RegField& pParent, /*const */std::size_t pIdx) :
+BoolRef::BoolRef(RegField& pParent, /*const */std::size_t pIdx) :
 #else
-BoolRef::BoolRef(const RegField& pParent, const std::size_t pIdx) :
+BoolRef::BoolRef(RegField& pParent, const std::size_t pIdx) :
 #endif
     dataField(pParent),
     idx(pIdx)
@@ -1246,9 +1276,9 @@ BoolRef::BoolRef(const RegField& pParent, const std::size_t pIdx) :
  * \return \p pValue.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-bool BoolRef::operator=(/*const */bool pValue) const
+bool BoolRef::operator=(/*const */bool pValue)
 #else
-bool BoolRef::operator=(const bool pValue) const
+bool BoolRef::operator=(const bool pValue)
 #endif
 {
     if (std::holds_alternative<const BitsetRef>(dataField))
@@ -1271,9 +1301,9 @@ bool BoolRef::operator=(const bool pValue) const
 BoolRef::operator bool() const
 {
     if (std::holds_alternative<const BitsetRef>(dataField))
-        return std::get<const BitsetRef>(dataField).get().operator[](idx);
+        return std::as_const(std::get<const BitsetRef>(dataField).get()).operator[](idx);
     else
-        return std::get<const FieldRef>(dataField).get().operator[](idx);
+        return std::as_const(std::get<const FieldRef>(dataField).get()).operator[](idx);
 }
 
 //
@@ -1302,13 +1332,13 @@ using RegField = StandardRegister::RegField;
  *
  * The indices in \p pIdxs must be \e unique and each of them must be within the extent of \p pParent.
  *
- * \note This constructor is primarily made for being used by operator[](const std::vector<std::size_t>&) const. See also there.
+ * \note This constructor is primarily made for being used by operator[](const std::vector<std::size_t>&). See also there.
  *
  * \note Other than a regular RegField (as constructed by one of the public constructors
  *       RegField(boost::dynamic_bitset<>&, const std::string&, std::uint64_t, std::uint64_t)
- *       or RegField(const RegField&, const std::string&, std::uint64_t, std::uint64_t))
- *       the field offset (see getOffset() and getTotalOffset()) is set such that it
- *       equals the \e largest index in \p pIdxs, regardless of its position.
+ *       or RegField(RegField&, const std::string&, std::uint64_t, std::uint64_t))
+ *       the field offset (see getOffset() and getTotalOffset()) is set such that
+ *       it equals the \e largest index in \p pIdxs, regardless of its position.
  *
  * \note Invalid \p pIdxs correctly result in \c std::invalid_argument exceptions but for this constructor with possibly confusing
  *       or at least not very helpful exception texts. Hence the passed \p pIdxs should simply \e always be correct (see above).
@@ -1320,7 +1350,7 @@ using RegField = StandardRegister::RegField;
  * \param pParent Parent register field that itself references the bits of the referenced bit sequence.
  * \param pIdxs Indices of the bits to be referenced from \p pParent.
  */
-RegField::RegField(const RegField& pParent, const std::vector<std::size_t>& pIdxs) :
+RegField::RegField(RegField& pParent, const std::vector<std::size_t>& pIdxs) :
     name(""),
     size(::checkFieldSize(pIdxs.size())),
     offs(::checkFieldOffset(*std::max_element(pIdxs.begin(), pIdxs.end()), pIdxs.size(), pParent.getSize())),
@@ -1402,10 +1432,10 @@ RegField::RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, con
  * \param pBitOrder Order/permutation of the \p pSize field bits with respect to \p pParent, or empty for regular order.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-RegField::RegField(const RegField& pParent, const std::string& pName, /*const */std::uint64_t pSize, /*const */std::uint64_t pOffs,
+RegField::RegField(RegField& pParent, const std::string& pName, /*const */std::uint64_t pSize, /*const */std::uint64_t pOffs,
                    const std::vector<std::uint64_t>& pBitOrder) :
 #else
-RegField::RegField(const RegField& pParent, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs,
+RegField::RegField(RegField& pParent, const std::string& pName, const std::uint64_t pSize, const std::uint64_t pOffs,
                    const std::vector<std::uint64_t>& pBitOrder) :
 #endif
     name(pName),
@@ -1429,15 +1459,15 @@ RegField::RegField(const RegField& pParent, const std::string& pName, const std:
  * with the least significant bit first and the assigned sequence being truncated or zero-padded to the
  * field's size at the most significant bit position.
  *
- * See also RegField::operator=(const boost::dynamic_bitset<>& pBits) const.
+ * See also RegField::operator=(const boost::dynamic_bitset<>& pBits).
  *
  * \param pValue Value to be assigned.
  * \return \p pValue.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-std::uint64_t RegField::operator=(/*const */std::uint64_t pValue) const
+std::uint64_t RegField::operator=(/*const */std::uint64_t pValue)
 #else
-std::uint64_t RegField::operator=(const std::uint64_t pValue) const
+std::uint64_t RegField::operator=(const std::uint64_t pValue)
 #endif
 {
     *this = Bytes::bitsetFromBytes(Bytes::composeByteVec(true, pValue), size);
@@ -1454,13 +1484,13 @@ std::uint64_t RegField::operator=(const std::uint64_t pValue) const
  * \param pBits Bit sequence to be assigned.
  * \return \p pBits.
  */
-const boost::dynamic_bitset<>& RegField::operator=(const boost::dynamic_bitset<>& pBits) const
+const boost::dynamic_bitset<>& RegField::operator=(const boost::dynamic_bitset<>& pBits)
 {
     if (pBits.size() != size)
         throw std::invalid_argument("Wrong number of bits for register field \"" + name + "\".");
 
     for (std::size_t i = 0; i < size; ++i)
-        dataRefs[i] = pBits[i];
+        *(dataRefs[i]) = pBits[i];
 
     return pBits;
 }
@@ -1470,11 +1500,11 @@ const boost::dynamic_bitset<>& RegField::operator=(const boost::dynamic_bitset<>
 /*!
  * \brief Assign equivalent integer value to the field.
  *
- * See operator=(std::uint64_t) const.
+ * See operator=(std::uint64_t).
  *
  * \param pValue Value to be assigned.
  */
-void RegField::set(const std::uint64_t pValue) const
+void RegField::set(const std::uint64_t pValue)
 {
     *this = pValue;
 }
@@ -1482,13 +1512,13 @@ void RegField::set(const std::uint64_t pValue) const
 /*!
  * \brief Assign a raw bit sequence to the field.
  *
- * See operator=(const boost::dynamic_bitset<>&) const.
+ * See operator=(const boost::dynamic_bitset<>&).
  *
- * \throws std::invalid_argument If operator=(const boost::dynamic_bitset<>&) const throws \c std::invalid_argument.
+ * \throws std::invalid_argument If operator=(const boost::dynamic_bitset<>&) throws \c std::invalid_argument.
  *
  * \param pBits Bit sequence to be assigned.
  */
-void RegField::set(const boost::dynamic_bitset<>& pBits) const
+void RegField::set(const boost::dynamic_bitset<>& pBits)
 {
     *this = pBits;
 }
@@ -1500,10 +1530,10 @@ void RegField::set(const boost::dynamic_bitset<>& pBits) const
  *
  * \param pValue True for bits high (1) and false for bits low (0).
  */
-void RegField::setAll(const bool pValue) const
+void RegField::setAll(const bool pValue)
 {
     for (std::size_t i = 0; i < size; ++i)
-        dataRefs[i] = pValue;
+        *(dataRefs[i]) = pValue;
 }
 
 //
@@ -1535,7 +1565,7 @@ RegField::operator boost::dynamic_bitset<>() const
     boost::dynamic_bitset retVal(size);
 
     for (std::size_t i = 0; i < size; ++i)
-        retVal[i] = dataRefs[i].get();
+        retVal[i] = std::as_const(*(dataRefs[i])).get();
 
     return retVal;
 }
@@ -1567,6 +1597,20 @@ boost::dynamic_bitset<> RegField::toBits() const
 /*!
  * \brief Access an immediate child field.
  *
+ * \copydetails operator[](std::string_view) const
+ */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+RegField& RegField::operator[](/*const */std::string_view pFieldName)
+#else
+RegField& RegField::operator[](const std::string_view pFieldName)
+#endif
+{
+    return const_cast<RegField&>(std::as_const(*this).operator[](pFieldName));
+}
+
+/*!
+ * \brief Access an immediate child field.
+ *
  * Returns a proxy reference to the immediate child register field with name \p pFieldName.
  *
  * Note that field repetitions (see n()) can also be accessed by using the names "#0", "#1", etc.
@@ -1593,6 +1637,20 @@ const RegField& RegField::operator[](const std::string_view pFieldName) const
 /*!
  * \brief Access a specific bit in the field.
  *
+ * \copydetails operator[](std::size_t) const
+ */
+#ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
+BoolRef& RegField::operator[](/*const */std::size_t pIdx)
+#else
+BoolRef& RegField::operator[](const std::size_t pIdx)
+#endif
+{
+    return const_cast<BoolRef&>(std::as_const(*this).operator[](pIdx));
+}
+
+/*!
+ * \brief Access a specific bit in the field.
+ *
  * \throws std::invalid_argument If \p pIdx exceeds the field size.
  *
  * \param pIdx Field-local bit number, assuming least significant bit first.
@@ -1607,7 +1665,7 @@ const BoolRef& RegField::operator[](const std::size_t pIdx) const
     if (pIdx >= size)
         throw std::invalid_argument("Index " + std::to_string(pIdx) + " is out of range for register field \"" + name + "\".");
 
-    return dataRefs[pIdx];
+    return *(dataRefs[pIdx]);
 }
 
 /*!
@@ -1629,7 +1687,7 @@ const BoolRef& RegField::operator[](const std::size_t pIdx) const
  * \param pLsbIdx Field-local bit number for the \e least significant bit of the selected slice.
  * \return New proxy class instance for <tt>field[pMsbIdx:pLsbIdx]</tt>.
  */
-RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx) const
+RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx)
 {
     //TODO this function should eventually become operator[] (need C++23 for multi-args there)
 
@@ -1671,7 +1729,7 @@ RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbI
  * \param pIdxs Unique, field-local bit numbers to form a new sub-field (in specified order).
  * \return New proxy class instance for <tt>field[pIdxs[0]:pIdxs[pIdxs.size()-1]]</tt>.
  */
-RegField RegField::operator[](const std::vector<std::size_t>& pIdxs) const
+RegField RegField::operator[](const std::vector<std::size_t>& pIdxs)
 {
     if (pIdxs.empty())
         throw std::invalid_argument("Number of selected indices must be larger than zero.");
@@ -1694,14 +1752,14 @@ RegField RegField::operator[](const std::vector<std::size_t>& pIdxs) const
 /*!
  * \brief Access a set of unique bits in the field.
  *
- * This function improves overload resolution if operator[](const std::vector<std::size_t>&) const is targeted.
+ * This function improves overload resolution if operator[](const std::vector<std::size_t>&) is targeted.
  *
- * \copydetails operator[](const std::vector<std::size_t>&) const
+ * \copydetails operator[](const std::vector<std::size_t>&)
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-RegField RegField::operator[](/*const */std::initializer_list<std::size_t> pIdxs) const
+RegField RegField::operator[](/*const */std::initializer_list<std::size_t> pIdxs)
 #else
-RegField RegField::operator[](const std::initializer_list<std::size_t> pIdxs) const
+RegField RegField::operator[](const std::initializer_list<std::size_t> pIdxs)
 #endif
 {
     return operator[](std::vector<std::size_t>(pIdxs));
@@ -1712,13 +1770,23 @@ RegField RegField::operator[](const std::initializer_list<std::size_t> pIdxs) co
 /*!
  * \brief Access the n-th repetition of the field.
  *
+ * \copydetails n(std::size_t) const
+ */
+RegField& RegField::n(const std::size_t pFieldRepIdx)
+{
+    return const_cast<RegField&>(std::as_const(*this).n(pFieldRepIdx));
+}
+
+/*!
+ * \brief Access the n-th repetition of the field.
+ *
  * If the field's configuration specifies a repetition count larger than one, the individual
  * repetitions can be accessed using this function in the form of dedicated child fields.
  * A proxy reference to the <tt>pFieldRepIdx</tt>-th repetition is returned accordingly.
  *
  * Note that here the zeroth repetition is the one starting at the highest bit offset.
  *
- * Also note that field repetitions can in principle also be accessed via RegField::operator[](std::string_view) const.
+ * Also note that field repetitions can in principle also be accessed via RegField::operator[](std::string_view).
  *
  * \throws std::runtime_error If the field does not have any (more than one) repetitions.
  * \throws std::invalid_argument If \p pFieldRepIdx exceeds the repetition count.
@@ -1782,14 +1850,14 @@ std::uint64_t RegField::getTotalOffset() const
  * \brief Set references to the immediate child fields.
  *
  * Makes the field aware of its immediate child fields and thereby makes their proxy references
- * accessible from the field via RegField::operator[](std::string_view) const.
+ * accessible from the field via RegField::operator[](std::string_view).
  *
  * Note: For the special case of \e field \e repetitions the followig overload must be used instead:
- * setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>>&)
+ * setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<RegField>>>&)
  *
  * \param pChildFields Map of child field proxy references with their field names as keys.
  */
-void RegField::setChildFields(std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> pChildFields)
+void RegField::setChildFields(std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> pChildFields)
 {
     childFields.swap(pChildFields);
     repetitionKeys.clear();     //Should not be needed in practice, just to make really sure this was not set before by the other overload
@@ -1799,11 +1867,11 @@ void RegField::setChildFields(std::map<std::string, const std::reference_wrapper
  * \brief Assign field repetition numbers to actual child field names.
  *
  * Makes the field aware of its repetitions (in the form of immediate child fields) and thereby makes their
- * proxy references accessible from the field via RegField::n() (and RegField::operator[](std::string_view) const).
+ * proxy references accessible from the field via RegField::n() (and RegField::operator[](std::string_view)).
  *
  * \param pFieldReps Vector of field repetition proxy references (as pairs together with their assigned field "names").
  */
-void RegField::setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>>& pFieldReps)
+void RegField::setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<RegField>>>& pFieldReps)
 {
     childFields.clear();
     repetitionKeys.clear();

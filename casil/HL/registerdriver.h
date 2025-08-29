@@ -153,6 +153,7 @@ public:
                                             ///< Constructor.
     ~RegisterDriver() override = default;   ///< Default destructor.
     //
+    RegisterProxy& operator[](std::string_view pRegName);               ///< Access a register via the proxy class.
     const RegisterProxy& operator[](std::string_view pRegName) const;   ///< Access a register via the proxy class.
     //
     void reset() override final;                                        ///< Reset the firmware module.
@@ -168,6 +169,9 @@ public:
     void setValue(std::string_view pRegName, std::uint64_t pValue);                         ///< Write a value to a value register.
     //
     std::variant<std::uint64_t, std::vector<std::uint8_t>> get(std::string_view pRegName);  ///< \brief Read an integer or byte sequence from
+                                                                                            ///  a register, according to its data type.
+    std::variant<std::uint64_t, std::vector<std::uint8_t>> get(std::string_view pRegName) const;
+                                                                                            ///< \brief Read an integer or byte sequence from
                                                                                             ///  a register, according to its data type.
     void set(std::string_view pRegName, std::uint64_t pValue);                              ///< Write a value to a value register.
     void set(std::string_view pRegName, const std::vector<std::uint8_t>& pBytes);           ///< Write data to a byte array register.
@@ -240,16 +244,20 @@ public:
         RegisterProxy& operator=(RegisterProxy) = delete;                       ///< Deleted copy assignment operator.
         RegisterProxy& operator=(RegisterProxy&&) = delete;                     ///< Deleted move assignment operator.
         //
-        std::uint64_t operator=(std::uint64_t pValue) const;                    ///< Write an integer value to the register.
-        const std::vector<std::uint8_t>& operator=(const std::vector<std::uint8_t>& pBytes) const;  ///< Write a byte sequence to the register.
+        std::uint64_t operator=(std::uint64_t pValue);                          ///< Write an integer value to the register.
+        const std::vector<std::uint8_t>& operator=(const std::vector<std::uint8_t>& pBytes);    ///< Write a byte sequence to the register.
         //
+        operator std::uint64_t();                                               ///< Read an integer value from the register.
         operator std::uint64_t() const;                                         ///< Read an integer value from the register.
+        operator std::vector<std::uint8_t>();                                   ///< Read a byte sequence from the register.
         operator std::vector<std::uint8_t>() const;                             ///< Read a byte sequence from the register.
         //
+        std::variant<std::uint64_t, std::vector<std::uint8_t>> get();           ///< \brief Read an integer or byte sequence from
+                                                                                ///  the register, according to its data type.
         std::variant<std::uint64_t, std::vector<std::uint8_t>> get() const;     ///< \brief Read an integer or byte sequence from
                                                                                 ///  the register, according to its data type.
         //
-        void trigger() const;                                   ///< "Trigger" the (write-only) register by writing configured default or zero.
+        void trigger();                                         ///< "Trigger" the (write-only) register by writing configured default or zero.
 
     private:
         RegisterDriver& regDriver;      ///< %Driver to which the register belongs.
@@ -257,7 +265,7 @@ public:
     };
 
 private:
-    std::map<std::string, const RegisterProxy, std::less<>> registerProxies;    ///< Map of proxy class instances with register names as keys.
+    std::map<std::string, RegisterProxy, std::less<>> registerProxies;          ///< Map of proxy class instances with register names as keys.
 };
 
 } // namespace HL

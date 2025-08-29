@@ -38,8 +38,11 @@ void bindHL_RegisterDriver(py::module& pM)
 {
     py::class_<RegisterDriver, casil::HL::MuxedDriver>(pM, "RegisterDriver", "Specialization for principally MuxedDriver components that will "
                                                                              "mainly control their firmware module via register operations.")
-            .def("__getitem__", &RegisterDriver::get, "Read an integer or byte sequence from a register, according to its data type.",
-                 py::arg("regName"), py::is_operator())
+            .def("__getitem__", [](RegisterDriver& pThis, const std::string_view pRegName) -> std::variant<std::uint64_t,
+                                                                                                           std::vector<std::uint8_t>>
+                                { return pThis.get(pRegName); },
+                                "Read an integer or byte sequence from a register, according to its data type.",
+                                py::arg("regName"), py::is_operator())
             .def("__setitem__", [](RegisterDriver& pThis, const std::string_view pRegName, const std::uint64_t pValue) -> void
                                 { pThis.setValue(pRegName, pValue); }, "Write a value to a value register.",
                  py::arg("regName"), py::arg("value"), py::is_operator())
@@ -187,8 +190,9 @@ void bindHL_RegisterDriver(py::module& pM)
             .def("getValue", [](RegisterDriver& pThis, const std::string_view pRegName) -> std::uint64_t
                              { return pThis.getValue(pRegName); }, "Read the value from a value register.", py::arg("regName"))
             .def("setValue", &RegisterDriver::setValue, "Write a value to a value register.", py::arg("regName"), py::arg("value"))
-            .def("get", &RegisterDriver::get, "Read an integer or byte sequence from a register, according to its data type.",
-                 py::arg("regName"))
+            .def("get", [](RegisterDriver& pThis, const std::string_view pRegName) -> std::variant<std::uint64_t, std::vector<std::uint8_t>>
+                        { return pThis.get(pRegName); },
+                        "Read an integer or byte sequence from a register, according to its data type.", py::arg("regName"))
             .def("set", [](RegisterDriver& pThis, const std::string_view pRegName, const std::uint64_t pValue) -> void
                         { pThis.setValue(pRegName, pValue); }, "Write a value to a value register.", py::arg("regName"), py::arg("value"))
             .def("set", [](RegisterDriver& pThis, const std::string_view pRegName, const std::vector<std::uint8_t>& pBytes) -> void

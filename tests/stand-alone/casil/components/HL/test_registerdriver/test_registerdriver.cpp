@@ -508,7 +508,10 @@ BOOST_AUTO_TEST_CASE(Test9_subscriptOperator)
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv["TESTVAL_F"].get()), 0x1D186AB43D452E2u);
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv["TESTVAL_G"].get()), 0x6EFCD1A87B1674F9u);
 
-    const auto& rstReg = drv["RESET"];
+    const auto& testvalReg = drv["TESTVAL"];
+    BOOST_CHECK_EQUAL(static_cast<std::uint64_t>(testvalReg), 0x9752u);
+
+    auto& rstReg = drv["RESET"];
     rstReg = 0;
 
     BOOST_CHECK(true);
@@ -580,7 +583,7 @@ BOOST_AUTO_TEST_CASE(Test10_triggerWO)
 
     drv2["TESTVAL_A"] = 0x32123u;
 
-    const auto& rstReg = drv2["RESET"];
+    auto& rstReg = drv2["RESET"];
     BOOST_CHECK_EQUAL(std::uint64_t{drv2["TESTVAL_A"]}, 0x32123u);
     rstReg.trigger();
     BOOST_CHECK_EQUAL(std::uint64_t{drv2["TESTVAL_A"]}, 0x0u);

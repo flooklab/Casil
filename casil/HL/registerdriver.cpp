@@ -219,6 +219,16 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
 /*!
  * \brief Access a register via the proxy class.
  *
+ * \copydetails operator[](std::string_view) const
+ */
+RegisterDriver::RegisterProxy& RegisterDriver::operator[](const std::string_view pRegName)
+{
+    return const_cast<RegisterProxy&>(std::as_const(*this).operator[](pRegName));
+}
+
+/*!
+ * \brief Access a register via the proxy class.
+ *
  * \throws std::invalid_argument If no register with name \p pRegName is defined.
  *
  * \param pRegName Name of the register.
@@ -625,6 +635,35 @@ void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64
  * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of \p pRegName.
  */
 std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const std::string_view pRegName)
+{
+    const auto it = registers.find(pRegName);
+
+    if (it == registers.end())
+    {
+        throw std::invalid_argument("The register \"" + std::string(pRegName) + "\" is not available " +
+                                    "for register driver \"" + name + "\".");
+    }
+
+    const RegisterDescr& reg = it->second;
+
+    if (reg.type == RegisterDescr::DataType::Value)
+        return getValue(pRegName);
+    else
+        return getBytes(pRegName);
+}
+
+/*!
+ * \brief Read an integer or byte sequence from a register, according to its data type.
+ *
+ * See getValue(std::string_view) const and getBytes(std::string_view) const.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::runtime_error If getValue(std::string_view) const or getBytes(std::string_view) const throw \c std::runtime_error.
+ *
+ * \param pRegName Name of the register.
+ * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of \p pRegName.
+ */
+std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterDriver::get(const std::string_view pRegName) const
 {
     const auto it = registers.find(pRegName);
 
@@ -1323,9 +1362,9 @@ RegisterProxy::RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName) :
  * \return \p pValue.
  */
 #ifdef CASIL_DOXYGEN    //Workaround for Doxygen getting confused by the added const
-std::uint64_t RegisterProxy::operator=(/*const */std::uint64_t pValue) const
+std::uint64_t RegisterProxy::operator=(/*const */std::uint64_t pValue)
 #else
-std::uint64_t RegisterProxy::operator=(const std::uint64_t pValue) const
+std::uint64_t RegisterProxy::operator=(const std::uint64_t pValue)
 #endif
 {
     regDriver.setValue(regName, pValue);
@@ -1343,7 +1382,7 @@ std::uint64_t RegisterProxy::operator=(const std::uint64_t pValue) const
  * \param pBytes Byte sequence to be written.
  * \return \p pBytes.
  */
-const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std::uint8_t>& pBytes) const
+const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std::uint8_t>& pBytes)
 {
     regDriver.setBytes(regName, pBytes);
     return pBytes;
@@ -1361,9 +1400,24 @@ const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std:
  *
  * \return Value stored in the register (or zero if write-only).
  */
-RegisterProxy::operator std::uint64_t() const
+RegisterProxy::operator std::uint64_t()
 {
     return regDriver.getValue(regName);
+}
+
+/*!
+ * \brief Read an integer value from the register.
+ *
+ * Reads the unsigned integer value stored by the register via RegisterDriver::getValue(std::string_view) const.
+ *
+ * \throws std::invalid_argument See RegisterDriver::getValue(std::string_view) const.
+ * \throws std::runtime_error See RegisterDriver::getValue(std::string_view) const.
+ *
+ * \return Value stored in the register.
+ */
+RegisterProxy::operator std::uint64_t() const
+{
+    return std::as_const(regDriver).getValue(regName);
 }
 
 /*!
@@ -1377,9 +1431,25 @@ RegisterProxy::operator std::uint64_t() const
  *
  * \return Byte sequence stored in the register (or empty vector if write-only).
  */
-RegisterProxy::operator std::vector<std::uint8_t>() const
+RegisterProxy::operator std::vector<std::uint8_t>()
 {
     return regDriver.getBytes(regName);
+}
+
+/*!
+ * \fn RegisterProxy::operator std::vector<std::uint8_t>() const
+ * \brief Read a byte sequence from the register.
+ *
+ * Reads the byte sequence of the register via RegisterDriver::getBytes(std::string_view) const.
+ *
+ * \throws std::invalid_argument See RegisterDriver::getBytes(std::string_view) const.
+ * \throws std::runtime_error See RegisterDriver::getBytes(std::string_view) const.
+ *
+ * \return Byte sequence stored in the register.
+ */
+RegisterProxy::operator std::vector<std::uint8_t>() const
+{
+    return std::as_const(regDriver).getBytes(regName);
 }
 
 //
@@ -1394,9 +1464,24 @@ RegisterProxy::operator std::vector<std::uint8_t>() const
  *
  * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of the register.
  */
-std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() const
+std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get()
 {
     return regDriver.get(regName);
+}
+
+/*!
+ * \brief Read an integer or byte sequence from the register, according to its data type.
+ *
+ * Reads the value/sequence stored by the register via RegisterDriver::get() const.
+ *
+ * \throws std::invalid_argument See RegisterDriver::get() const.
+ * \throws std::runtime_error See RegisterDriver::get() const.
+ *
+ * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of the register.
+ */
+std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() const
+{
+    return std::as_const(regDriver).get(regName);
 }
 
 //
@@ -1409,7 +1494,7 @@ std::variant<std::uint64_t, std::vector<std::uint8_t>> RegisterProxy::get() cons
  * \throws std::invalid_argument See RegisterDriver::trigger().
  * \throws std::runtime_error See RegisterDriver::trigger().
  */
-void RegisterProxy::trigger() const
+void RegisterProxy::trigger()
 {
     regDriver.trigger(regName);
 }

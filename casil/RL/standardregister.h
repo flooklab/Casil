@@ -102,9 +102,12 @@ public:
     StandardRegister(std::string pName, HL::Driver& pDriver, LayerConfig pConfig);  ///< Constructor.
     ~StandardRegister() override = default;                                         ///< Default destructor.
     //
+    RegField& operator[](const std::string& pFieldPath);                            ///< Access a specific register field.
     const RegField& operator[](const std::string& pFieldPath) const;                ///< Access a specific register field.
+    BoolRef& operator[](std::size_t pIdx);                                          ///< Access a specific bit in the register.
     const BoolRef& operator[](std::size_t pIdx) const;                              ///< Access a specific bit in the register.
     //
+    RegField& root();                                                               ///< Get the root field node.
     const RegField& root() const;                                                   ///< Get the root field node.
     const RegField& rootRead() const;                                               ///< Get the root field node for driver readback data.
     //
@@ -112,9 +115,9 @@ public:
     //
     void applyDefaults();                                                           ///< Set register fields to configured default/init values.
     //
-    void set(std::uint64_t pValue) const;                                           ///< Assign equivalent integer value to the register.
-    void set(const boost::dynamic_bitset<>& pBits) const;                           ///< Assign a raw bit sequence to the register.
-    void setAll(bool pValue = true) const;                                          ///< Set/unset all register bits at once.
+    void set(std::uint64_t pValue);                                                 ///< Assign equivalent integer value to the register.
+    void set(const boost::dynamic_bitset<>& pBits);                                 ///< Assign a raw bit sequence to the register.
+    void setAll(bool pValue = true);                                                ///< Set/unset all register bits at once.
     //
     boost::dynamic_bitset<> get() const;                                            ///< Get the register data as raw bit sequence.
     boost::dynamic_bitset<> getRead() const;                                        ///< Get the driver readback data as a bit sequence.
@@ -167,7 +170,7 @@ class StandardRegister::BoolRef                                 // cppcheck-supp
 {
 public:
     BoolRef(boost::dynamic_bitset<>& pBits, std::size_t pIdx);  ///< Constructor.
-    BoolRef(const RegField& pParent, std::size_t pIdx);         ///< Constructor.
+    BoolRef(RegField& pParent, std::size_t pIdx);               ///< Constructor.
     BoolRef(const BoolRef&) = default;                          ///< Default copy constructor.
     BoolRef(BoolRef&&) = delete;                                ///< Deleted move constructor.
     ~BoolRef() = default;                                       ///< Default destructor.
@@ -175,7 +178,7 @@ public:
     BoolRef& operator=(const BoolRef&) = delete;                ///< Deleted copy assignment operator.
     BoolRef& operator=(BoolRef&&) = delete;                     ///< Deleted move assignment operator.
     //
-    bool operator=(bool pValue) const;                          ///< Assign a value to the referenced bit.
+    bool operator=(bool pValue);                                ///< Assign a value to the referenced bit.
     //
     operator bool() const;                                      ///< Get the value of the referenced bit.
     //
@@ -183,7 +186,7 @@ public:
 
 private:
     using BitsetRef = std::reference_wrapper<boost::dynamic_bitset<>>;  ///< Wrapper for reference to bitset to be held by \c std::variant.
-    using FieldRef = std::reference_wrapper<const RegField>;            ///< Wrapper for reference to RegField to be held by \c std::variant.
+    using FieldRef = std::reference_wrapper<RegField>;                  ///< Wrapper for reference to RegField to be held by \c std::variant.
 
 private:
     const std::variant<const BitsetRef, const FieldRef> dataField;  ///< Referenced dataset (either raw bitset or abstract register field).
@@ -199,11 +202,11 @@ private:
 class StandardRegister::RegField                                                        // cppcheck-suppress noConstructor symbolName=RegField
 {
 private:
-    RegField(const RegField& pParent, const std::vector<std::size_t>& pIdxs);                                       ///< Constructor.
+    RegField(RegField& pParent, const std::vector<std::size_t>& pIdxs);                                             ///< Constructor.
 
 public:
     RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs);   ///< Constructor.
-    RegField(const RegField& pParent, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs,
+    RegField(RegField& pParent, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs,
              const std::vector<std::uint64_t>& pBitOrder = {});                                                     ///< Constructor.
     RegField(const RegField&) = delete;                                                     ///< Deleted copy constructor.
     RegField(RegField&&) = delete;                                                          ///< Deleted move constructor.
@@ -212,12 +215,12 @@ public:
     RegField& operator=(const RegField&) = delete;                                          ///< Deleted copy assignment operator.
     RegField& operator=(RegField&&) = delete;                                               ///< Deleted move assignment operator.
     //
-    std::uint64_t operator=(std::uint64_t pValue) const;                                    ///< Assign equivalent integer value to the field.
-    const boost::dynamic_bitset<>& operator=(const boost::dynamic_bitset<>& pBits) const;   ///< Assign a raw bit sequence to the field.
+    std::uint64_t operator=(std::uint64_t pValue);                                          ///< Assign equivalent integer value to the field.
+    const boost::dynamic_bitset<>& operator=(const boost::dynamic_bitset<>& pBits);         ///< Assign a raw bit sequence to the field.
     //
-    void set(std::uint64_t pValue) const;                                                   ///< Assign equivalent integer value to the field.
-    void set(const boost::dynamic_bitset<>& pBits) const;                                   ///< Assign a raw bit sequence to the field.
-    void setAll(bool pValue = true) const;                                                  ///< Set/unset all field bits at once.
+    void set(std::uint64_t pValue);                                                         ///< Assign equivalent integer value to the field.
+    void set(const boost::dynamic_bitset<>& pBits);                                         ///< Assign a raw bit sequence to the field.
+    void setAll(bool pValue = true);                                                        ///< Set/unset all field bits at once.
     //
     explicit operator std::uint64_t() const;                                                ///< Get the integer equivalent of field's content.
     explicit operator boost::dynamic_bitset<>() const;                                      ///< Get the field's content as raw bitset.
@@ -225,12 +228,15 @@ public:
     std::uint64_t toUInt() const;                                                           ///< Get the integer equivalent of field's content.
     boost::dynamic_bitset<> toBits() const;                                                 ///< Get the field's data as raw bitset.
     //
+    RegField& operator[](std::string_view pFieldName);                                      ///< Access an immediate child field.
     const RegField& operator[](std::string_view pFieldName) const;                          ///< Access an immediate child field.
+    BoolRef& operator[](std::size_t pIdx);                                                  ///< Access a specific bit in the field.
     const BoolRef& operator[](std::size_t pIdx) const;                                      ///< Access a specific bit in the field.
-    RegField operator()(std::size_t pMsbIdx, std::size_t pLsbIdx) const;                    ///< Access a slice of bits in the field.
-    RegField operator[](const std::vector<std::size_t>& pIdxs) const;                       ///< Access a set of unique bits in the field.
-    RegField operator[](std::initializer_list<std::size_t> pIdxs) const;                    ///< Access a set of unique bits in the field.
+    RegField operator()(std::size_t pMsbIdx, std::size_t pLsbIdx);                          ///< Access a slice of bits in the field.
+    RegField operator[](const std::vector<std::size_t>& pIdxs);                             ///< Access a set of unique bits in the field.
+    RegField operator[](std::initializer_list<std::size_t> pIdxs);                          ///< Access a set of unique bits in the field.
     //
+    RegField& n(std::size_t pFieldRepIdx);                                                  ///< Access the n-th repetition of the field.
     const RegField& n(std::size_t pFieldRepIdx) const;                                      ///< Access the n-th repetition of the field.
     //
     std::uint64_t getSize() const;                                                          ///< Get the size of the field.
@@ -240,9 +246,9 @@ public:
                                                                                             ///  with respect to the whole register.
 
 private:
-    void setChildFields(std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> pChildFields);
+    void setChildFields(std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> pChildFields);
                                                                                             ///< Set references to the immediate child fields.
-    void setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<const RegField>>>& pFieldReps);
+    void setChildFields(const std::vector<std::pair<std::string, const std::reference_wrapper<RegField>>>& pFieldReps);
                                                                             ///< Assign field repetition numbers to actual child field names.
     //
     /// \cond INTERNAL
@@ -264,9 +270,9 @@ private:
     const std::uint64_t parentSize;             ///< Size of the parent field in number of bits.
     const std::uint64_t parentTotalOffs;        ///< Index of the parent field's most significant bit in the register's top level bitset.
     //
-    const std::vector<BoolRef> dataRefs;        ///< Proxy references to all of the field's bits (least significant bit at front).
+    const std::vector<std::unique_ptr<BoolRef>> dataRefs;   ///< Proxy references to all of the field's bits (least significant bit at front).
     //
-    std::map<std::string, const std::reference_wrapper<const RegField>, std::less<>> childFields;   ///< Map of immediate child fields.
+    std::map<std::string, const std::reference_wrapper<RegField>, std::less<>> childFields;     ///< Map of immediate child fields.
     std::vector<std::string> repetitionKeys;    ///< Assignment of number of field's repetition to respective key in 'childFields'.
 };
 

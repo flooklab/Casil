@@ -43,16 +43,16 @@ void bindRL_StandardRegister(py::module& pM)
             .def("__getitem__", [](const RegField& pThis, const std::size_t pIdx) -> bool
                                 { return pThis.operator[](pIdx).get(); }, "Access a specific bit in the field.",
                                 py::arg("idx"), py::is_operator())
-            .def("__getitem__", [](const RegField& pThis, const std::string_view pFieldName) -> const RegField&
+            .def("__getitem__", [](RegField& pThis, const std::string_view pFieldName) -> RegField&
                                 { return pThis.operator[](pFieldName); }, "Access an immediate child field.",
                                 py::arg("fieldName"), py::return_value_policy::reference, py::is_operator())
-            .def("__getitem__", [](const RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx) -> RegField
+            .def("__getitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx) -> RegField
                                 { return pThis.operator()(pMsbIdx, pLsbIdx); }, "Access a slice of bits in the field.",
                                 py::arg("msbIdx"), py::arg("lsbIdx"), py::is_operator())
-            .def("__getitem__", [](const RegField& pThis, const std::vector<std::size_t>& pIdxs) -> RegField
+            .def("__getitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs) -> RegField
                                 { return pThis.operator[](pIdxs); }, "Access a set of unique bits in the field.",
                                 py::arg("idxs"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::size_t pIdx, const bool pValue) -> void
+            .def("__setitem__", [](RegField& pThis, const std::size_t pIdx, const bool pValue) -> void
                                 { pThis.operator[](pIdx) = pValue; }, "Assign a boolean value to a specific bit in the field.",
                                 py::arg("idx"), py::arg("value"), py::is_operator())
             .def("__setitem__", [](const RegField& pThis, const std::size_t pIdx, py::object) -> void
@@ -68,10 +68,10 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to a field bit (will fail).",
                                 py::arg("idx"), py::arg("arg"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::string_view pFieldName, const std::uint64_t pValue) -> void
+            .def("__setitem__", [](RegField& pThis, const std::string_view pFieldName, const std::uint64_t pValue) -> void
                                 { pThis.operator[](pFieldName) = pValue; }, "Assign an integer value to an immediate child field.",
                                 py::arg("fieldName"), py::arg("value"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::string_view pFieldName, const std::vector<bool>& pBits) -> void
+            .def("__setitem__", [](RegField& pThis, const std::string_view pFieldName, const std::vector<bool>& pBits) -> void
                                 { pThis.operator[](pFieldName) = PyCasilUtils::bitsetFromBoolVec(pBits); },
                                 "Assign a bit sequence to an immediate child field.", py::arg("fieldName"), py::arg("bits"), py::is_operator())
             .def("__setitem__", [](const RegField& pThis, const std::string_view pFieldName, py::object) -> void
@@ -87,16 +87,16 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to an immediate child field (will fail).",
                                 py::arg("fieldName"), py::arg("arg"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, const std::uint64_t pValue)
+            .def("__setitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, const std::uint64_t pValue)
                                     -> void
                                 { pThis.operator()(pMsbIdx, pLsbIdx) = pValue; }, "Assign an integer value to a slice of bits in the field.",
                                 py::arg("msbIdx"), py::arg("lsbIdx"), py::arg("value"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, const std::vector<bool>& pBits)
+            .def("__setitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, const std::vector<bool>& pBits)
                                     -> void
                                 { pThis.operator()(pMsbIdx, pLsbIdx) = PyCasilUtils::bitsetFromBoolVec(pBits); },
                                 "Assign a bit sequence to a slice of bits in the field.",
                                 py::arg("msbIdx"), py::arg("lsbIdx"), py::arg("bits"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, py::object) -> void
+            .def("__setitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, py::object) -> void
                                 {
                                     try
                                     {
@@ -109,14 +109,14 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to a slice of bits in the field (will fail).",
                                 py::arg("msbIdx"), py::arg("lsbIdx"), py::arg("arg"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::vector<std::size_t>& pIdxs, const std::uint64_t pValue) -> void
+            .def("__setitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs, const std::uint64_t pValue) -> void
                                 { pThis.operator[](pIdxs) = pValue; }, "Assign an integer value to a set of unique bits in the field.",
                                 py::arg("idxs"), py::arg("value"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::vector<std::size_t>& pIdxs, const std::vector<bool>& pBits) -> void
+            .def("__setitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs, const std::vector<bool>& pBits) -> void
                                 { pThis.operator[](pIdxs) = PyCasilUtils::bitsetFromBoolVec(pBits); },
                                 "Assign a bit sequence to a set of unique bits in the field.",
                                 py::arg("idxs"), py::arg("bits"), py::is_operator())
-            .def("__setitem__", [](const RegField& pThis, const std::vector<std::size_t>& pIdxs, py::object) -> void
+            .def("__setitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs, py::object) -> void
                                 {
                                     try
                                     {
@@ -129,15 +129,16 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to a set of unique bits in the field (will fail).",
                                 py::arg("idxs"), py::arg("arg"), py::is_operator())
-            .def("set", [](const RegField& pThis, const std::uint64_t pValue) -> void
+            .def("set", [](RegField& pThis, const std::uint64_t pValue) -> void
                         { pThis.set(pValue); }, "Assign equivalent integer value to the field.", py::arg("value"))
-            .def("set", [](const RegField& pThis, const std::vector<bool>& pBits) -> void
+            .def("set", [](RegField& pThis, const std::vector<bool>& pBits) -> void
                         { pThis.set(PyCasilUtils::bitsetFromBoolVec(pBits)); }, "Assign a raw bit sequence to the field.", py::arg("bits"))
             .def("setAll", &RegField::setAll, "Set/unset all field bits at once.", py::arg("value") = true)
             .def("toUInt", &RegField::toUInt, "Get the integer equivalent of field's content.")
             .def("toBits", [](const RegField& pThis) -> std::vector<bool>
                            { return PyCasilUtils::boolVecFromBitset(pThis.toBits()); }, "Get the field's data as raw bitset.")
-            .def("n", &RegField::n, "Access the n-th repetition of the field.", py::return_value_policy::reference)
+            .def("n", [](RegField& pThis, const std::size_t pFieldRepIdx) -> RegField& { return pThis.n(pFieldRepIdx); },
+                 "Access the n-th repetition of the field.", py::arg("fieldRepIdx"), py::return_value_policy::reference)
             .def("getSize", &RegField::getSize, "Get the size of the field.")
             .def("__len__", &RegField::getSize, "Get the size of the field.", py::is_operator())
             .def("getOffset", &RegField::getOffset, "Get the field's offset with respect to its parent field.")
@@ -149,10 +150,10 @@ void bindRL_StandardRegister(py::module& pM)
             .def("__getitem__", [](const StandardRegister& pThis, const std::size_t pIdx) -> bool
                                 { return pThis.operator[](pIdx).get(); }, "Access a specific bit in the register.",
                                 py::arg("idx"), py::is_operator())
-            .def("__getitem__", [](const StandardRegister& pThis, const std::string& pFieldPath) -> const RegField&
+            .def("__getitem__", [](StandardRegister& pThis, const std::string& pFieldPath) -> RegField&
                                 { return pThis.operator[](pFieldPath); }, "Access a specific register field.", py::arg("fieldPath"),
                                 py::return_value_policy::reference, py::is_operator())
-            .def("__setitem__", [](const StandardRegister& pThis, const std::size_t pIdx, const bool pValue) -> void
+            .def("__setitem__", [](StandardRegister& pThis, const std::size_t pIdx, const bool pValue) -> void
                                 { pThis.operator[](pIdx) = pValue; }, "Assign a boolean value to a specific bit in the register.",
                                 py::arg("idx"), py::arg("value"), py::is_operator())
             .def("__setitem__", [](const StandardRegister& pThis, const std::size_t pIdx, py::object) -> void
@@ -168,10 +169,10 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to a register bit (will fail).",
                                 py::arg("idx"), py::arg("arg"), py::is_operator())
-            .def("__setitem__", [](const StandardRegister& pThis, const std::string& pFieldPath, const std::uint64_t pValue) -> void
+            .def("__setitem__", [](StandardRegister& pThis, const std::string& pFieldPath, const std::uint64_t pValue) -> void
                                 { pThis.operator[](pFieldPath) = pValue; }, "Assign an integer value to a field.",
                                 py::arg("fieldPath"), py::arg("value"), py::is_operator())
-            .def("__setitem__", [](const StandardRegister& pThis, const std::string& pFieldPath, const std::vector<bool>& pBits) -> void
+            .def("__setitem__", [](StandardRegister& pThis, const std::string& pFieldPath, const std::vector<bool>& pBits) -> void
                                 { pThis.operator[](pFieldPath) = PyCasilUtils::bitsetFromBoolVec(pBits); },
                                 "Assign a bit sequence to a field.", py::arg("fieldPath"), py::arg("bits"), py::is_operator())
             .def("__setitem__", [](const StandardRegister& pThis, const std::string& pFieldPath, py::object) -> void
@@ -187,15 +188,16 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to a register field (will fail).",
                                 py::arg("fieldPath"), py::arg("arg"), py::is_operator())
-            .def("root", &StandardRegister::root, "Get the root field node.", py::return_value_policy::reference)
+            .def("root", [](StandardRegister& pThis) -> RegField& { return pThis.root(); }, "Get the root field node.",
+                 py::return_value_policy::reference)
             .def("rootRead", &StandardRegister::rootRead, "Get the root field node for driver readback data.",
                  py::return_value_policy::reference)
             .def("getSize", &StandardRegister::getSize, "Get the size of the register.")
             .def("__len__", &StandardRegister::getSize, "Get the size of the register.", py::is_operator())
             .def("applyDefaults", &StandardRegister::applyDefaults, "Set register fields to configured default/init values.")
-            .def("set", [](const StandardRegister& pThis, const std::uint64_t pValue) -> void
+            .def("set", [](StandardRegister& pThis, const std::uint64_t pValue) -> void
                         { pThis.set(pValue); }, "Assign equivalent integer value to the register.")
-            .def("set", [](const StandardRegister& pThis, const std::vector<bool>& pBits) -> void
+            .def("set", [](StandardRegister& pThis, const std::vector<bool>& pBits) -> void
                         { pThis.set(PyCasilUtils::bitsetFromBoolVec(pBits)); }, "Assign a raw bit sequence to the register.")
             .def("setAll", &StandardRegister::setAll, "Set/unset all register bits at once.", py::arg("value") = true)
             .def("get", [](const StandardRegister& pThis) -> std::vector<bool>

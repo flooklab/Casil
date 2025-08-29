@@ -220,7 +220,7 @@ public:
     RegField(boost::dynamic_bitset<>& pBits, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs);   ///< Constructor.
     RegField(RegField& pParent, const std::string& pName, std::uint64_t pSize, std::uint64_t pOffs,
              const std::vector<std::uint64_t>& pBitOrder = {});                                                     ///< Constructor.
-    RegField(const RegField&) = delete;                                                     ///< Deleted copy constructor.
+    RegField(const RegField& pOther);                                                       ///< Copy constructor.
     RegField(RegField&&) = delete;                                                          ///< Deleted move constructor.
     ~RegField() = default;                                                                  ///< Default destructor.
     //

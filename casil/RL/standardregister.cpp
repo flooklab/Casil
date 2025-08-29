@@ -1462,6 +1462,31 @@ RegField::RegField(RegField& pParent, const std::string& pName, const std::uint6
 {
 }
 
+//
+
+/*!
+ * \brief Copy constructor.
+ *
+ * Constructs a copy of \p pOther (references the same bits and also child fields).
+ */
+RegField::RegField(const RegField& pOther) :
+    name(pOther.name),
+    size(pOther.size),
+    offs(pOther.offs),
+    parentSize(pOther.parentSize),
+    parentTotalOffs(pOther.parentTotalOffs),
+    dataRefs([&pOther]() -> std::vector<std::unique_ptr<BoolRef>>
+                {
+                    std::vector<std::unique_ptr<BoolRef>> vec;
+                    for (const std::unique_ptr<BoolRef>& ptr : pOther.dataRefs)
+                        vec.push_back(std::make_unique<BoolRef>(*ptr));
+                    return vec;
+                }()),
+    childFields(pOther.childFields),
+    repetitionKeys(pOther.repetitionKeys)
+{
+}
+
 //Public
 
 /*!

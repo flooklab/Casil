@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2025 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -21,16 +21,19 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 */
 
-#ifndef PYCASIL_PYCASIL_H
-#define PYCASIL_PYCASIL_H
+#ifndef PYCASIL_PYCASILUTILS_PYCASILUTILS_H
+#define PYCASIL_PYCASILUTILS_PYCASILUTILS_H
 
-#include <pybind11/pybind11.h>
+#include <boost/dynamic_bitset_fwd.hpp>
 
-#include <pybind11/functional.h>
-#include <pybind11/stl.h>
+#include <vector>
 
-#include <pycasil/pycasil_utils.h>
+namespace PyCasilUtils
+{
 
-namespace py = pybind11;
+boost::dynamic_bitset<> bitsetFromBoolVec(const std::vector<bool>& pBits);
+std::vector<bool> boolVecFromBitset(const boost::dynamic_bitset<>& pBits);
 
-#endif // PYCASIL_PYCASIL_H
+} // namespace PyCasilUtils
+
+#endif // PYCASIL_PYCASILUTILS_PYCASILUTILS_H

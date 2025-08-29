@@ -193,9 +193,11 @@ include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
 
 include("SourceFiles.cmake")
 
-set(PYBIND_HEADER_FILES pycasil/pycasil.h)
+set(PYBIND_HEADER_FILES pycasil/pycasil.h
+                        pycasil/pycasil_utils.h)
 
 set(PYBIND_SOURCE_FILES pycasil/pycasil.cpp
+                        pycasil/pycasil_utils.cpp
                         pycasil/HL/hl.cpp
                         pycasil/RL/rl.cpp
                         pycasil/TL/tl.cpp

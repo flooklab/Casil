@@ -49,20 +49,11 @@ void bindBytes(py::module& pM)
            py::arg("bytes"), py::arg("bigEndian") = true);
 
     pM.def("bitsetFromBytes", [](const std::vector<std::uint8_t>& pBytes, const std::size_t pBitSize) -> std::vector<bool>
-                              {
-                                  const boost::dynamic_bitset bitset = Bytes::bitsetFromBytes(pBytes, pBitSize);
-                                  std::vector<bool> retVal(bitset.size(), false);
-                                  for (std::size_t i = 0; i < bitset.size(); ++i)
-                                      retVal[i] = bitset.test(bitset.size() - 1 - i);
-                                  return retVal;
-                              }, "Convert a sequence of bytes to a dynamic bitset.", py::arg("bytes"), py::arg("bitSize"));
+                              { return PyCasilUtils::boolVecFromBitset(Bytes::bitsetFromBytes(pBytes, pBitSize)); },
+                              "Convert a sequence of bytes to a dynamic bitset.", py::arg("bytes"), py::arg("bitSize"));
     pM.def("bytesFromBitset", [](const std::vector<bool>& pBits, const std::size_t pByteSize) -> std::vector<std::uint8_t>
-                              {
-                                  boost::dynamic_bitset bitset(pBits.size());
-                                  for (std::size_t i = 0; i < pBits.size(); ++i)
-                                      bitset[i] = pBits[pBits.size() - 1 - i];
-                                  return Bytes::bytesFromBitset(bitset, pByteSize);
-                              }, "Convert a dynamic bitset to a sequence of bytes.", py::arg("bits"), py::arg("byteSize"));
+                              { return Bytes::bytesFromBitset(PyCasilUtils::bitsetFromBoolVec(pBits), pByteSize); },
+                              "Convert a dynamic bitset to a sequence of bytes.", py::arg("bits"), py::arg("byteSize"));
 
     pM.def("byteVecFromStr", &Bytes::byteVecFromStr, "Interpret a character string as a sequence of bytes.", py::arg("str"));
     pM.def("strFromByteVec", &Bytes::strFromByteVec, "Interpret a sequence of bytes as a character string.", py::arg("vec"));

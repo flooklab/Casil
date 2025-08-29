@@ -44,18 +44,9 @@ void bindHL_GPIO(py::module& pM)
             .def("getOutputEn", &GPIO::getOutputEn, "Get the OUTPUT_EN register.")
             .def("setOutputEn", &GPIO::setOutputEn, "Set the OUTPUT_EN register.", py::arg("enable"))
             .def("bitsetFromBytes", [](const GPIO& pThis, const std::vector<std::uint8_t>& pBytes) -> std::vector<bool>
-                                    {
-                                        const boost::dynamic_bitset bitset = pThis.bitsetFromBytes(pBytes);
-                                        std::vector<bool> retVal(bitset.size(), false);
-                                        for (std::size_t i = 0; i < bitset.size(); ++i)
-                                            retVal[i] = bitset.test(bitset.size() - 1 - i);
-                                        return retVal;
-                                    }, "Convert IO register bytes to a bitset.", py::arg("bytes"))
+                                    { return PyCasilUtils::boolVecFromBitset(pThis.bitsetFromBytes(pBytes)); },
+                                    "Convert IO register bytes to a bitset.", py::arg("bytes"))
             .def("bytesFromBitset", [](const GPIO& pThis, const std::vector<bool>& pBits) -> std::vector<std::uint8_t>
-                                    {
-                                        boost::dynamic_bitset bitset(pBits.size());
-                                        for (std::size_t i = 0; i < pBits.size(); ++i)
-                                            bitset[i] = pBits[pBits.size() - 1 - i];
-                                        return pThis.bytesFromBitset(bitset);
-                                    }, "Convert a bitset to IO register bytes.", py::arg("bits"));
+                                    { return pThis.bytesFromBitset(PyCasilUtils::bitsetFromBoolVec(pBits)); },
+                                    "Convert a bitset to IO register bytes.", py::arg("bits"));
 }

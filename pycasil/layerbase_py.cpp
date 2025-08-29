@@ -38,8 +38,8 @@ void bind_LayerBase(py::module& pM)
             .value("RegisterLayer", LayerBase::Layer::RegisterLayer, "Register layer (RL): Registers");
 
     layerBase.def("getLayer", &LayerBase::getLayer, "Get the layer of this layer component.")
-            .def("getType", &LayerBase::getType, "Get the type name of this layer component.", py::return_value_policy::reference)
-            .def("getName", &LayerBase::getName, "Get the instance name of this layer component.", py::return_value_policy::reference)
+            .def("getType", &LayerBase::getType, "Get the type name of this layer component.")
+            .def("getName", &LayerBase::getName, "Get the instance name of this layer component.")
             .def("init", &LayerBase::init, "Initialize this layer component.", py::arg("force") = false)
             .def("close", &LayerBase::close, "Close (\"uninitialize\") this layer component.", py::arg("force") = false)
             .def("loadRuntimeConfiguration", &LayerBase::loadRuntimeConfiguration,

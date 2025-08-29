@@ -160,9 +160,11 @@ public:
     void applyDefaults();                                               ///< Write configured default values to all appropriate registers.
     //
     std::vector<std::uint8_t> getBytes(std::string_view pRegName);                          ///< Read the data from a byte array register.
+    std::vector<std::uint8_t> getBytes(std::string_view pRegName) const;                    ///< Read the data from a byte array register.
     void setBytes(std::string_view pRegName, const std::vector<std::uint8_t>& pData);       ///< Write data to a byte array register.
     //
     std::uint64_t getValue(std::string_view pRegName);                                      ///< Read the value from a value register.
+    std::uint64_t getValue(std::string_view pRegName) const;                                ///< Read the value from a value register.
     void setValue(std::string_view pRegName, std::uint64_t pValue);                         ///< Write a value to a value register.
     //
     std::variant<std::uint64_t, std::vector<std::uint8_t>> get(std::string_view pRegName);  ///< \brief Read an integer or byte sequence from

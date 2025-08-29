@@ -181,9 +181,11 @@ void bindHL_RegisterDriver(py::module& pM)
                  py::arg("attr"), py::arg("arg"), py::is_operator())
             .def("reset", &RegisterDriver::reset, "Reset the firmware module.")
             .def("applyDefaults", &RegisterDriver::applyDefaults, "Write configured default values to all appropriate registers.")
-            .def("getBytes", &RegisterDriver::getBytes, "Read the data from a byte array register.", py::arg("regName"))
+            .def("getBytes", [](RegisterDriver& pThis, const std::string_view pRegName) -> std::vector<std::uint8_t>
+                             { return pThis.getBytes(pRegName); }, "Read the data from a byte array register.", py::arg("regName"))
             .def("setBytes", &RegisterDriver::setBytes, "Write data to a byte array register.", py::arg("regName"), py::arg("data"))
-            .def("getValue", &RegisterDriver::getValue, "Read the value from a value register.", py::arg("regName"))
+            .def("getValue", [](RegisterDriver& pThis, const std::string_view pRegName) -> std::uint64_t
+                             { return pThis.getValue(pRegName); }, "Read the value from a value register.", py::arg("regName"))
             .def("setValue", &RegisterDriver::setValue, "Write a value to a value register.", py::arg("regName"), py::arg("value"))
             .def("get", &RegisterDriver::get, "Read an integer or byte sequence from a register, according to its data type.",
                  py::arg("regName"))

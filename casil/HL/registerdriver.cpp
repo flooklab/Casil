@@ -360,6 +360,45 @@ std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegNa
 }
 
 /*!
+ * \brief Read the data from a byte array register.
+ *
+ * This is the \c const overload for getBytes(std::string_view).
+ *
+ * Reads the byte sequence for register \p pRegName from the firmware module.
+ *
+ * Instead of the non-<tt>const</tt> getBytes(std::string_view), this \c const overload (naturally)
+ * does \b not redirect to trigger() and does \b not support write-only registers at all.
+ *
+ * Note: Warns via Logger if the read bytes do not match the corresponding sequence from the written values cache.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \p pRegName is a \e value register.
+ * \throws std::invalid_argument If \p pRegName is write-only.
+ * \throws std::runtime_error If the read fails.
+ *
+ * \param pRegName Name of the register.
+ * \return Byte sequence stored in the register.
+ */
+std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegName) const
+{
+    const auto it = registers.find(pRegName);
+
+    if (it == registers.end())
+    {
+        throw std::invalid_argument("The register \"" + std::string(pRegName) + "\" is not available " +
+                                    "for register driver \"" + name + "\".");
+    }
+
+    if (it->second.mode == AccessMode::WriteOnly)
+    {
+        throw std::invalid_argument("Cannot read (via const overload) from write-only register \"" + std::string(pRegName) + "\" " +
+                                    "of register driver \"" + name + "\".");
+    }
+    else
+        return const_cast<RegisterDriver*>(this)->getBytes(pRegName);   //Cast safe because write-only trigger case excluded
+}
+
+/*!
  * \brief Write data to a byte array register.
  *
  * Writes \p pData to the register \p pRegName in the firmware module.
@@ -475,6 +514,45 @@ std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
 }
 
 /*!
+ * \brief Read the value from a value register.
+ *
+ * This is the \c const overload for getValue(std::string_view).
+ *
+ * Reads the unsigned integer value stored by register \p pRegName from the firmware module.
+ *
+ * Instead of the non-<tt>const</tt> getValue(std::string_view), this \c const overload (naturally)
+ * does \b not redirect to trigger() and does \b not support write-only registers at all.
+ *
+ * Note: Warns via Logger if the read value does not match the corresponding value from the written values cache.
+ *
+ * \throws std::invalid_argument If no register with name \p pRegName is defined.
+ * \throws std::invalid_argument If \p pRegName is a \e byte \e array register.
+ * \throws std::invalid_argument If \p pRegName is write-only.
+ * \throws std::runtime_error If the read fails.
+ *
+ * \param pRegName Name of the register.
+ * \return Value stored in the register.
+ */
+std::uint64_t RegisterDriver::getValue(const std::string_view pRegName) const
+{
+    const auto it = registers.find(pRegName);
+
+    if (it == registers.end())
+    {
+        throw std::invalid_argument("The register \"" + std::string(pRegName) + "\" is not available " +
+                                    "for register driver \"" + name + "\".");
+    }
+
+    if (it->second.mode == AccessMode::WriteOnly)
+    {
+        throw std::invalid_argument("Cannot read (via const overload) from write-only register \"" + std::string(pRegName) + "\" " +
+                                    "of register driver \"" + name + "\".");
+    }
+    else
+        return const_cast<RegisterDriver*>(this)->getValue(pRegName);   //Cast safe because write-only trigger case excluded
+}
+
+/*!
  * \brief Write a value to a value register.
  *
  * Writes \p pValue to the register \p pRegName in the firmware module.
@@ -530,10 +608,10 @@ void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64
 /*!
  * \brief Read an integer or byte sequence from a register, according to its data type.
  *
- * See getValue() and getBytes().
+ * See getValue(std::string_view) and getBytes(std::string_view).
  *
  * \throws std::invalid_argument If no register with name \p pRegName is defined.
- * \throws std::runtime_error If getValue() or getBytes() throw \c std::runtime_error.
+ * \throws std::runtime_error If getValue(std::string_view) or getBytes(std::string_view) throw \c std::runtime_error.
  *
  * \param pRegName Name of the register.
  * \return Integer value or byte sequence, depending on the \ref RegisterDescr::DataType "DataType" of \p pRegName.
@@ -1159,10 +1237,10 @@ const std::vector<std::uint8_t>& RegisterProxy::operator=(const std::vector<std:
 /*!
  * \brief Read an integer value from the register.
  *
- * Reads the unsigned integer value stored by the register via RegisterDriver::getValue().
+ * Reads the unsigned integer value stored by the register via RegisterDriver::getValue(std::string_view).
  *
- * \throws std::invalid_argument See RegisterDriver::getValue().
- * \throws std::runtime_error See RegisterDriver::getValue().
+ * \throws std::invalid_argument See RegisterDriver::getValue(std::string_view).
+ * \throws std::runtime_error See RegisterDriver::getValue(std::string_view).
  *
  * \return Value stored in the register (or zero if write-only).
  */
@@ -1175,10 +1253,10 @@ RegisterProxy::operator std::uint64_t() const
  * \fn RegisterProxy::operator std::vector<std::uint8_t>()
  * \brief Read a byte sequence from the register.
  *
- * Reads the byte sequence of the register via RegisterDriver::getBytes().
+ * Reads the byte sequence of the register via RegisterDriver::getBytes(std::string_view).
  *
- * \throws std::invalid_argument See RegisterDriver::getBytes().
- * \throws std::runtime_error See RegisterDriver::getBytes().
+ * \throws std::invalid_argument See RegisterDriver::getBytes(std::string_view).
+ * \throws std::runtime_error See RegisterDriver::getBytes(std::string_view).
  *
  * \return Byte sequence stored in the register (or empty vector if write-only).
  */

@@ -57,7 +57,7 @@ enum class ReleaseType : std::uint8_t
 };
 
 inline constexpr int casilVersionMajor = 0;                         ///< Library version major number.
-inline constexpr int casilVersionMinor = 4;                         ///< Library version minor number.
+inline constexpr int casilVersionMinor = 5;                         ///< Library version minor number.
 inline constexpr int casilVersionPatch = 0;                         ///< Library version patch number.
 inline constexpr ReleaseType casilVersionType = ReleaseType::Alpha; ///< Library version release type.
 

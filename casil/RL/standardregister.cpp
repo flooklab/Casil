@@ -657,7 +657,7 @@ void StandardRegister::setAll(const bool pValue)
  *
  * \return <tt>register[(size-1):0]</tt>.
  */
-boost::dynamic_bitset<> StandardRegister::get() const
+const boost::dynamic_bitset<>& StandardRegister::get() const
 {
     return data;
 }
@@ -669,7 +669,7 @@ boost::dynamic_bitset<> StandardRegister::get() const
  *
  * \return <tt>readback[(size-1):0]</tt>.
  */
-boost::dynamic_bitset<> StandardRegister::getRead() const
+const boost::dynamic_bitset<>& StandardRegister::getRead() const
 {
     return readData;
 }

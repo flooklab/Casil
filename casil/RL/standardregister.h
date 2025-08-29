@@ -131,8 +131,8 @@ public:
     void set(const boost::dynamic_bitset<>& pBits);                                 ///< Assign a raw bit sequence to the register.
     void setAll(bool pValue = true);                                                ///< Set/unset all register bits at once.
     //
-    boost::dynamic_bitset<> get() const;                                            ///< Get the register data as raw bit sequence.
-    boost::dynamic_bitset<> getRead() const;                                        ///< Get the driver readback data as a bit sequence.
+    const boost::dynamic_bitset<>& get() const;                                     ///< Get the register data as raw bit sequence.
+    const boost::dynamic_bitset<>& getRead() const;                                 ///< Get the driver readback data as a bit sequence.
     //
     void write(std::size_t pNumBytes = 0) const;                                    ///< Write the register data to the driver.
     void read(std::size_t pNumBytes = 0);                                           ///< Read from the driver and assign to the readback data.

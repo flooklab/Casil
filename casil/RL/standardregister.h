@@ -265,12 +265,18 @@ private:
     //
     /// \cond INTERNAL
     /*!
-     * \brief Let the enclosing StandardRegister class set the field's child
-     * fields \e after it has recursively constructed the nested fields branch.
+     * \brief Let the enclosing StandardRegister class set the field's child fields
+     *        \e after it has recursively constructed the nested fields branch.
      *
-     * See setChildFields() and StandardRegister::populateFieldTree() / StandardRegister::StandardRegister().
+     * See setChildFields() and StandardRegister::StandardRegister().
      */
     friend StandardRegister::StandardRegister(std::string, HL::Driver&, LayerConfig);
+    /*!
+     * \brief Let the enclosing StandardRegister class set the field's child fields
+     *        \e after it has recursively constructed the nested fields branch.
+     *
+     * See setChildFields() and StandardRegister::populateFieldTree().
+     */
     friend void StandardRegister::populateFieldTree(StandardRegister::FieldTree&, const boost::property_tree::ptree&, const std::string&) const;
     /// \endcond INTERNAL
 

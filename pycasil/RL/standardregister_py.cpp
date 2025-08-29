@@ -196,9 +196,9 @@ void bindRL_StandardRegister(py::module& pM)
             .def("__len__", &StandardRegister::getSize, "Get the size of the register.", py::is_operator())
             .def("applyDefaults", &StandardRegister::applyDefaults, "Set register fields to configured default/init values.")
             .def("set", [](StandardRegister& pThis, const std::uint64_t pValue) -> void
-                        { pThis.set(pValue); }, "Assign equivalent integer value to the register.")
+                        { pThis.set(pValue); }, "Assign equivalent integer value to the register.", py::arg("value"))
             .def("set", [](StandardRegister& pThis, const std::vector<bool>& pBits) -> void
-                        { pThis.set(PyCasilUtils::bitsetFromBoolVec(pBits)); }, "Assign a raw bit sequence to the register.")
+                        { pThis.set(PyCasilUtils::bitsetFromBoolVec(pBits)); }, "Assign a raw bit sequence to the register.", py::arg("bits"))
             .def("setAll", &StandardRegister::setAll, "Set/unset all register bits at once.", py::arg("value") = true)
             .def("get", [](const StandardRegister& pThis) -> std::vector<bool>
                         { return PyCasilUtils::boolVecFromBitset(pThis.get()); }, "Get the register data as raw bit sequence.")
@@ -207,5 +207,5 @@ void bindRL_StandardRegister(py::module& pM)
             .def("write", &StandardRegister::write, "Write the register data to the driver.", py::arg("numBytes") = 0)
             .def("read", &StandardRegister::read, "Read from the driver and assign to the readback data.", py::arg("numBytes") = 0)
             .def("toBytes", &StandardRegister::toBytes, "Convert the register data to a byte sequence.")
-            .def("fromBytes", &StandardRegister::fromBytes, "Load/assign the register data from a byte sequence.");
+            .def("fromBytes", &StandardRegister::fromBytes, "Load/assign the register data from a byte sequence.", py::arg("bytes"));
 }

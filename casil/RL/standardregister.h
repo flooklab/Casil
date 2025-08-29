@@ -90,7 +90,19 @@ namespace Layers::RL
 /*!
  * \brief Basic register implementation for accessing raw driver data through a structured register view.
  *
- * \todo ...
+ * Provides high-level access/manipulation to/of the driver-specific special data that can
+ * be exposed by certain drivers via MuxedDriver::setData() and MuxedDriver::getData().
+ *
+ * The data to be written can be set/prepared as a whole, in terms of "register fields"
+ * (structured/logical subdivisions of the register) or by setting individual bits.
+ * This data can then be "committed" to the driver by calling write() (which calls
+ * MuxedDriver::setData() and optionally also MuxedDriver::exec()).
+ *
+ * Data to be read from the driver (see MuxedDriver::getData()) can instead be fetched
+ * by calling read() and can then be accessed similar to the write data (see getRead()
+ * and rootRead()). However, this "readback" data is not meant to be changed (read-only).
+ *
+ * See StandardRegister() for more detailed information.
  */
 class StandardRegister final : public Register
 {

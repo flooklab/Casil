@@ -46,9 +46,14 @@ void bindRL_StandardRegister(py::module& pM)
             .def("__getitem__", [](RegField& pThis, const std::string_view pFieldName) -> RegField&
                                 { return pThis.operator[](pFieldName); }, "Access an immediate child field.",
                                 py::arg("fieldName"), py::return_value_policy::reference, py::is_operator())
-            .def("__getitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx) -> RegField
-                                { return pThis.operator()(pMsbIdx, pLsbIdx); }, "Access a slice of bits in the field.",
-                                py::arg("msbIdx"), py::arg("lsbIdx"), py::is_operator())
+            .def("__getitem__", [](RegField& pThis, const py::slice& pSlice) -> RegField
+                                {
+                                    const std::size_t msbIdx = pSlice.attr("start").cast<std::size_t>();
+                                    const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
+                                    if (!pSlice.attr("step").is_none())
+                                        throw std::invalid_argument("Step size definition for slices is unsupported.");
+                                    return pThis.operator()(msbIdx, lsbIdx);
+                                }, "Access a slice of bits in the field.", py::arg("idxSlice"), py::is_operator())
             .def("__getitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs) -> RegField
                                 { return pThis.operator[](pIdxs); }, "Access a set of unique bits in the field.",
                                 py::arg("idxs"), py::is_operator())
@@ -87,20 +92,36 @@ void bindRL_StandardRegister(py::module& pM)
                                     }
                                 }, "Assign something else to an immediate child field (will fail).",
                                 py::arg("fieldName"), py::arg("arg"), py::is_operator())
-            .def("__setitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, const std::uint64_t pValue)
+            .def("__setitem__", [](RegField& pThis, const py::slice& pSlice, const std::uint64_t pValue)
                                     -> void
-                                { pThis.operator()(pMsbIdx, pLsbIdx) = pValue; }, "Assign an integer value to a slice of bits in the field.",
-                                py::arg("msbIdx"), py::arg("lsbIdx"), py::arg("value"), py::is_operator())
-            .def("__setitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, const std::vector<bool>& pBits)
-                                    -> void
-                                { pThis.operator()(pMsbIdx, pLsbIdx) = PyCasilUtils::bitsetFromBoolVec(pBits); },
-                                "Assign a bit sequence to a slice of bits in the field.",
-                                py::arg("msbIdx"), py::arg("lsbIdx"), py::arg("bits"), py::is_operator())
-            .def("__setitem__", [](RegField& pThis, const std::size_t pMsbIdx, const std::size_t pLsbIdx, py::object) -> void
                                 {
+                                    const std::size_t msbIdx = pSlice.attr("start").cast<std::size_t>();
+                                    const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
+                                    if (!pSlice.attr("step").is_none())
+                                        throw std::invalid_argument("Step size definition for slices is unsupported.");
+                                    pThis.operator()(msbIdx, lsbIdx) = pValue;
+                                }, "Assign an integer value to a slice of bits in the field.",
+                                py::arg("idxSlice"), py::arg("value"), py::is_operator())
+            .def("__setitem__", [](RegField& pThis, const py::slice& pSlice, const std::vector<bool>& pBits)
+                                    -> void
+                                {
+                                    const std::size_t msbIdx = pSlice.attr("start").cast<std::size_t>();
+                                    const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
+                                    if (!pSlice.attr("step").is_none())
+                                        throw std::invalid_argument("Step size definition for slices is unsupported.");
+                                    pThis.operator()(msbIdx, lsbIdx) = PyCasilUtils::bitsetFromBoolVec(pBits);
+                                }, "Assign a bit sequence to a slice of bits in the field.",
+                                py::arg("idxSlice"), py::arg("bits"), py::is_operator())
+            .def("__setitem__", [](RegField& pThis, const py::slice& pSlice, py::object) -> void
+                                {
+                                    const std::size_t msbIdx = pSlice.attr("start").cast<std::size_t>();
+                                    const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
+                                    if (!pSlice.attr("step").is_none())
+                                        throw std::invalid_argument("Step size definition for slices is unsupported.");
+
                                     try
                                     {
-                                        (void)pThis.operator()(pMsbIdx, pLsbIdx);
+                                        (void)pThis.operator()(msbIdx, lsbIdx);
                                         throw py::type_error("Invalid assignment.");
                                     }
                                     catch (const std::invalid_argument&)
@@ -108,7 +129,7 @@ void bindRL_StandardRegister(py::module& pM)
                                         throw;
                                     }
                                 }, "Assign something else to a slice of bits in the field (will fail).",
-                                py::arg("msbIdx"), py::arg("lsbIdx"), py::arg("arg"), py::is_operator())
+                                py::arg("idxSlice"), py::arg("arg"), py::is_operator())
             .def("__setitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs, const std::uint64_t pValue) -> void
                                 { pThis.operator[](pIdxs) = pValue; }, "Assign an integer value to a set of unique bits in the field.",
                                 py::arg("idxs"), py::arg("value"), py::is_operator())

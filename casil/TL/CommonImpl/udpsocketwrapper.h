@@ -57,6 +57,7 @@ public:
     UDPSocketWrapper(std::string pHostName, int pPort);         ///< Constructor.
     UDPSocketWrapper(const UDPSocketWrapper&) = delete;         ///< Deleted copy constructor.
     UDPSocketWrapper(UDPSocketWrapper&&) = default;             ///< Default move constructor.
+    ~UDPSocketWrapper() = default;                              ///< Default destructor.
     //
     UDPSocketWrapper& operator=(UDPSocketWrapper) = delete;     ///< Deleted copy assignment operator.
     UDPSocketWrapper& operator=(UDPSocketWrapper&&) = delete;   ///< Deleted move assignment operator.

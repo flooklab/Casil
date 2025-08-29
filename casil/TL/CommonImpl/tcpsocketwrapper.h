@@ -57,6 +57,7 @@ public:
                                                                 ///< Constructor.
     TCPSocketWrapper(const TCPSocketWrapper&) = delete;         ///< Deleted copy constructor.
     TCPSocketWrapper(TCPSocketWrapper&&) = default;             ///< Default move constructor.
+    ~TCPSocketWrapper() = default;                              ///< Default destructor.
     //
     TCPSocketWrapper& operator=(TCPSocketWrapper) = delete;     ///< Deleted copy assignment operator.
     TCPSocketWrapper& operator=(TCPSocketWrapper&&) = delete;   ///< Deleted move assignment operator.

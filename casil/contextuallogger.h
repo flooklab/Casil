@@ -46,6 +46,7 @@ public:
 
 public:
     explicit ContextualLogger(const LayerBase& pComponent);                         ///< Constructor for logging from layer components.
+    ~ContextualLogger() = default;                                                  ///< Default destructor.
     //
     void log(const std::string& pMessage, LogLevel pLevel = LogLevel::Info) const;  ///< Print a log message with contextual information.
     //

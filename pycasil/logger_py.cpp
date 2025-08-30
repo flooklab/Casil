@@ -62,5 +62,7 @@ void bind_Logger(py::module& pM)
             .def_static("logMore", &Logger::logMore, "Print a log message (LogLevel.More).", py::arg("message"))
             .def_static("logVerbose", &Logger::logVerbose, "Print a log message (LogLevel.Verbose).", py::arg("message"))
             .def_static("logDebug", &Logger::logDebug, "Print a log message (LogLevel.Debug).", py::arg("message"))
-            .def_static("logDebugDebug", &Logger::logDebugDebug, "Print a log message (LogLevel.DebugDebug).", py::arg("message"));
+            .def_static("logDebugDebug", &Logger::logDebugDebug, "Print a log message (LogLevel.DebugDebug).", py::arg("message"))
+            .def_static("includeLogLevel", &Logger::includeLogLevel, "Check whether a message with a certain log level should be logged.",
+                        py::arg("level"));
 }

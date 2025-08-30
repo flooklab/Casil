@@ -35,6 +35,15 @@ void bind_LayerConfig(py::module& pM)
             .def("__eq__", (&LayerConfig::operator==), "Equality operator.", py::arg("other"), py::is_operator())
             .def("contains", &LayerConfig::contains, "Check the configuration tree structure (and value types).",
                  py::arg("other"), py::arg("checkTypes") = false)
+            .def("getBoolOpt", &LayerConfig::getBoolOpt, "Get a boolean configuration value.", py::arg("key"))
+            .def("getIntOpt", &LayerConfig::getIntOpt, "Get a (signed) integer configuration value.", py::arg("key"))
+            .def("getUIntOpt", &LayerConfig::getUIntOpt, "Get an unsigned integer configuration value.", py::arg("key"))
+            .def("getDblOpt", &LayerConfig::getDblOpt, "Get a floating point configuration value.", py::arg("key"))
+            .def("getStrOpt", &LayerConfig::getStrOpt, "Get a string-type configuration value.", py::arg("key"))
+            .def("getByteSeqOpt", &LayerConfig::getByteSeqOpt, "Get an 8 bit unsigned integer sequence from the configuration tree.",
+                 py::arg("key"))
+            .def("getUIntSeqOpt", &LayerConfig::getUIntSeqOpt, "Get a 64 bit unsigned integer sequence from the configuration tree.",
+                 py::arg("key"))
             .def("getBool", &LayerConfig::getBool, "Get a boolean configuration value.", py::arg("key"), py::arg("default") = false)
             .def("getInt", &LayerConfig::getInt, "Get a (signed) integer configuration value.", py::arg("key"), py::arg("default") = 0)
             .def("getUInt", &LayerConfig::getUInt, "Get an unsigned integer configuration value.", py::arg("key"), py::arg("default") = 0u)
@@ -44,5 +53,6 @@ void bind_LayerConfig(py::module& pM)
                  py::arg("key"), py::arg("default") = std::vector<std::uint8_t>{})
             .def("getUIntSeq", &LayerConfig::getUIntSeq, "Get a 64 bit unsigned integer sequence from the configuration tree.",
                  py::arg("key"), py::arg("default") = std::vector<std::uint64_t>{})
+            .def("toString", &LayerConfig::toString, "Format the configuration tree content as human-readable string.")
             .def_static("fromYAML", &LayerConfig::fromYAML, "Create a configuration object from YAML format.", py::arg("yamlString"));
 }

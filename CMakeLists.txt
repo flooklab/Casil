@@ -275,7 +275,7 @@ else()
 endif()
 
 if(CASIL_USE_SYSTEM_PYBIND11)
-    find_package(pybind11 2.13.4 REQUIRED)
+    find_package(pybind11 3.0.1 REQUIRED)
 else()
     add_subdirectory(external/pybind11)
 endif()

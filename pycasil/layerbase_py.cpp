@@ -32,10 +32,12 @@ void bind_LayerBase(py::module& pM)
     py::class_<LayerBase> layerBase(pM, "LayerBase", "Common top-level base class that connects the different layers "
                                                      "and layer components of the basil layer structure.");
 
-    py::enum_<LayerBase::Layer>(layerBase, "Layer", "Enumeration of identifiers for the distinguished component layers TL, HL and RL.")
+    py::native_enum<LayerBase::Layer>(layerBase, "Layer", "enum.Enum",
+                                      "Enumeration of identifiers for the distinguished component layers TL, HL and RL.")
             .value("TransferLayer", LayerBase::Layer::TransferLayer, "Transfer layer (TL): Interfaces")
             .value("HardwareLayer", LayerBase::Layer::HardwareLayer, "Hardware layer (HL): Drivers")
-            .value("RegisterLayer", LayerBase::Layer::RegisterLayer, "Register layer (RL): Registers");
+            .value("RegisterLayer", LayerBase::Layer::RegisterLayer, "Register layer (RL): Registers")
+            .finalize();
 
     layerBase.def("getLayer", &LayerBase::getLayer, "Get the layer of this layer component.")
             .def("getType", &LayerBase::getType, "Get the type name of this layer component.")

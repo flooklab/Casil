@@ -33,11 +33,12 @@ void bindVersion(py::module& pM)
 {
     using Version::ReleaseType;
 
-    py::enum_<ReleaseType>(pM, "ReleaseType", "Release type of the released library version.")
+    py::native_enum<ReleaseType>(pM, "ReleaseType", "enum.Enum", "Release type of the released library version.")
             .value("Alpha", ReleaseType::Alpha, "Pre-release alpha status.")
             .value("Beta", ReleaseType::Beta, "Pre-release beta status.")
             .value("ReleaseCandidate", ReleaseType::ReleaseCandidate, "Pre-release release candidate status.")
-            .value("Normal", ReleaseType::Normal, "Normal/final release.");
+            .value("Normal", ReleaseType::Normal, "Normal/final release.")
+            .finalize();
 
     py::class_<PyCasilVersion>(pM, "CasilVersion", "Current library version.")
             .def_readonly_static("casilVersionMajor", &Version::casilVersionMajor, "Library version major number.")

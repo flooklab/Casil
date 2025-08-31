@@ -31,7 +31,7 @@ void bind_Logger(py::module& pM)
 {
     py::class_<Logger> logger(pM, "Logger", "Print log messages.");
 
-    py::enum_<Logger::LogLevel>(logger, "LogLevel", "Enumeration of available log levels.")
+    py::native_enum<Logger::LogLevel>(logger, "LogLevel", "enum.Enum", "Enumeration of available log levels.")
             .value("None", Logger::LogLevel::None, "Do not print any log messages.")
             .value("Critical", Logger::LogLevel::Critical, "Log critical errors only.")
             .value("Error", Logger::LogLevel::Error, "Log all errors.")
@@ -41,7 +41,8 @@ void bind_Logger(py::module& pM)
             .value("More", Logger::LogLevel::More, "Log also less important notifications.")
             .value("Verbose", Logger::LogLevel::Verbose, "Log even more notifications.")
             .value("Debug", Logger::LogLevel::Debug, "Log also debug messages.")
-            .value("DebugDebug", Logger::LogLevel::DebugDebug, "Log even more debug messages.");
+            .value("DebugDebug", Logger::LogLevel::DebugDebug, "Log even more debug messages.")
+            .finalize();
 
     logger.def_static("getLogLevel", &Logger::getLogLevel, "Get the log level.")
             .def_static("setLogLevel", &Logger::setLogLevel, "Set the log level.", py::arg("level"))

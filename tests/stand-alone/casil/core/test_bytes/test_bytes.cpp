@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(Test6_toStringFormatting)
     using Bytes::formatUInt16Vec;
     using Bytes::formatUInt32Vec;
     using Bytes::formatUInt64Vec;
-    using Bytes::operator<<;
+    using Bytes::operator<<;                                                                            // cppcheck-suppress constStatement
 
     BOOST_CHECK_EQUAL(formatHex(std::uint8_t{0xFu}), "0xF");
     BOOST_CHECK_EQUAL(formatHex(std::uint8_t{0xABu}), "0xAB");

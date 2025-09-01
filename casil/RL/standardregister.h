@@ -178,7 +178,7 @@ private:
  *
  * Provides convenient read/write access to a single bit of a StandardRegister instance or of a specific register field thereof.
  */
-class StandardRegister::BoolRef                                 // cppcheck-suppress noConstructor symbolName=BoolRef
+class StandardRegister::BoolRef
 {
 public:
     BoolRef(boost::dynamic_bitset<>& pBits, std::size_t pIdx);  ///< Constructor.
@@ -211,7 +211,7 @@ private:
  * Provides convenient read/write access to a certain register \e field, a subset of
  * bits from a StandardRegister instance or of another, parent register field thereof.
  */
-class StandardRegister::RegField                                                        // cppcheck-suppress noConstructor symbolName=RegField
+class StandardRegister::RegField
 {
 private:
     RegField(RegField& pParent, const std::vector<std::size_t>& pIdxs);                                             ///< Constructor.

@@ -233,7 +233,7 @@ public:
      *
      * Provides convenient read/write access to a single register of a specific RegisterDriver instance.
      */
-    class RegisterProxy                                                         // cppcheck-suppress noConstructor symbolName=RegisterProxy
+    class RegisterProxy
     {
     public:
         RegisterProxy(RegisterDriver& pRegDriver, std::string pRegName);        ///< Constructor.

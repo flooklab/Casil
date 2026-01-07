@@ -39,7 +39,7 @@ CASIL_REGISTER_DRIVER_CPP(DummyRegisterDriver)
  * \param pConfig Component configuration.
  */
 DummyRegisterDriver::DummyRegisterDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
-    RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig(),
+    RegisterDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig(),
        {{"RESET",     {.type{DataType::Value},     .mode{AccessMode::WriteOnly}, .addr{0},  .size{8},  .offs{0}}},
         {"VERSION",   {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0},  .size{8},  .offs{0}}}})
 {

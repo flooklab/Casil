@@ -32,7 +32,7 @@ CASIL_REGISTER_DRIVER_CPP(TestRegDriver)
 //
 
 TestRegDriver::TestRegDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
-    RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig(),
+    RegisterDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig(),
        {{"RESET",     {.type{DataType::Value},     .mode{AccessMode::WriteOnly}, .addr{0},  .size{8},  .offs{0}}},
         {"VERSION",   {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0},  .size{8},  .offs{0}}},
         {"FOOBAR",    {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{1},  .size{10}, .offs{3}}},

@@ -85,7 +85,7 @@ CASIL_REGISTER_DRIVER_ALIAS("gpio")
  * \param pInterface %Interface instance to be used.
  * \param pConfig Component configuration.
  */
-GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
+GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, const LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig::fromYAML("{size: uint}"), getRegisterDescrs(pConfig)),
     size(config.getUInt("size", 8)),
     ioBytes(((size - 1) / 8) + 1)

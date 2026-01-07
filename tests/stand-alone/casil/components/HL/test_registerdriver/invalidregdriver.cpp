@@ -31,7 +31,7 @@ CASIL_REGISTER_DRIVER_CPP(InvalidRegDriver)
 
 //
 
-InvalidRegDriver::InvalidRegDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
+InvalidRegDriver::InvalidRegDriver(std::string pName, InterfaceBaseType& pInterface, const LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig(), getRegisterDescrs(pConfig))
 {
 }

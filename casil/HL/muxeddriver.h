@@ -129,7 +129,7 @@ private:
      * \param pDriver A muxed driver instance.
      * \return The interface of \p pDriver.
      */
-    static MuxedDriver::InterfaceBaseType& getDriverInterface(MuxedDriver& pDriver)
+    static MuxedDriver::InterfaceBaseType& getDriverInterface(const MuxedDriver& pDriver)
     {
         return pDriver.interface;
     }

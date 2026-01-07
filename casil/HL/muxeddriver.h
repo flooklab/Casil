@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -97,6 +97,49 @@ protected:
     InterfaceBaseType& interface;           ///< The interface instance to be used for required access to the transfer layer.
     //
     const std::uint64_t baseAddr;           ///< The root bus address for the controlled firmware module instance.
+
+    /// \cond INTERNAL
+    /*!
+     * \brief Let the MetaDriver class access the interface instance in order for its constructor
+     *        to be able to pass its backend driver's interface to its own parent class constructor.
+     *
+     * The limited friend access is indirectly given via MetaDriverFriendAccessHelper (see there).
+     */
+    friend class MetaDriverFriendAccessHelper;
+    /// \endcond INTERNAL
+};
+
+class MetaDriver;
+
+/*!
+ * \brief Helper class for fine-grained friend access of MetaDriver to MuxedDriver.
+ *
+ * Enables MetaDriver to access the interface instance of a MuxedDriver via getDriverInterface().
+ */
+class MetaDriverFriendAccessHelper
+{
+public:
+    MetaDriverFriendAccessHelper() = delete;    ///< Deleted constructor.
+private:
+    /*!
+     * \brief Get the interface instance of \p pDriver.
+     *
+     * Returns a reference to the TL::Interface that is used by \p pDriver.
+     *
+     * \param pDriver A muxed driver instance.
+     * \return The interface of \p pDriver.
+     */
+    static MuxedDriver::InterfaceBaseType& getDriverInterface(MuxedDriver& pDriver)
+    {
+        return pDriver.interface;
+    }
+    //
+    /*!
+     * \brief Let the MetaDriver class access an interface instance of another muxed driver.
+     *
+     * Access to a muxed driver's interface is given via getDriverInterface(), as this helper class is in turn a friend of MuxedDriver.
+     */
+    friend class MetaDriver;
 };
 
 } // namespace HL

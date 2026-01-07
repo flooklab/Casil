@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2026 M. Frohne
+//  Copyright (C) 2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -23,37 +23,13 @@
 
 #include <pycasil/pycasil.h>
 
-extern void bindHL_Driver(py::module&);
+#include <casil/HL/metadriver.h>
 
-extern void bindHL_DirectDriver(py::module&);
-extern void bindHL_MuxedDriver(py::module&);
+using casil::HL::MetaDriver;
 
-extern void bindHL_MetaDriver(py::module&);
-extern void bindHL_RegisterDriver(py::module&);
-
-extern void bindHL_DummyDriver(py::module&);
-extern void bindHL_SCPI(py::module&);
-extern void bindHL_VirtEcho(py::module&);
-
-extern void bindHL_DummyMuxedDriver(py::module&);
-extern void bindHL_GPIO(py::module&);
-extern void bindHL_SiTCPFifo(py::module&);
-
-void bindHL(py::module& pM)
+void bindHL_MetaDriver(py::module& pM)
 {
-    bindHL_Driver(pM);
-
-    bindHL_DirectDriver(pM);
-    bindHL_MuxedDriver(pM);
-
-    bindHL_MetaDriver(pM);
-    bindHL_RegisterDriver(pM);
-
-    bindHL_DummyDriver(pM);
-    bindHL_SCPI(pM);
-    bindHL_VirtEcho(pM);
-
-    bindHL_DummyMuxedDriver(pM);
-    bindHL_GPIO(pM);
-    bindHL_SiTCPFifo(pM);
+    py::class_<MetaDriver, casil::HL::MuxedDriver>(pM, "MetaDriver", "Specialization for principally MuxedDriver components that "
+                                                                     "indirectly control their actual firmware module counterpart "
+                                                                     "on a meta level by means of a backend driver.");
 }

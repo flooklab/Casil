@@ -1,7 +1,7 @@
 #[[
 ##################################################################################################
 ##
-##  Copyright (C) 2024–2025 M. Frohne
+##  Copyright (C) 2024–2026 M. Frohne
 ##
 ##  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 ##
@@ -39,6 +39,7 @@ set(HEADER_FILE_NAMES
     version.h
     HL/directdriver.h
     HL/driver.h
+    HL/metadriver.h
     HL/muxeddriver.h
     HL/registerdriver.h
     HL/Direct/dummydriver.h
@@ -87,6 +88,7 @@ set(SOURCE_FILE_NAMES
     version
     HL/directdriver
     HL/driver
+    HL/metadriver
     HL/muxeddriver
     HL/registerdriver
     HL/Direct/dummydriver

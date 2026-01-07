@@ -146,7 +146,7 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
                 const auto it = drivers.find(intfName);
 
                 if (it == drivers.end())
-                    throw std::runtime_error("No driver with name \"" + drvName + "\" defined (or not constructed yet).");
+                    throw std::runtime_error("No (backend) driver with name \"" + intfName + "\" defined (or not constructed yet).");
 
                 try
                 {

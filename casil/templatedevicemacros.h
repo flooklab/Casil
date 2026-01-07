@@ -83,7 +83,7 @@ struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
 /*!
  * \brief Define a meta driver configuration struct for use with \ref TemplateDeviceSpecialization "TemplateDevice".
  *
- * Defines a meta driver configuration wrapper derived from \ref casil::TmplDev::DriverConf "TmplDev::DriverConf"
+ * Defines a meta driver configuration wrapper derived from \ref casil::TmplDev::MetaDriverConf "TmplDev::MetaDriverConf"
  * such that it meets the concept requirement \ref casil::TmplDev::ImplementsMetaDriverConf "TmplDev::ImplementsMetaDriverConf"
  * and can hence be used to configure a meta driver component for \ref TemplateDeviceSpecialization "TemplateDevice".
  * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::DriversConf "TmplDev::DriversConf".
@@ -95,7 +95,7 @@ struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
  * \param CONF Component configuration YAML code (as string literal).
  */
 #define CASIL_DEFINE_META_DRIVER(DRV_CLASS, STRUCT_NAME, DRV_NAME, BACKEND_DRIVER, CONF) \
-struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
+struct STRUCT_NAME : public casil::TmplDev::MetaDriverConf<DRV_CLASS>\
 {\
     static constexpr char name[] = DRV_NAME;\
     static constexpr char hw_driver[] = BACKEND_DRIVER;\

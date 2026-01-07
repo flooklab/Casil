@@ -141,6 +141,30 @@ struct DriverConf : public TmplDevImpl::DriverConfBase
 };
 
 /*!
+ * \brief Meta driver configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * This struct is intended to be derived from for every meta driver configuration needed. \p T must be the class type of
+ * the meta driver to be configured. To properly define the meta driver's configuration (and make it usable by DriversConf)
+ * the derived struct must declare the following members:
+ *
+ * - <tt>static constexpr char name[] = "instance_name_of_the_driver"</tt>
+ * - <tt>static constexpr char hw_driver[] = "instance_name_of_the_used_backend_driver"</tt>
+ * - <tt>static constexpr char conf[] = "driver: specific, yaml: configuration"</tt>
+ *
+ * \note Such a struct can be more easily defined via the \ref CASIL_DEFINE_META_DRIVER macro from \ref templatedevicemacros.h.
+ *
+ * \tparam T Registered driver class implementing \ref Layers::HL::MetaDriver "HL::MetaDriver".
+ */
+template<typename T>
+struct MetaDriverConf : public TmplDevImpl::DriverConfBase
+{
+    static_assert(Concepts::IsMetaDriver<T>, "Type must be a meta driver.");
+    static_assert(Concepts::HasRegisteredTypeName<T>, "Type must be registered to the factory.");
+
+    typedef T Type;     ///< The wrapped driver type.
+};
+
+/*!
  * \brief Register configuration wrapper for \ref TemplateDeviceSpecialization "TemplateDevice".
  *
  * This struct is intended to be derived from for every register configuration needed. \p T must be the class type of the
@@ -173,7 +197,8 @@ namespace TmplDevImpl
      * \brief Check if type is derived from a component configuration wrapper.
      *
      * Checks if \p T is derived from \p U, assuming that \p U is one of \ref casil::TmplDev::InterfaceConf "TmplDev::InterfaceConf",
-     * \ref casil::TmplDev::DriverConf "TmplDev::DriverConf" or \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf".
+     * \ref casil::TmplDev::DriverConf "TmplDev::DriverConf", \ref casil::TmplDev::MetaDriverConf "TmplDev::MetaDriverConf" or
+     * \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf".
      *
      * \tparam T Type to be checked.
      * \tparam U Component configuration wrapper struct that \p T should be derived from.
@@ -188,7 +213,8 @@ namespace TmplDevImpl
      *
      * Checks if \p T
      * - (a) is derived from \p U, assuming that \p U is one of \ref casil::TmplDev::InterfaceConf "TmplDev::InterfaceConf",
-     *       \ref casil::TmplDev::DriverConf "TmplDev::DriverConf" or \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf", and
+     *       \ref casil::TmplDev::DriverConf "TmplDev::DriverConf", \ref casil::TmplDev::MetaDriverConf "TmplDev::MetaDriverConf" or
+     *       \ref casil::TmplDev::RegisterConf "TmplDev::RegisterConf", \e and
      * - (b) further defines two member variables that every component configuration wrapper must have:
      *   - `static constexpr char name[] = "name_of_interface";`
      *   - `static constexpr char conf[] = "possibly: empty, rest: of, yaml: configuration";`
@@ -240,12 +266,12 @@ concept ImplementsDriverConf = TmplDevImpl::ImplementsConfStruct<T, DriverConf> 
 /*!
  * \brief Check if type is a valid meta driver configuration wrapper.
  *
- * See \ref casil::TmplDev::DriverConf "DriverConf" for the requirements on \p T.
+ * See \ref casil::TmplDev::MetaDriverConf "MetaDriverConf" for the requirements on \p T.
  *
  * \tparam T Type to be checked.
  */
 template<typename T>
-concept ImplementsMetaDriverConf = TmplDevImpl::ImplementsConfStruct<T, DriverConf> && requires
+concept ImplementsMetaDriverConf = TmplDevImpl::ImplementsConfStruct<T, MetaDriverConf> && requires
 {
     T::hw_driver;
     requires Concepts::IsConstCharArr<decltype(T::hw_driver)>;
@@ -292,13 +318,13 @@ struct InterfacesConf
  * This struct, instantiated with \p Ts being configurations for individual drivers, is meant to be passed as template argument
  * to \ref TemplateDeviceSpecialization "TemplateDevice" in order to compile-time-configure all driver components to be used.
  *
- * \tparam Ts Set of driver configurations (each implementing DriverConf).
+ * \tparam Ts Set of driver configurations (each implementing either DriverConf or MetaDriverConf).
  */
 template<typename... Ts>
 struct DriversConf
 {
     static_assert(((ImplementsDriverConf<Ts> || ImplementsMetaDriverConf<Ts>) && ...),
-                  "Each driver must be specified by deriving from DriverConf and defining "
+                  "Each driver must be specified by deriving from {DriverConf or MetaDriverConf} and defining "
                   "'static constexpr char name[] = \"name_of_driver\";' and "
                   "{'static constexpr char interface[] = \"name_of_used_interface\";' or "
                   "'static constexpr char hw_driver[] = \"name_of_used_backend_driver\";'} and "

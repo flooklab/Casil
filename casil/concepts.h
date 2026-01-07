@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -26,6 +26,8 @@
 
 #include <casil/layerconfig.h>
 #include <casil/HL/driver.h>
+#include <casil/HL/muxeddriver.h>
+#include <casil/HL/metadriver.h>
 
 #include <string>
 #include <type_traits>
@@ -47,6 +49,8 @@ namespace Concepts
 
 using Layers::TL::Interface;
 using HL::Driver;
+using HL::MuxedDriver;
+using HL::MetaDriver;
 using Layers::RL::Register;
 
 /*!
@@ -134,6 +138,19 @@ template<typename T>
 concept IsDriver = std::is_base_of_v<Driver, T> &&
                    HasInterfaceBaseType<T> &&
                    std::is_constructible_v<T, std::string, typename T::InterfaceBaseType&, LayerConfig>;
+
+/*!
+ * \brief Check if type is a proper \ref casil::Layers::HL::MetaDriver "MetaDriver" component
+ *        that is constructible through the \ref casil::LayerFactory "LayerFactory".
+ *
+ * \p T must be derived from \ref casil::Layers::HL::MetaDriver "HL::MetaDriver" and have a constructor
+ * with a signature that is compatible with <tt>T(std::string, MuxedDriver&, LayerConfig)</tt>.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept IsMetaDriver = std::is_base_of_v<MetaDriver, T> &&
+                       std::is_constructible_v<T, std::string, MuxedDriver&, LayerConfig>;
 
 /*!
  * \brief Check if type is a proper \ref casil::Layers::RL::Register "Register" component

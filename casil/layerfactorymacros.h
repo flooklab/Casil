@@ -237,7 +237,7 @@ namespace RegistryImpl\
     using casil::LayerConfig;\
     using casil::LayerFactory;\
     using casil::HL::Driver;\
-    using casil::HL::MetaDriver;\
+    using casil::HL::MuxedDriver;\
     using ThisDriverType = TYPE_CLASS;\
     class RegistryHelper\
     {\
@@ -250,7 +250,7 @@ namespace RegistryImpl\
                 {\
                     try\
                     {\
-                        return std::make_unique<ThisDriverType>(std::move(pName), dynamic_cast<MetaDriver&>(pBackendDriver),\
+                        return std::make_unique<ThisDriverType>(std::move(pName), dynamic_cast<MuxedDriver&>(pBackendDriver),\
                                                                 std::move(pConfig));\
                     }\
                     catch (const std::bad_cast&)\

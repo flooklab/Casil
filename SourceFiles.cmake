@@ -148,6 +148,11 @@ set(TESTS_FILE_NAMES
     core/test_templatedevice/testdriver.h
     core/test_templatedevicemacros/test_templatedevicemacros.cpp
     components/HL/test_gpio/test_gpio.cpp
+    components/HL/test_metadriver/test_metadriver.cpp
+    components/HL/test_metadriver/testbackenddriver.cpp
+    components/HL/test_metadriver/testbackenddriver.h
+    components/HL/test_metadriver/testmetadriver.cpp
+    components/HL/test_metadriver/testmetadriver.h
     components/HL/test_registerdriver/test_registerdriver.cpp
     components/HL/test_registerdriver/fakeinterface.cpp
     components/HL/test_registerdriver/fakeinterface.h

@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -48,19 +48,26 @@ BOOST_AUTO_TEST_CASE(Test1_initCloseAndTemplateAccess)
     BOOST_CHECK(exampleDev.init(true));
 
     BOOST_CHECK(exampleDev.interface<TLDummyInterface1>().init());
+    BOOST_CHECK(exampleDev.interface<TLDummyInterface2>().init());
     BOOST_CHECK(exampleDev.driver<HLDummyDriver1>().init());
     BOOST_CHECK(exampleDev.driver<HLDriver2>().init());
+    BOOST_CHECK(exampleDev.driver<HLDummyDriver3>().init());
+    BOOST_CHECK(exampleDev.driver<HLMetaDriver4>().init());
     BOOST_CHECK(exampleDev.reg<RLDummyRegister1>().init());
 
     BOOST_CHECK(exampleDev.interface<TLDummyInterface1>().read() == std::vector<std::uint8_t>{});
+    BOOST_CHECK(exampleDev.interface<TLDummyInterface2>().read(0x0) == std::vector<std::uint8_t>{});
 
     BOOST_CHECK(exampleDev.close());
     BOOST_CHECK(exampleDev.close(false));
     BOOST_CHECK(exampleDev.close(true));
 
     BOOST_CHECK(exampleDev.interface<TLDummyInterface1>().close());
+    BOOST_CHECK(exampleDev.interface<TLDummyInterface2>().close());
     BOOST_CHECK(exampleDev.driver<HLDummyDriver1>().close());
     BOOST_CHECK(exampleDev.driver<HLDriver2>().close());
+    BOOST_CHECK(exampleDev.driver<HLDummyDriver3>().close());
+    BOOST_CHECK(exampleDev.driver<HLMetaDriver4>().close());
     BOOST_CHECK(exampleDev.reg<RLDummyRegister1>().close());
 }
 
@@ -76,6 +83,10 @@ BOOST_AUTO_TEST_CASE(Test2_layerTypeNameMatching)
     BOOST_CHECK_EQUAL(exampleDev[TLDummyInterface1::name].getType(), TLDummyInterface1::Type::typeName);
     BOOST_CHECK_EQUAL(exampleDev[TLDummyInterface1::name].getName(), TLDummyInterface1::name);
 
+    BOOST_CHECK(exampleDev[TLDummyInterface2::name].getLayer() == LayerBase::Layer::TransferLayer);
+    BOOST_CHECK_EQUAL(exampleDev[TLDummyInterface2::name].getType(), TLDummyInterface2::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev[TLDummyInterface2::name].getName(), TLDummyInterface2::name);
+
     BOOST_CHECK(exampleDev[HLDummyDriver1::name].getLayer() == LayerBase::Layer::HardwareLayer);
     BOOST_CHECK_EQUAL(exampleDev[HLDummyDriver1::name].getType(), HLDummyDriver1::Type::typeName);
     BOOST_CHECK_EQUAL(exampleDev[HLDummyDriver1::name].getName(), HLDummyDriver1::name);
@@ -83,6 +94,14 @@ BOOST_AUTO_TEST_CASE(Test2_layerTypeNameMatching)
     BOOST_CHECK(exampleDev[HLDriver2::name].getLayer() == LayerBase::Layer::HardwareLayer);
     BOOST_CHECK_EQUAL(exampleDev[HLDriver2::name].getType(), HLDriver2::Type::typeName);
     BOOST_CHECK_EQUAL(exampleDev[HLDriver2::name].getName(), HLDriver2::name);
+
+    BOOST_CHECK(exampleDev[HLDummyDriver3::name].getLayer() == LayerBase::Layer::HardwareLayer);
+    BOOST_CHECK_EQUAL(exampleDev[HLDummyDriver3::name].getType(), HLDummyDriver3::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev[HLDummyDriver3::name].getName(), HLDummyDriver3::name);
+
+    BOOST_CHECK(exampleDev[HLMetaDriver4::name].getLayer() == LayerBase::Layer::HardwareLayer);
+    BOOST_CHECK_EQUAL(exampleDev[HLMetaDriver4::name].getType(), HLMetaDriver4::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev[HLMetaDriver4::name].getName(), HLMetaDriver4::name);
 
     BOOST_CHECK(exampleDev[RLDummyRegister1::name].getLayer() == LayerBase::Layer::RegisterLayer);
     BOOST_CHECK_EQUAL(exampleDev[RLDummyRegister1::name].getType(), RLDummyRegister1::Type::typeName);
@@ -98,8 +117,11 @@ BOOST_AUTO_TEST_CASE(Test3_subscriptOperator)
     BOOST_REQUIRE(exampleDev.init());
 
     BOOST_CHECK(&(exampleDev[TLDummyInterface1::name]) == &(exampleDev.interface<TLDummyInterface1>()));
+    BOOST_CHECK(&(exampleDev[TLDummyInterface2::name]) == &(exampleDev.interface<TLDummyInterface2>()));
     BOOST_CHECK(&(exampleDev[HLDummyDriver1::name]) == &(exampleDev.driver<HLDummyDriver1>()));
     BOOST_CHECK(&(exampleDev[HLDriver2::name]) == &(exampleDev.driver<HLDriver2>()));
+    BOOST_CHECK(&(exampleDev[HLDummyDriver3::name]) == &(exampleDev.driver<HLDummyDriver3>()));
+    BOOST_CHECK(&(exampleDev[HLMetaDriver4::name]) == &(exampleDev.driver<HLMetaDriver4>()));
     BOOST_CHECK(&(exampleDev[RLDummyRegister1::name]) == &(exampleDev.reg<RLDummyRegister1>()));
 
     exampleDev.close();

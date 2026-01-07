@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -26,8 +26,11 @@
 #include <casil/templatedevice.h>
 #include <casil/templatedevicemacros.h>
 #include <casil/HL/Direct/dummydriver.h>
+#include <casil/HL/Muxed/dummymetadriver.h>
+#include <casil/HL/Muxed/dummymuxeddriver.h>
 #include <casil/RL/dummyregister.h>
 #include <casil/TL/Direct/dummyinterface.h>
+#include <casil/TL/Muxed/dummymuxedinterface.h>
 
 #include <cstdint>
 #include <vector>
@@ -54,6 +57,36 @@ typedef casil::TemplateDevice<
                 casil::TmplDev::DriversConf<HLDummyDriver1>,
                 casil::TmplDev::RegistersConf<RLDummyRegister1>
             > ExampleDevice;
+
+CASIL_DEFINE_INTERFACE(casil::TL::DummyMuxedInterface,
+                       TLDummyInterface2,
+                       "DummyInterface2",
+                       "")
+
+CASIL_DEFINE_DRIVER(casil::HL::DummyMuxedDriver,
+                    HLDummyDriver2,
+                    "DummyDriver2",
+                    "DummyInterface2",
+                    "base_addr: 0x123")
+
+CASIL_DEFINE_META_DRIVER(casil::HL::DummyMetaDriver,
+                    HLMetaDriver1,
+                    "MetaDriver1",
+                    "DummyDriver2",
+                    "")
+
+CASIL_DEFINE_REGISTER(casil::RL::DummyRegister,
+                      RLDummyRegister2,
+                      "DummyRegister2",
+                      "MetaDriver1",
+                      "")
+
+typedef casil::TemplateDevice<
+                casil::TmplDev::InterfacesConf<TLDummyInterface2>,
+                casil::TmplDev::DriversConf<HLDummyDriver2,
+                                            HLMetaDriver1>,
+                casil::TmplDev::RegistersConf<RLDummyRegister2>
+            > ExampleDevice2;
 
 //
 
@@ -85,6 +118,28 @@ BOOST_AUTO_TEST_CASE(Test1_initCloseAndTemplateAccess)
     BOOST_CHECK(exampleDev.interface<TLDummyInterface1>().close());
     BOOST_CHECK(exampleDev.driver<HLDummyDriver1>().close());
     BOOST_CHECK(exampleDev.reg<RLDummyRegister1>().close());
+
+    ExampleDevice2 exampleDev2;
+
+    BOOST_CHECK(exampleDev2.init());
+    BOOST_CHECK(exampleDev2.init(false));
+    BOOST_CHECK(exampleDev2.init(true));
+
+    BOOST_CHECK(exampleDev2.interface<TLDummyInterface2>().init());
+    BOOST_CHECK(exampleDev2.driver<HLDummyDriver2>().init());
+    BOOST_CHECK(exampleDev2.driver<HLMetaDriver1>().init());
+    BOOST_CHECK(exampleDev2.reg<RLDummyRegister2>().init());
+
+    BOOST_CHECK(exampleDev2.interface<TLDummyInterface2>().read(0x0u) == std::vector<std::uint8_t>{});
+
+    BOOST_CHECK(exampleDev2.close());
+    BOOST_CHECK(exampleDev2.close(false));
+    BOOST_CHECK(exampleDev2.close(true));
+
+    BOOST_CHECK(exampleDev2.interface<TLDummyInterface2>().close());
+    BOOST_CHECK(exampleDev2.driver<HLDummyDriver2>().close());
+    BOOST_CHECK(exampleDev2.driver<HLMetaDriver1>().close());
+    BOOST_CHECK(exampleDev2.reg<RLDummyRegister2>().close());
 }
 
 BOOST_AUTO_TEST_CASE(Test2_layerTypeNameMatching)
@@ -108,6 +163,28 @@ BOOST_AUTO_TEST_CASE(Test2_layerTypeNameMatching)
     BOOST_CHECK_EQUAL(exampleDev[RLDummyRegister1::name].getName(), RLDummyRegister1::name);
 
     exampleDev.close();
+
+    ExampleDevice2 exampleDev2;
+
+    BOOST_REQUIRE(exampleDev2.init());
+
+    BOOST_CHECK(exampleDev2[TLDummyInterface2::name].getLayer() == LayerBase::Layer::TransferLayer);
+    BOOST_CHECK_EQUAL(exampleDev2[TLDummyInterface2::name].getType(), TLDummyInterface2::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev2[TLDummyInterface2::name].getName(), TLDummyInterface2::name);
+
+    BOOST_CHECK(exampleDev2[HLDummyDriver2::name].getLayer() == LayerBase::Layer::HardwareLayer);
+    BOOST_CHECK_EQUAL(exampleDev2[HLDummyDriver2::name].getType(), HLDummyDriver2::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev2[HLDummyDriver2::name].getName(), HLDummyDriver2::name);
+
+    BOOST_CHECK(exampleDev2[HLMetaDriver1::name].getLayer() == LayerBase::Layer::HardwareLayer);
+    BOOST_CHECK_EQUAL(exampleDev2[HLMetaDriver1::name].getType(), HLMetaDriver1::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev2[HLMetaDriver1::name].getName(), HLMetaDriver1::name);
+
+    BOOST_CHECK(exampleDev2[RLDummyRegister2::name].getLayer() == LayerBase::Layer::RegisterLayer);
+    BOOST_CHECK_EQUAL(exampleDev2[RLDummyRegister2::name].getType(), RLDummyRegister2::Type::typeName);
+    BOOST_CHECK_EQUAL(exampleDev2[RLDummyRegister2::name].getName(), RLDummyRegister2::name);
+
+    exampleDev2.close();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

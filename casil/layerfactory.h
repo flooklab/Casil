@@ -83,10 +83,10 @@ public:
                                                                                             ///< Construct a registered register type.
     //
     static void registerInterfaceType(std::string pType, TLGeneratorFunction pGenerator);   ///< Register a generator for an interface type.
-    static void registerDriverType(std::string pType, HLGeneratorFunction pGenerator);      ///< Register a generator for an driver type.
+    static void registerDriverType(std::string pType, HLGeneratorFunction pGenerator);      ///< Register a generator for a driver type.
     static void registerMetaDriverType(std::string pType, HLMetaGeneratorFunction pGenerator);
                                                                                             ///< Register a generator for a meta driver type.
-    static void registerRegisterType(std::string pType, RLGeneratorFunction pGenerator);    ///< Register a generator for an register type.
+    static void registerRegisterType(std::string pType, RLGeneratorFunction pGenerator);    ///< Register a generator for a register type.
     //
     static void registerInterfaceAlias(const std::string& pType, std::string pAlias);       ///< Register an interface type name alias.
     static void registerDriverAlias(const std::string& pType, std::string pAlias);          ///< Register a driver type name alias.

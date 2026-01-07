@@ -209,7 +209,7 @@ void LayerFactory::registerInterfaceType(std::string pType, TLGeneratorFunction 
 }
 
 /*!
- * \brief Register a generator for an driver type.
+ * \brief Register a generator for a driver type.
  *
  * Registers a driver type \p T with a "type name" \p pType, which will enable createDriver()
  * to generate \p T based on \p pType. \p pGenerator must construct an instance of the desired
@@ -241,7 +241,7 @@ void LayerFactory::registerMetaDriverType(std::string pType, HLMetaGeneratorFunc
 }
 
 /*!
- * \brief Register a generator for an register type.
+ * \brief Register a generator for a register type.
  *
  * Registers a register type \p T with a "type name" \p pType, which will enable createRegister()
  * to generate \p T based on \p pType. \p pGenerator must construct an instance of the desired

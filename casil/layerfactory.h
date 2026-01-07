@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -42,10 +42,12 @@ namespace Layers { namespace RL { class Register; } }
  * \brief Factory for LayerBase classes of the three component layers \ref casil::Layers::TL "TL",
  * \ref casil::Layers::HL "HL" and \ref casil::Layers::RL "RL".
  *
- * Use createInterface() / createDriver() / createRegister() to construct layer components by their registered type names.
+ * Use createInterface() / createDriver() / createMetaDriver() / createRegister()
+ * to construct layer components by their registered type names.
  *
- * Component classes can be registered via registerInterfaceType() / registerDriverType() / registerRegisterType().
- * You can add aliases for registered type names via registerInterfaceAlias() / registerDriverAlias() / registerRegisterAlias().
+ * Component classes can be registered via registerInterfaceType() / registerDriverType() / registerMetaDriverType() /
+ * registerRegisterType(). You can add aliases for registered type names via registerInterfaceAlias() /
+ * registerDriverAlias() / registerMetaDriverAlias() / registerRegisterAlias().
  *
  * The actually recommended way to register any component classes is by using the macros defined in \ref layerfactorymacros.h.
  *
@@ -60,11 +62,13 @@ private:
 
 public:
     typedef std::function<std::unique_ptr<Interface>(std::string, LayerConfig)> TLGeneratorFunction;
-                                                                                    ///< Function signature required for interface generators.
+                                                                                ///< Function signature required for interface generators.
     typedef std::function<std::unique_ptr<Driver>(std::string, Interface&, LayerConfig)> HLGeneratorFunction;
-                                                                                    ///< Function signature required for driver generators.
+                                                                                ///< Function signature required for driver generators.
+    typedef std::function<std::unique_ptr<Driver>(std::string, Driver&, LayerConfig)> HLMetaGeneratorFunction;
+                                                                                ///< Function signature required for meta driver generators.
     typedef std::function<std::unique_ptr<Register>(std::string, Driver&, LayerConfig)> RLGeneratorFunction;
-                                                                                    ///< Function signature required for register generators.
+                                                                                ///< Function signature required for register generators.
 
 public:
     LayerFactory() = delete;                                                                ///< Deleted constructor.
@@ -73,21 +77,31 @@ public:
                                                                                             ///< Construct a registered interface type.
     static std::unique_ptr<Driver> createDriver(const std::string& pType, std::string pName, Interface& pInterface, LayerConfig pConfig);
                                                                                             ///< Construct a registered driver type.
+    static std::unique_ptr<Driver> createMetaDriver(const std::string& pType, std::string pName, Driver& pBackendDriver, LayerConfig pConfig);
+                                                                                            ///< Construct a registered meta driver type.
     static std::unique_ptr<Register> createRegister(const std::string& pType, std::string pName, Driver& pDriver, LayerConfig pConfig);
                                                                                             ///< Construct a registered register type.
     //
     static void registerInterfaceType(std::string pType, TLGeneratorFunction pGenerator);   ///< Register a generator for an interface type.
     static void registerDriverType(std::string pType, HLGeneratorFunction pGenerator);      ///< Register a generator for an driver type.
+    static void registerMetaDriverType(std::string pType, HLMetaGeneratorFunction pGenerator);
+                                                                                            ///< Register a generator for a meta driver type.
     static void registerRegisterType(std::string pType, RLGeneratorFunction pGenerator);    ///< Register a generator for an register type.
     //
     static void registerInterfaceAlias(const std::string& pType, std::string pAlias);       ///< Register an interface type name alias.
     static void registerDriverAlias(const std::string& pType, std::string pAlias);          ///< Register a driver type name alias.
+    static void registerMetaDriverAlias(const std::string& pType, std::string pAlias);      ///< Register a meta driver type name alias.
     static void registerRegisterAlias(const std::string& pType, std::string pAlias);        ///< Register a register type name alias.
 
 private:
-    static std::map<std::string, TLGeneratorFunction>& tlGenerators();  ///< Access the map of interface generators with interface types as keys.
-    static std::map<std::string, HLGeneratorFunction>& hlGenerators();  ///< Access the map of driver generators with driver types as keys.
-    static std::map<std::string, RLGeneratorFunction>& rlGenerators();  ///< Access the map of register generators with register types as keys.
+    static std::map<std::string, TLGeneratorFunction>& tlGenerators();                      ///< \brief Access the map of interface
+                                                                                            ///  generators with interface types as keys.
+    static std::map<std::string, HLGeneratorFunction>& hlGenerators();                      ///< \brief Access the map of driver
+                                                                                            ///  generators with driver types as keys.
+    static std::map<std::string, HLMetaGeneratorFunction>& hlMetaGenerators();              ///< \brief Access the map of meta driver
+                                                                                            ///  generators with meta driver types as keys.
+    static std::map<std::string, RLGeneratorFunction>& rlGenerators();                      ///< \brief Access the map of register
+                                                                                            ///  generators with register types as keys.
 };
 
 } // namespace casil

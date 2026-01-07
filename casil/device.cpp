@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -60,11 +60,16 @@ Device::Device() :
  * \ref casil::Layers::RL "RL" from "transfer_layer" / "hw_drivers" / "registers" sections) and constructs all of those
  * components accordingly using the LayerFactory. First constructs all interfaces, then all drivers and then all registers.
  *
- * The generally mandatory configuration keys "name" and "type" (and "interface" for \ref casil::Layers::HL "HL" and "hw_driver"
- * for \ref casil::Layers::RL "RL") are separately processed and therefore stripped from the individual configurations before
- * they are passed as LayerConfig to the LayerFactory (and eventually to the component constructors).
+ * The generally mandatory configuration keys "name" and "type" (and "interface" for \ref casil::Layers::HL "HL"
+ * (exception: "hw_driver" for \ref casil::Layers::HL::MetaDriver "meta drivers" instead) and "hw_driver" for
+ * \ref casil::Layers::RL "RL") are separately processed and therefore stripped from the individual configurations
+ * before they are passed as LayerConfig to the LayerFactory (and eventually to the component constructors).
  *
- * \throws std::runtime_error If mandatory parts are missing from \p pConfig or construction of a component fails.
+ * \throws std::runtime_error If mandatory parts are missing from \p pConfig.
+ * \throws std::runtime_error If the same component name is used multiple times.
+ * \throws std::runtime_error If an interface needed/referenced by a driver or a driver needed/referenced by a register or meta driver does
+ *                            not exist. Note that therefore meta drivers must come after their respective backend drivers in \p pConfig.
+ * \throws std::runtime_error If construction of a component fails.
  *
  * \param pConfig %Device configuration tree as loaded from a basil YAML configuration file via Auxil::propertyTreeFromYAML().
  */
@@ -110,30 +115,65 @@ Device::Device(const boost::property_tree::ptree& pConfig) :
         {
             const std::string drvName = drvConf.get_child("name").data();
             const std::string drvType = drvConf.get_child("type").data();
-            const std::string intfName = drvConf.get_child("interface").data();
+            std::string intfName;
+            bool intfIsBackendDrv = false;  //Meta drivers need a backend driver and no (explicit) interface
+
+            if (drvConf.find("hw_driver") != drvConf.not_found())   //Assume meta driver using backend driver instead of interface
+            {
+                if (drvConf.find("interface") != drvConf.not_found())
+                    throw std::runtime_error("Cannot create driver \"" + drvName + "\": Must define either an interface or a backend driver.");
+
+                intfIsBackendDrv = true;
+                intfName = drvConf.get_child("hw_driver").data();
+            }
+            else
+                intfName = drvConf.get_child("interface").data();
 
             drvConf.erase("name");
             drvConf.erase("type");
-            drvConf.erase("interface");
+            if (intfIsBackendDrv)
+                drvConf.erase("hw_driver");
+            else
+                drvConf.erase("interface");
 
             if (componentNames.contains(drvName))
                 throw std::runtime_error("Cannot create driver \"" + drvName + "\": The name is already used by another component.");
             else
                 componentNames.insert(drvName);
 
-            const auto it = interfaces.find(intfName);
-
-            if (it == interfaces.end())
-                throw std::runtime_error("No interface with name \"" + intfName + "\" defined.");
-
-            try
+            if (intfIsBackendDrv)
             {
-                Interface& intf = *(it->second);
-                drivers.emplace(drvName, LayerFactory::createDriver(drvType, drvName, intf, LayerConfig(std::move(drvConf))));
+                const auto it = drivers.find(intfName);
+
+                if (it == drivers.end())
+                    throw std::runtime_error("No driver with name \"" + drvName + "\" defined (or not constructed yet).");
+
+                try
+                {
+                    Driver& backendDrv = *(it->second);
+                    drivers.emplace(drvName, LayerFactory::createMetaDriver(drvType, drvName, backendDrv, LayerConfig(std::move(drvConf))));
+                }
+                catch (const std::runtime_error& exc)
+                {
+                    throw std::runtime_error("Could not create meta driver \"" + drvName + "\": " + exc.what());
+                }
             }
-            catch (const std::runtime_error& exc)
+            else
             {
-                throw std::runtime_error("Could not create driver \"" + drvName + "\": " + exc.what());
+                const auto it = interfaces.find(intfName);
+
+                if (it == interfaces.end())
+                    throw std::runtime_error("No interface with name \"" + intfName + "\" defined.");
+
+                try
+                {
+                    Interface& intf = *(it->second);
+                    drivers.emplace(drvName, LayerFactory::createDriver(drvType, drvName, intf, LayerConfig(std::move(drvConf))));
+                }
+                catch (const std::runtime_error& exc)
+                {
+                    throw std::runtime_error("Could not create driver \"" + drvName + "\": " + exc.what());
+                }
             }
         }
 

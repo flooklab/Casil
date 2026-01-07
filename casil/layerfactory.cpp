@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -115,6 +115,45 @@ std::unique_ptr<Driver> LayerFactory::createDriver(const std::string& pType, std
 }
 
 /*!
+ * \brief Construct a registered meta driver type.
+ *
+ * Calls the generator function for the registered type name \p pType (see registerMetaDriverType(), registerMetaDriverAlias()) with forwarded
+ * \p pName, \p pBackendDriver and \p pConfig arguments and returns a pointer to the generated \ref casil::Layers::HL::Driver "HL::Driver".
+ *
+ * Returns \c nullptr if \p pType is not a registered meta driver type name.
+ *
+ * \throws std::runtime_error If the class constructor or the generator function itself throw \c std::runtime_error
+ *         (it is expcected that they always only throw this type).
+ *
+ * \param pType Registered type name (or alias) of the requested meta driver type.
+ * \param pName Instance name for the new driver component.
+ * \param pBackendDriver The driver instance to be used as actual/backend driver.
+ * \param pConfig Configuration for the new driver component.
+ * \return Pointer to the created \ref casil::Layers::HL::Driver "HL::Driver".
+ */
+std::unique_ptr<Driver> LayerFactory::createMetaDriver(const std::string& pType, std::string pName, Driver& pBackendDriver,
+                                                       LayerConfig pConfig)
+{
+    const auto it = hlMetaGenerators().find(pType);
+
+    if (it == hlMetaGenerators().end())
+        return nullptr;
+
+    const HLMetaGeneratorFunction& genFunc = it->second;
+
+    try
+    {
+        return genFunc(std::move(pName), pBackendDriver, std::move(pConfig));
+    }
+    catch (const std::runtime_error& exc)
+    {
+        throw std::runtime_error(std::string("Error while constructing meta driver: ") + exc.what());
+    }
+
+    return nullptr;
+}
+
+/*!
  * \brief Construct a registered register type.
  *
  * Calls the generator function for the registered type name \p pType (see registerRegisterType(), registerRegisterAlias()) with forwarded
@@ -186,6 +225,22 @@ void LayerFactory::registerDriverType(std::string pType, HLGeneratorFunction pGe
 }
 
 /*!
+ * \brief Register a generator for a meta driver type.
+ *
+ * Registers a meta driver type \p T with a "type name" \p pType, which will enable createMetaDriver()
+ * to generate \p T based on \p pType. \p pGenerator must construct an instance of the desired
+ * meta driver type and return it as a pointer to \ref casil::Layers::HL::Driver "HL::Driver".
+ * See also \ref HLMetaGeneratorFunction.
+ *
+ * \param pType Type name to be used as type identifier for createMetaDriver().
+ * \param pGenerator Generator function to construct an instance of the type.
+ */
+void LayerFactory::registerMetaDriverType(std::string pType, HLMetaGeneratorFunction pGenerator)
+{
+    hlMetaGenerators().insert({std::move(pType), std::move(pGenerator)});
+}
+
+/*!
  * \brief Register a generator for an register type.
  *
  * Registers a register type \p T with a "type name" \p pType, which will enable createRegister()
@@ -246,6 +301,27 @@ void LayerFactory::registerDriverAlias(const std::string& pType, std::string pAl
 }
 
 /*!
+ * \brief Register a meta driver type name alias.
+ *
+ * Enables a meta driver type identified by type name \p pType to also be
+ * constructed by createMetaDriver() using the alias type name \p pAlias.
+ *
+ * \param pType Originally registered type name.
+ * \param pAlias New alias for \p pType.
+ */
+void LayerFactory::registerMetaDriverAlias(const std::string& pType, std::string pAlias)
+{
+    const auto it = hlMetaGenerators().find(pType);
+
+    if (it == hlMetaGenerators().end())
+        return;
+
+    HLMetaGeneratorFunction boundGenerator = std::bind(it->second, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+
+    hlMetaGenerators().insert({std::move(pAlias), std::move(boundGenerator)});
+}
+
+/*!
  * \brief Register a register type name alias.
  *
  * Enables a register type identified by type name \p pType to also be
@@ -293,6 +369,20 @@ std::map<std::string, LayerFactory::TLGeneratorFunction>& LayerFactory::tlGenera
 std::map<std::string, LayerFactory::HLGeneratorFunction>& LayerFactory::hlGenerators()
 {
     static std::map<std::string, HLGeneratorFunction> typeGtors = {};
+    return typeGtors;
+}
+
+/*!
+ * \brief Access the map of meta driver generators with meta driver types as keys.
+ *
+ * Creates a static map of generator functions and always returns a reference to that one.
+ * Keys shall be the registered type names (see registerMetaDriverType()) and aliases (see registerMetaDriverAlias()).
+ *
+ * \return The generator map.
+ */
+std::map<std::string, LayerFactory::HLMetaGeneratorFunction>& LayerFactory::hlMetaGenerators()
+{
+    static std::map<std::string, HLMetaGeneratorFunction> typeGtors = {};
     return typeGtors;
 }
 

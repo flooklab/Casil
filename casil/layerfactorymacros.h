@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -77,6 +77,22 @@ private:
  * \param TYPE_NAME The type name to register to the factory for the class.
  */
 #define CASIL_REGISTER_DRIVER_H(TYPE_NAME) \
+public:\
+    static constexpr char typeName[] = TYPE_NAME;\
+private:
+
+/*!
+ * \brief Register a meta driver component class's type name.
+ *
+ * Append this to a \ref casil::Layers::HL::MetaDriver "HL::MetaDriver" class definition in order to define a type name via
+ * the \c typeName member, which is needed by \ref CASIL_REGISTER_META_DRIVER_CPP for registering the component type to the
+ * \ref casil::LayerFactory "LayerFactory". The presence of this member is also used by the \ref TemplateDeviceSpecialization "TemplateDevice"
+ * configuration helpers (see \ref casil::TmplDev "TmplDev" and \ref casil::Concepts::HasRegisteredTypeName "Concepts::HasRegisteredTypeName")
+ * to check at compile time that the type is actually registered.
+ *
+ * \param TYPE_NAME The type name to register to the factory for the class.
+ */
+#define CASIL_REGISTER_META_DRIVER_H(TYPE_NAME) \
 public:\
     static constexpr char typeName[] = TYPE_NAME;\
 private:
@@ -196,6 +212,61 @@ namespace RegistryImpl\
 }
 
 /*!
+ * \brief Register a meta driver component to the \ref casil::LayerFactory "LayerFactory".
+ *
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::HL::MetaDriver "HL::MetaDriver"
+ * class in order to register the component type to the \ref casil::LayerFactory "LayerFactory", which is needed
+ * to use the component with \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice".
+ * You need to also place \ref CASIL_REGISTER_META_DRIVER_H within the class's definition to make this work,
+ * because that macro defines the actual type name that is used to refer to the component type.
+ *
+ * \note You can only register one class per translation unit (this macro utilizes the unnamed namespace of the translation unit).
+ *
+ * \note The defined generator function for \ref casil::LayerFactory "LayerFactory" catches all potential \c std::bad_cast
+ *       exceptions from the class constructor and in that case throws \c std::runtime_error instead. This also applies
+ *       to the attempted conversion of the backend driver instance that is passed to the constructor/factory,
+ *       i.e. if the backend driver type is not a muxed driver, the generator throws \c std::runtime_error.
+ *
+ * \param TYPE_CLASS The class type to register to the factory.
+ */
+#define CASIL_REGISTER_META_DRIVER_CPP(TYPE_CLASS) \
+namespace\
+{\
+namespace RegistryImpl\
+{\
+    using casil::LayerConfig;\
+    using casil::LayerFactory;\
+    using casil::HL::Driver;\
+    using casil::HL::MetaDriver;\
+    using ThisDriverType = TYPE_CLASS;\
+    class RegistryHelper\
+    {\
+    public:\
+        RegistryHelper()\
+        {\
+            LayerFactory::registerMetaDriverType(\
+                ThisDriverType::typeName,\
+                [](std::string pName, Driver& pBackendDriver, LayerConfig pConfig) -> std::unique_ptr<Driver>\
+                {\
+                    try\
+                    {\
+                        return std::make_unique<ThisDriverType>(std::move(pName), dynamic_cast<MetaDriver&>(pBackendDriver),\
+                                                                std::move(pConfig));\
+                    }\
+                    catch (const std::bad_cast&)\
+                    {\
+                        throw std::runtime_error("Incompatible backend driver type \"" + pBackendDriver.getType() + "\" for use with \"" +\
+                                                 ThisDriverType::typeName + "\".");\
+                    }\
+                }\
+            );\
+        }\
+    };\
+    const RegistryHelper registryHelper;\
+}\
+}
+
+/*!
  * \brief Register a register component to the \ref casil::LayerFactory "LayerFactory".
  *
  * Put this into the translation unit (the source file) of a \ref casil::Layers::RL::Register "HL::Register" class
@@ -298,6 +369,37 @@ namespace RegistryImpl\
         CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)()\
         {\
             LayerFactory::registerDriverAlias(ThisDriverType::typeName, ALIAS_NAME);\
+        }\
+    };\
+    CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__) CASIL_CONCATENATE_WITH_MACRO(aliasHelper, __LINE__);\
+}\
+}
+
+/*!
+ * \brief Register an alias type name for a meta driver component.
+ *
+ * Put this into the translation unit (the source file) of a \ref casil::Layers::HL::MetaDriver "HL::MetaDriver" class \e after
+ * \ref CASIL_REGISTER_META_DRIVER_CPP in order to allow using this component type with the \ref casil::LayerFactory "LayerFactory"
+ * and \ref casil::Device "Device" / \ref TemplateDeviceSpecialization "TemplateDevice" under an alternative type name
+ * (i.e. different from the one defined by \ref CASIL_REGISTER_META_DRIVER_H).
+ * Use this macro multiple times to define multiple different aliases.
+ *
+ * \note You can only register aliases for the \e one component of the current translation unit (this macro utilizes and refers
+ * to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_META_DRIVER_CPP).
+ *
+ * \param ALIAS_NAME An alternative type name to additionally register to the factory for the class.
+ */
+#define CASIL_REGISTER_META_DRIVER_ALIAS(ALIAS_NAME) \
+namespace\
+{\
+namespace RegistryImpl\
+{\
+    class CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)\
+    {\
+    public:\
+        CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__)()\
+        {\
+            LayerFactory::registerMetaDriverAlias(ThisDriverType::typeName, ALIAS_NAME);\
         }\
     };\
     CASIL_CONCATENATE_WITH_MACRO(AliasHelper, __LINE__) CASIL_CONCATENATE_WITH_MACRO(aliasHelper, __LINE__);\

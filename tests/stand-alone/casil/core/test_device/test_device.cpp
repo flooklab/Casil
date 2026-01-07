@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -313,7 +313,159 @@ BOOST_AUTO_TEST_CASE(Test6_componentNameCollision)
     BOOST_CHECK_EQUAL(exceptionCtr, 5);
 }
 
-BOOST_AUTO_TEST_CASE(Test7_runtimeConfiguration)
+BOOST_AUTO_TEST_CASE(Test7_essentialConfigurationKeys)
+{
+    int exceptionCtr = 0;
+
+    try
+    {
+        //OK
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "name" for interface
+        Device exampleDev("{transfer_layer: [{type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "type" for interface
+        Device exampleDev("{transfer_layer: [{name: intf}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "name" for driver
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "type" for driver
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "interface" for driver
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //OK (another driver)
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: bdrv, type: DummyDriver, interface: intf}, "
+                                        "{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Driver cannot specify both "interface" and "hw_driver"
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: bdrv, type: DummyDriver, interface: intf}, "
+                                        "{name: drv, type: DummyDriver, interface: intf, hw_driver: bdrv}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //OK
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                           "hw_drivers: [{name: bdrv, type: DummyMuxedDriver, interface: intf, base_addr: 0x0}, "
+                                        "{name: mdrv, type: DummyMetaDriver, hw_driver: bdrv}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: mdrv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "hw_driver" (backend driver) for meta driver
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                           "hw_drivers: [{name: bdrv, type: DummyMuxedDriver, interface: intf, base_addr: 0x0}, "
+                                        "{name: mdrv, type: DummyMetaDriver}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: mdrv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Meta driver cannot specify both "hw_driver" and "interface"
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                           "hw_drivers: [{name: bdrv, type: DummyMuxedDriver, interface: intf, base_addr: 0x0}, "
+                                        "{name: mdrv, type: DummyMetaDriver, hw_driver: bdrv, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister, hw_driver: mdrv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "name" for register
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{type: DummyRegister, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "type" for register
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, hw_driver: drv}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    try
+    {
+        //Missing "hw_driver" for register
+        Device exampleDev("{transfer_layer: [{name: intf, type: DummyInterface}],"
+                           "hw_drivers: [{name: drv, type: DummyDriver, interface: intf}],"
+                           "registers: [{name: reg, type: DummyRegister}]}");
+        (void)exampleDev;
+    }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
+
+    BOOST_CHECK_EQUAL(exceptionCtr, 11);
+}
+
+BOOST_AUTO_TEST_CASE(Test8_runtimeConfiguration)
 {
     Device exampleDev("{transfer_layer: [{name: intf1, type: DummyInterface}],"
                        "hw_drivers: [{name: drv1, type: DummyDriver, interface: intf1},"

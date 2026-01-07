@@ -145,6 +145,35 @@ BOOST_AUTO_TEST_CASE(Test4_wrongDriverOrder)
     BOOST_CHECK_EQUAL(exceptionCtr, 1);
 }
 
+BOOST_AUTO_TEST_CASE(Test5_baseAddrException)
+{
+    bool exceptionThrown = false;
+
+    try
+    {
+        Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                  "hw_drivers: [{name: bDrv, type: TestBackendDriver, interface: intf, base_addr: 0x100}, "
+                               "{name: mDrv, type: TestMetaDriver, hw_driver: bDrv}], "
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { exceptionThrown = true; }
+
+    BOOST_REQUIRE(exceptionThrown == false);
+
+    try
+    {
+        Device d("{transfer_layer: [{name: intf, type: DummyMuxedInterface}],"
+                  "hw_drivers: [{name: bDrv, type: TestBackendDriver, interface: intf, base_addr: 0x100}, "
+                               "{name: mDrv, type: TestMetaDriver, hw_driver: bDrv, base_addr: 0x000}], "
+                  "registers: []}");
+        (void)d;
+    }
+    catch (const std::runtime_error&) { exceptionThrown = true; }
+
+    BOOST_CHECK(exceptionThrown == true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

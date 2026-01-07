@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(Test4_wrongDriverOrder)
                   "registers: []}");
         (void)d;
     }
-    catch (const std::runtime_error& exc) { ++exceptionCtr; }
+    catch (const std::runtime_error&) { ++exceptionCtr; }
 
     BOOST_CHECK_EQUAL(exceptionCtr, 1);
 }

@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -77,6 +77,28 @@ struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
 {\
     static constexpr char name[] = DRV_NAME;\
     static constexpr char interface[] = INTERFACE;\
+    static constexpr char conf[] = CONF;\
+};
+
+/*!
+ * \brief Define a meta driver configuration struct for use with \ref TemplateDeviceSpecialization "TemplateDevice".
+ *
+ * Defines a meta driver configuration wrapper derived from \ref casil::TmplDev::DriverConf "TmplDev::DriverConf"
+ * such that it meets the concept requirement \ref casil::TmplDev::ImplementsMetaDriverConf "TmplDev::ImplementsMetaDriverConf"
+ * and can hence be used to configure a meta driver component for \ref TemplateDeviceSpecialization "TemplateDevice".
+ * To use it in that way \p STRUCT_NAME must be used as template argument of \ref casil::TmplDev::DriversConf "TmplDev::DriversConf".
+ *
+ * \param DRV_CLASS The registered \ref casil::Layers::HL::MetaDriver "HL::MetaDriver" class type to use as component type.
+ * \param STRUCT_NAME The desired struct name of the configuration wrapper to be declared.
+ * \param DRV_NAME Component instance name (as string literal).
+ * \param BACKEND_DRIVER Configured instance name of the backend driver component to be used (as string literal).
+ * \param CONF Component configuration YAML code (as string literal).
+ */
+#define CASIL_DEFINE_META_DRIVER(DRV_CLASS, STRUCT_NAME, DRV_NAME, BACKEND_DRIVER, CONF) \
+struct STRUCT_NAME : public casil::TmplDev::DriverConf<DRV_CLASS>\
+{\
+    static constexpr char name[] = DRV_NAME;\
+    static constexpr char hw_driver[] = BACKEND_DRIVER;\
     static constexpr char conf[] = CONF;\
 };
 

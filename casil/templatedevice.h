@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -238,6 +238,21 @@ concept ImplementsDriverConf = TmplDevImpl::ImplementsConfStruct<T, DriverConf> 
 };
 
 /*!
+ * \brief Check if type is a valid meta driver configuration wrapper.
+ *
+ * See \ref casil::TmplDev::DriverConf "DriverConf" for the requirements on \p T.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept ImplementsMetaDriverConf = TmplDevImpl::ImplementsConfStruct<T, DriverConf> && requires
+{
+    T::hw_driver;
+    requires Concepts::IsConstCharArr<decltype(T::hw_driver)>;
+    typename Concepts::TestConstexpr<T::hw_driver[0]>;
+};
+
+/*!
  * \brief Check if type is a valid register configuration wrapper.
  *
  * See \ref casil::TmplDev::RegisterConf "RegisterConf" for the requirements on \p T.
@@ -282,10 +297,11 @@ struct InterfacesConf
 template<typename... Ts>
 struct DriversConf
 {
-    static_assert((ImplementsDriverConf<Ts> && ...),
+    static_assert(((ImplementsDriverConf<Ts> || ImplementsMetaDriverConf<Ts>) && ...),
                   "Each driver must be specified by deriving from DriverConf and defining "
                   "'static constexpr char name[] = \"name_of_driver\";' and "
-                  "'static constexpr char interface[] = \"name_of_used_interface\";' and "
+                  "{'static constexpr char interface[] = \"name_of_used_interface\";' or "
+                  "'static constexpr char hw_driver[] = \"name_of_used_backend_driver\";'} and "
                   "'static constexpr char conf[] = \"possibly: empty, rest: of, yaml: configuration\";'.");
 };
 
@@ -392,7 +408,7 @@ public:
      * \return The driver component configured by \p T, casted to the specific driver type.
      */
     template<typename T>
-        requires TmplDev::ImplementsDriverConf<T>
+        requires (TmplDev::ImplementsDriverConf<T> || TmplDev::ImplementsMetaDriverConf<T>)
     typename T::Type& driver()
     {
         static_assert((std::is_same_v<T, DriverConfTs> || ...), "Device does not have the requested driver.");
@@ -480,7 +496,14 @@ private:
         std::string tElementMap = std::string("{name: ") + CurrentElementT::name + ", " + "type: " + CurrentElementT::Type::typeName;
 
         if constexpr (layer == LayerBase::Layer::HardwareLayer)
-            tElementMap += std::string(", interface: ") + CurrentElementT::interface;
+        {
+            if constexpr (TmplDev::ImplementsDriverConf<CurrentElementT>)
+                tElementMap += std::string(", interface: ") + CurrentElementT::interface;
+            else if constexpr (TmplDev::ImplementsMetaDriverConf<CurrentElementT>)
+                tElementMap += std::string(", hw_driver: ") + CurrentElementT::hw_driver;
+            else
+                static_assert(false, "Driver template component is neither a regular driver nor a meta driver. THIS SHOULD NEVER HAPPEN!");
+        }
         else if constexpr (layer == LayerBase::Layer::RegisterLayer)
             tElementMap += std::string(", hw_driver: ") + CurrentElementT::driver;
 

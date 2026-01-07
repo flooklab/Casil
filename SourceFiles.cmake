@@ -45,7 +45,9 @@ set(HEADER_FILE_NAMES
     HL/Direct/dummydriver.h
     HL/Direct/scpi.h
     HL/Direct/virtecho.h
+    HL/Muxed/dummymetadriver.h
     HL/Muxed/dummymuxeddriver.h
+    HL/Muxed/dummyregisterdriver.h
     HL/Muxed/gpio.h
     HL/Muxed/sitcpfifo.h
     RL/dummyregister.h
@@ -94,7 +96,9 @@ set(SOURCE_FILE_NAMES
     HL/Direct/dummydriver
     HL/Direct/scpi
     HL/Direct/virtecho
+    HL/Muxed/dummymetadriver
     HL/Muxed/dummymuxeddriver
+    HL/Muxed/dummyregisterdriver
     HL/Muxed/gpio
     HL/Muxed/sitcpfifo
     RL/dummyregister

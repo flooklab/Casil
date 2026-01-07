@@ -35,7 +35,9 @@ extern void bindHL_DummyDriver(py::module&);
 extern void bindHL_SCPI(py::module&);
 extern void bindHL_VirtEcho(py::module&);
 
+extern void bindHL_DummyMetaDriver(py::module&);
 extern void bindHL_DummyMuxedDriver(py::module&);
+extern void bindHL_DummyRegisterDriver(py::module&);
 extern void bindHL_GPIO(py::module&);
 extern void bindHL_SiTCPFifo(py::module&);
 
@@ -53,7 +55,9 @@ void bindHL(py::module& pM)
     bindHL_SCPI(pM);
     bindHL_VirtEcho(pM);
 
+    bindHL_DummyMetaDriver(pM);
     bindHL_DummyMuxedDriver(pM);
+    bindHL_DummyRegisterDriver(pM);
     bindHL_GPIO(pM);
     bindHL_SiTCPFifo(pM);
 }

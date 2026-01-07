@@ -55,7 +55,7 @@ LayerBase::LayerBase(const Layer pLayer, std::string pType, std::string pName, L
     name(std::move(pName)),
     config(std::move(pConfig)),
     initialized(false),
-    logger(*this),  //Note: needs/accesses members layer, type and name
+    logger(*this),  //Note: needs/accesses members 'layer', 'type' and 'name' (already initialized above)
     selfDescription("\"" + type + "\"-" +
                     (layer == Layer::TransferLayer ? "interface" : (layer == Layer::HardwareLayer ? "driver" : "register")) +
                     " instance \"" + name + "\"")

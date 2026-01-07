@@ -1,5 +1,6 @@
 #Qt Creator project configuration
 CMakeLists.txt.user
+.qtcreator/
 
 #Doxygen output
 doc/casil/doc

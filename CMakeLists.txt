@@ -100,7 +100,7 @@ if(NOT MSVC)
     init_cache_variable(CASIL_ENABLE_GLIBCXX_DEBUG_MODE BOOL OFF "Add compiler flags to enable the debug mode of libstdc++.")
 endif()
 
-init_cache_variable(CASIL_BUILD_STATIC BOOL ON "Build static Casil library.")
+init_cache_variable(CASIL_BUILD_STATIC BOOL OFF "Build static Casil library.")
 init_cache_variable(CASIL_BUILD_SHARED BOOL ON "Build shared Casil library.")
 init_cache_variable(CASIL_BUILD_BINDING BOOL ON "Build PyCasil Python binding.")
 init_cache_variable(CASIL_BUILD_EXAMPLE BOOL ON "Build example executable.")
@@ -114,7 +114,7 @@ if(CASIL_BUILD_BINDING AND (NOT CASIL_BUILD_STATIC))
     message(FATAL_ERROR "Casil will be statically linked to the PyCasil binding.")
 endif()
 
-init_cache_variable(CASIL_INSTALL_STATIC BOOL ON "Install static Casil library.")
+init_cache_variable(CASIL_INSTALL_STATIC BOOL OFF "Install static Casil library.")
 init_cache_variable(CASIL_INSTALL_SHARED BOOL ON "Install shared Casil library.")
 init_cache_variable(CASIL_INSTALL_BINDING BOOL ON "Install PyCasil Python binding.")
 
@@ -131,6 +131,10 @@ endif()
 init_cache_variable(CASIL_USE_SYSTEM_YAMLCPP BOOL OFF "Use system's yaml-cpp library.")
 init_cache_variable(CASIL_USE_SYSTEM_PYBIND11 BOOL OFF "Use system's pybind11 library.")
 
+if (CASIL_INSTALL_STATIC AND (NOT CASIL_USE_SYSTEM_YAMLCPP))
+    message(FATAL_ERROR "Will only install static library if using system's yaml-cpp library.")
+endif()
+
 init_cache_variable(CASIL_LINK_STATIC_BOOST BOOL OFF "Statically link boost libraries.")
 
 init_cache_variable(CASIL_PYTHON_SITEPACKS_LIBDIR PATH "" "Python site-packages directory (relative to CMAKE_INSTALL_PREFIX).")
@@ -141,6 +145,14 @@ init_cache_variable(CASIL_CMAKE_LICENSEDIR PATH "${CMAKE_INSTALL_DATAROOTDIR}/li
 
 init_cache_variable(CASIL_CMAKE_DATADIR PATH "${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_PROJECT_NAME}"
                     "Install path for general project data (relative to CMAKE_INSTALL_PREFIX).")
+
+if(NOT WIN32)
+    set(CMAKECONFEXPORT_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}/")
+else()
+    set(CMAKECONFEXPORT_DIR "cmake/")
+endif()
+init_cache_variable(CASIL_CMAKE_CMAKECONFEXPORTDIR PATH "${CMAKECONFEXPORT_DIR}"
+                    "Install path for the CasilConfig.cmake file (relative to CMAKE_INSTALL_PREFIX).")
 
 init_cache_variable(CASIL_BUILD_DOCUMENTATION BOOL OFF "Build library documentation with Doxygen.")
 init_cache_variable(CASIL_BUILD_DOCUMENTATION_INTERNAL BOOL OFF "Include implementation details in the library documentation.")
@@ -309,6 +321,7 @@ endif()
 
 add_library(CasilObjLib OBJECT ${SOURCE_FILES} ${HEADER_FILES})
 set_target_properties(CasilObjLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(CasilObjLib PROPERTIES EXPORT_NAME Headers)   #This is just for exporting of the following header file set
 if(CASIL_DEV_DESC_DIRS)
     target_compile_definitions(CasilObjLib PRIVATE "CASIL_DEV_DESC_DIRS=${CASIL_DEV_DESC_DIRS}")
 endif()
@@ -319,6 +332,7 @@ if(CASIL_BUILD_SHARED)
     set_target_properties(CasilLibShared PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilLibShared PROPERTIES OUTPUT_NAME Casil)
     set_target_properties(CasilLibShared PROPERTIES VERSION ${PROJECT_VERSION})
+    set_target_properties(CasilLibShared PROPERTIES EXPORT_NAME CasilShared)
     target_link_libraries(CasilLibShared PRIVATE Threads::Threads)
     target_link_libraries(CasilLibShared PRIVATE yaml-cpp)
     #target_link_libraries(CasilLibShared PRIVATE ${Boost_LIBRARIES})   #Not needed for the currently used libraries
@@ -328,6 +342,7 @@ if(CASIL_BUILD_STATIC)
     add_library(CasilLibStatic STATIC $<TARGET_OBJECTS:CasilObjLib>)
     set_target_properties(CasilLibStatic PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilLibStatic PROPERTIES OUTPUT_NAME Casil)
+    set_target_properties(CasilLibStatic PROPERTIES EXPORT_NAME CasilStatic)
     target_link_libraries(CasilLibStatic PRIVATE Threads::Threads)
     target_link_libraries(CasilLibStatic PRIVATE yaml-cpp)
     #target_link_libraries(CasilLibStatic PRIVATE ${Boost_LIBRARIES})   #Not needed for the currently used libraries
@@ -343,6 +358,7 @@ if(CASIL_BUILD_BINDING)
     pybind11_add_module(CasilPython ${PYBIND_HEADER_FILES} ${PYBIND_SOURCE_FILES})
     set_target_properties(CasilPython PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilPython PROPERTIES OUTPUT_NAME PyCasil)
+    set_target_properties(CasilPython PROPERTIES EXPORT_NAME PyCasil)
     target_link_libraries(CasilPython PRIVATE CasilObjLib)
     target_link_libraries(CasilPython PRIVATE Threads::Threads)
     target_link_libraries(CasilPython PRIVATE yaml-cpp)
@@ -403,25 +419,27 @@ install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "${CASIL_CMAKE_LICENSE
 
 install(DIRECTORY "${PROJECT_BINARY_DIR}/${CASIL_DEVICE_DESCRIPTIONS_SUBDIR}/" DESTINATION "${CASIL_DEVICE_DESCRIPTIONS_INSTALLDIR}")
 
-install(TARGETS CasilObjLib FILE_SET HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+install(TARGETS CasilObjLib EXPORT CasilExport FILE_SET HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 if(CASIL_INSTALL_SHARED)
     if(NOT WIN32)
-        install(TARGETS CasilLibShared LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+        install(TARGETS CasilLibShared EXPORT CasilExport LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
     else()
-        install(TARGETS CasilLibShared RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-        install(TARGETS CasilLibShared ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+        install(TARGETS CasilLibShared EXPORT CasilExport RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+        install(TARGETS CasilLibShared EXPORT CasilExport ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
     endif()
 endif()
 
 if(CASIL_INSTALL_STATIC)
-    install(TARGETS CasilLibStatic ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+    install(TARGETS CasilLibStatic EXPORT CasilExport ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(CASIL_INSTALL_BINDING)
-    install(TARGETS CasilPython LIBRARY DESTINATION ${CASIL_PYTHON_SITEPACKS_LIBDIR})
+    install(TARGETS CasilPython EXPORT CasilExport LIBRARY DESTINATION ${CASIL_PYTHON_SITEPACKS_LIBDIR})
 endif()
 
 if((CASIL_INSTALL_SHARED OR CASIL_INSTALL_STATIC) AND CASIL_BUILD_DOCUMENTATION)
     install(DIRECTORY "${PROJECT_BINARY_DIR}/doc/casil/doc/" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 endif()
+
+install(EXPORT CasilExport DESTINATION "${CASIL_CMAKE_CMAKECONFEXPORTDIR}" NAMESPACE Casil:: FILE CasilConfig.cmake COMPONENT ExportConfig)

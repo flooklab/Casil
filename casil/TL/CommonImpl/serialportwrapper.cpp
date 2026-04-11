@@ -106,6 +106,13 @@ SerialPortWrapper::~SerialPortWrapper()
  * number of bytes up to (but excluding) the configured read termination if \p pSize is -1.
  * Other values for \p pSize are not useful (will then return an empty sequence).
  *
+ * \note When the read buffer polling stops (or if it stopped already) because of repeated read errors
+ *       \internal (see handleAsyncRead()) \endinternal \e before the requested data gets complete
+ *       (i.e. still waiting for termination or \p pSize), then this function will \e not block
+ *       indefinitely but instead return the available incomplete data regardless. In case of
+ *       positive \p pSize, the returned data will be filled with trailing zeros to \p pSize.
+ *       \e If the returned data is incomplete/filled, this will be logged as an error.
+ *
  * \param pSize Number of bytes to read or -1.
  * \return Byte sequence of requested length or up to (but excluding) termination.
  */
@@ -206,6 +213,11 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
  * \brief Read maximally some amount of bytes from the read buffer.
  *
  * Reads and returns maximally \p pSize bytes from the read buffer. Returns an empty sequence for negative \p pSize.
+ *
+ * \note This function normally waits until at least \e some data is available. However, when the read buffer polling stops
+ *       (or if it stopped already) because of repeated read errors \internal (see handleAsyncRead()) \endinternal
+ *       \e before any data got available, then this function will \e not block indefinitely but instead
+ *       just return an empty byte sequence. This type of event will be logged as a warning.
  *
  * \param pSize Maximum number of bytes to read.
  * \return Maximally \p pSize bytes long byte sequence.

@@ -40,7 +40,7 @@ at some point. I do not see this happening anytime soon (unless maybe someone wo
 
 Building the project can be configured with [CMake](https://cmake.org/) (>= v3.23).  
 
-You will need a `C++20` compatible compiler, probably at least `GCC 13` or equivalent.  
+You will need a `C++23` compatible compiler, probably at least `GCC 14` or equivalent.  
 
 Required additional libraries/packages:
 - [Python](https://www.python.org/) (>= v3.10)

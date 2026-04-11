@@ -74,7 +74,7 @@ include(GNUInstallDirs)
 
 if(NOT MSVC)
     string(CONCAT TMP_CXX_FLAGS "-Wall;-Wextra;-Wshadow;-pedantic-errors;"
-                                "-pipe;-march=x86-64;-mtune=generic;-Wp,-D_FORTIFY_SOURCE=3;-Wp,-D_GLIBCXX_ASSERTIONS;"
+                                "-pipe;-march=x86-64-v2;-mtune=generic;-Wp,-D_FORTIFY_SOURCE=3;-Wp,-D_GLIBCXX_ASSERTIONS;"
                                 "-fno-plt;-fstack-protector-strong;-fstack-clash-protection;-fcf-protection=full;-flto=auto")
     set(CASIL_CXX_FLAGS "${TMP_CXX_FLAGS}" CACHE STRING "Additional compiler flags.")
     set(CASIL_LINK_FLAGS "-Wl,--sort-common;-Wl,--as-needed;-Wl,-z,defs;-Wl,-z,relro;-Wl,-z,now;-Wl,-z,pack-relative-relocs"
@@ -84,6 +84,7 @@ if(NOT MSVC)
 else()
     #Those MSVC flags are probably not tested
     string(CONCAT TMP_CXX_FLAGS "/W4;/permissive-;"
+                                "/arch:SSE4.2;"
                                 "/GL;/GS;/guard:cf;/guard:ehcont")
     set(CASIL_CXX_FLAGS "${TMP_CXX_FLAGS}" CACHE STRING "Additional compiler flags.")
     set(CASIL_LINK_FLAGS "/CETCOMPAT;/DYNAMICBASE;/OPT;/LTCG" CACHE STRING "Additional linker flags.")

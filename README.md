@@ -114,7 +114,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ### External Libraries
 
-Casil uses (i.e. links to) the following external libraries:
+Casil uses (i.e. includes and/or links to) the following external libraries:
 
 - [Boost](https://www.boost.org/) (Algorithm, Asio, DynamicBitset, Predef, PropertyTree, System, Test):  
 

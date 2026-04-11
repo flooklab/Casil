@@ -57,7 +57,7 @@ Parts of Casil have been more or less directly adapted from the original basil s
 #########################################################################
 
 
-Casil uses (i.e. links to) the following external libraries:
+Casil uses (i.e. includes and/or links to) the following external libraries:
 
 - Boost [Algorithm, Asio, DynamicBitset, Predef, PropertyTree, System, Test] (see https://www.boost.org/):
 

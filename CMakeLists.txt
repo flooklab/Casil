@@ -1,7 +1,7 @@
 #[[
 ##################################################################################################
 ##
-##  Copyright (C) 2024–2025 M. Frohne
+##  Copyright (C) 2024–2026 M. Frohne
 ##
 ##  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 ##
@@ -185,6 +185,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_link_options("$<$<LINK_LANGUAGE:CXX>:${CASIL_LINK_FLAGS_DEBUG}>")
 else()
     add_link_options("$<$<LINK_LANGUAGE:CXX>:${CASIL_LINK_FLAGS_RELEASE}>")
+endif()
+
+if(NOT MSVC)
+    add_link_options("$<$<LINK_LANGUAGE:CXX>:${CASIL_CXX_FLAGS}>")
 endif()
 
 #Sources

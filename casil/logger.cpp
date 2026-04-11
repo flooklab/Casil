@@ -32,6 +32,7 @@
 #include <ostream>
 #include <sstream>
 #include <thread>
+#include <utility>
 
 using casil::Logger;
 
@@ -393,8 +394,7 @@ void Logger::logDebugDebug(const std::string_view pMessage)
  */
 bool Logger::includeLogLevel(const LogLevel pLevel)
 {
-    return ((pLevel != LogLevel::None) &&
-            (static_cast<std::uint8_t>(pLevel) <= static_cast<std::uint8_t>(logLevel)));
+    return ((pLevel != LogLevel::None) && (std::to_underlying(pLevel) <= std::to_underlying(logLevel)));
 }
 
 //Private
@@ -435,7 +435,7 @@ void Logger::logMessage(const std::string_view pMessage, const LogLevel pLevel)
             ostr<<msg;
 
         //Flush immediately for warnings and more severe messages
-        if (static_cast<std::uint8_t>(pLevel) <= static_cast<std::uint8_t>(LogLevel::Warning))
+        if (std::to_underlying(pLevel) <= std::to_underlying(LogLevel::Warning))
         {
             for (std::ostream& ostr : outputStreams)
             {

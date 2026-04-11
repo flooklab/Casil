@@ -46,9 +46,9 @@ namespace
 std::map<std::string, std::set<std::string>, std::less<>> readEnv()
 {
 #if BOOST_OS_WINDOWS != 0
-    static constexpr char const* separator = ";";
+    static constexpr const char* separator = ";";
 #else
-    static constexpr char const* separator = ":";
+    static constexpr const char* separator = ":";
 #endif
 
     auto combinePaths = [](const std::string& pEnvPaths, const std::string& pMacroPaths) -> std::set<std::string>

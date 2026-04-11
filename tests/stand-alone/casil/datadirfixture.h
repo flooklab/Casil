@@ -46,7 +46,7 @@ struct DataDirFixture
     const std::string dataPath;
 
 private:
-    static constexpr const char dataPathArgvStart[] = "--test-data-dir=";
+    static constexpr char dataPathArgvStart[] = "--test-data-dir=";
     static constexpr auto dataPathArgvStartLen = std::extent_v<decltype(dataPathArgvStart)> - 1;
     //
     static std::string extractDataPath()

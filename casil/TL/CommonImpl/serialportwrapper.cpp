@@ -371,14 +371,16 @@ void SerialPortWrapper::handleAsyncRead(const boost::system::error_code& pErrorC
 
     if (pNumBytes > 0)
     {
-        const std::lock_guard<std::mutex> bufferLock(readBufferMutex);
-        (void)bufferLock;
+        {
+            const std::lock_guard<std::mutex> bufferLock(readBufferMutex);
+            (void)bufferLock;
 
-        readBuffer.insert(readBuffer.end(), intermediateReadBuffer.begin(), intermediateReadBuffer.end());
+            readBuffer.insert(readBuffer.end(), intermediateReadBuffer.begin(), intermediateReadBuffer.end());
 
-        intermediateReadBuffer.clear();
+            intermediateReadBuffer.clear();
 
-        newData = true;
+            newData = true;
+        }
         newDataCondVar.notify_one();
     }
 

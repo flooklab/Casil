@@ -316,6 +316,7 @@ target_sources(CasilObjLib PUBLIC FILE_SET HEADERS BASE_DIRS "${PROJECT_SOURCE_D
 
 if(CASIL_BUILD_SHARED)
     add_library(CasilLibShared SHARED $<TARGET_OBJECTS:CasilObjLib>)
+    set_target_properties(CasilLibShared PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilLibShared PROPERTIES OUTPUT_NAME Casil)
     set_target_properties(CasilLibShared PROPERTIES VERSION ${PROJECT_VERSION})
     target_link_libraries(CasilLibShared PRIVATE Threads::Threads)
@@ -325,6 +326,7 @@ endif()
 
 if(CASIL_BUILD_STATIC)
     add_library(CasilLibStatic STATIC $<TARGET_OBJECTS:CasilObjLib>)
+    set_target_properties(CasilLibStatic PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilLibStatic PROPERTIES OUTPUT_NAME Casil)
     target_link_libraries(CasilLibStatic PRIVATE Threads::Threads)
     target_link_libraries(CasilLibStatic PRIVATE yaml-cpp)
@@ -339,6 +341,7 @@ endif()
 
 if(CASIL_BUILD_BINDING)
     pybind11_add_module(CasilPython ${PYBIND_HEADER_FILES} ${PYBIND_SOURCE_FILES})
+    set_target_properties(CasilPython PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilPython PROPERTIES OUTPUT_NAME PyCasil)
     target_link_libraries(CasilPython PRIVATE CasilObjLib)
     target_link_libraries(CasilPython PRIVATE Threads::Threads)

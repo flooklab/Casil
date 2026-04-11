@@ -58,21 +58,21 @@ BOOST_AUTO_TEST_CASE(Test1_context)
 
     const std::string testStr = logOutputStrm.str();
 
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (1)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (2)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (3)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (4)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (5)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (6)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (7)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (8)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (9)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (10)") != testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (11)") == testStr.npos);
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (1)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (2)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (3)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (4)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (5)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (6)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (7)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (8)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (9)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (10)"));
+    BOOST_CHECK(!testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not a regular log but just a test message! (11)"));
 
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not an error but yet another a test message! (0)") == testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not an error but yet another a test message! (1)") == testStr.npos);
-    BOOST_CHECK(testStr.find("HL/Logging-Driver/\"someDriverName\": This is not an error but yet another a test message! (2)") != testStr.npos);
+    BOOST_CHECK(!testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not an error but yet another a test message! (0)"));
+    BOOST_CHECK(!testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not an error but yet another a test message! (1)"));
+    BOOST_CHECK(testStr.contains("HL/Logging-Driver/\"someDriverName\": This is not an error but yet another a test message! (2)"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -741,7 +741,7 @@ BOOST_AUTO_TEST_CASE(Test14_validRegisterNames)
         if (c == '\0')
             continue;
 
-        if (testChars.find(c) != testChars.npos)
+        if (testChars.contains(c))
             continue;
 
         std::string testName = "TEST_REG_NAME_";

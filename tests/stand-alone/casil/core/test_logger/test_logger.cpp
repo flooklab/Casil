@@ -71,19 +71,19 @@ BOOST_AUTO_TEST_CASE(Test1_logLevelThreshold)
 
     const std::string testStr = logOutputStrm.str();
 
-    BOOST_CHECK(testStr.find("HelloWorld0-Level-None") == testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld1-Level-Critical") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld2-Level-Error") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld3-Level-Warning") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld4-Level-Success") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld5-Level-Info") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld6-Level-More") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld7-Level-Verbose") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld8-Level-Debug") == testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld8.1-Level-Debug") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld9-Level-DebugDebug") == testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld9.1-Level-DebugDebug") != testStr.npos);
-    BOOST_CHECK(testStr.find("HelloWorld10") == testStr.npos);
+    BOOST_CHECK(!testStr.contains("HelloWorld0-Level-None"));
+    BOOST_CHECK(testStr.contains("HelloWorld1-Level-Critical"));
+    BOOST_CHECK(testStr.contains("HelloWorld2-Level-Error"));
+    BOOST_CHECK(testStr.contains("HelloWorld3-Level-Warning"));
+    BOOST_CHECK(testStr.contains("HelloWorld4-Level-Success"));
+    BOOST_CHECK(testStr.contains("HelloWorld5-Level-Info"));
+    BOOST_CHECK(testStr.contains("HelloWorld6-Level-More"));
+    BOOST_CHECK(testStr.contains("HelloWorld7-Level-Verbose"));
+    BOOST_CHECK(!testStr.contains("HelloWorld8-Level-Debug"));
+    BOOST_CHECK(testStr.contains("HelloWorld8.1-Level-Debug"));
+    BOOST_CHECK(!testStr.contains("HelloWorld9-Level-DebugDebug"));
+    BOOST_CHECK(testStr.contains("HelloWorld9.1-Level-DebugDebug"));
+    BOOST_CHECK(!testStr.contains("HelloWorld10"));
 }
 
 BOOST_AUTO_TEST_CASE(Test2_logFile)
@@ -128,8 +128,8 @@ BOOST_AUTO_TEST_CASE(Test2_logFile)
 
     std::filesystem::remove(logFileName);
 
-    BOOST_CHECK(logStr.find("This is a test message.") != logStr.npos);
-    BOOST_CHECK(logStr.find("This is the second test message.") == logStr.npos);
+    BOOST_CHECK(logStr.contains("This is a test message."));
+    BOOST_CHECK(!logStr.contains("This is the second test message."));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

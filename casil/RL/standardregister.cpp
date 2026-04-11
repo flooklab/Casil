@@ -1156,7 +1156,7 @@ void StandardRegister::populateFieldTree(FieldTree& pFieldTree, const boost::pro
             }
         }
 
-        if (tName.find('.') != tName.npos || tName.starts_with('#'))
+        if (tName.contains('.') || tName.starts_with('#'))
             throw std::runtime_error("Invalid name set for register field \"" + tName + "\" of " + getSelfDescription() + ".");
         if (pFieldTree.find(tName) != pFieldTree.not_found())
             throw std::runtime_error("Field with name \"" + tName + "\" is defined multiple times for " + getSelfDescription() + ".");

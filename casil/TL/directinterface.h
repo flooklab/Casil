@@ -69,8 +69,8 @@ public:
      * \param pData %Bytes to be written.
      */
     virtual void write(const std::vector<std::uint8_t>& pData) = 0;
-    virtual std::vector<std::uint8_t> query(const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;    ///< \brief Write a query to the
-                                                                                                            ///  interface and read the response.
+    virtual std::vector<std::uint8_t> query(const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;
+                                                                                    ///< Write a query to the interface and read the response.
     //
     bool readBufferEmpty() const override = 0;
     void clearReadBuffer() override = 0;

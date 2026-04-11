@@ -78,9 +78,12 @@ public:
                                                                     ///< Save current runtime configuration data/values of the components.
 
 private:
-    std::map<std::string, const std::unique_ptr<TL::Interface>, std::less<>> interfaces;    ///< Map of all interfaces with their names as keys.
-    std::map<std::string, const std::unique_ptr<HL::Driver>, std::less<>> drivers;          ///< Map of all drivers with their names as keys.
-    std::map<std::string, const std::unique_ptr<RL::Register>, std::less<>> registers;      ///< Map of all registers with their names as keys.
+    std::map<std::string, const std::unique_ptr<TL::Interface>, std::less<>> interfaces;    ///< \brief Map of all interfaces
+                                                                                            ///  with their names as keys.
+    std::map<std::string, const std::unique_ptr<HL::Driver>, std::less<>> drivers;          ///< \brief Map of all drivers
+                                                                                            ///  with their names as keys.
+    std::map<std::string, const std::unique_ptr<RL::Register>, std::less<>> registers;      ///< \brief Map of all registers
+                                                                                            ///  with their names as keys.
     //
     bool initialized;                                                                       ///< Initialized and not closed.
 };

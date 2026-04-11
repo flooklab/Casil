@@ -73,8 +73,8 @@ public:
                std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
                                                                                     ///< Write data to the socket (automatically terminated).
     //
-    bool readBufferEmpty() const;                               ///< Check if the read buffer is empty (and no remaining data to be read).
-    void clearReadBuffer();                                     ///< Read remaining data from the socket and then clear the read buffer contents.
+    bool readBufferEmpty() const;                           ///< Check if the read buffer is empty (and no remaining data to be read).
+    void clearReadBuffer();                                 ///< Read remaining data from the socket and then clear the read buffer contents.
     //
     void init(std::chrono::milliseconds pConnectTimeout = std::chrono::milliseconds::zero(),
               std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);            ///< Connect the %TCP socket.

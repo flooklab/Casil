@@ -64,13 +64,13 @@ public:
     //
     std::vector<std::uint8_t> read(std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                    std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
-                                                                                                ///< Receive a single datagram from the socket.
+                                                                                            ///< Receive a single datagram from the socket.
     std::vector<std::uint8_t> readMax(int pSize, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                       std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
-                                                                                                ///< \brief Receive maximally some amount of
-                                                                                                ///  bytes of a single datagram from the socket.
+                                                                                            ///< \brief Receive maximally some amount of
+                                                                                            ///  bytes of a single datagram from the socket.
     void write(const std::vector<std::uint8_t>& pData, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
-               std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);           ///< Send a single datagram over the socket.
+               std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);       ///< Send a single datagram over the socket.
     //
     bool readBufferEmpty() const;                               ///< Check if no incoming datagrams are available on the socket.
     void clearReadBuffer();                                     ///< Read remaining datagrams from the socket and discard them.

@@ -111,14 +111,14 @@ struct RegisterDescr
     };
     //
     typedef std::variant<std::monostate, std::uint64_t, std::vector<std::uint8_t>> VariantValueType;
-                                                            ///< Variant to optionally store the two possible types of register content.
+                                                        ///< Variant to optionally store the two possible types of register content.
     //
-    const DataType type = DataType::Value;                  ///< \copybrief DataType
-    const AccessMode mode = AccessMode::ReadWrite;          ///< \copybrief AccessMode
-    const std::uint32_t addr = 0;                           ///< %Register address in bytes.
-    const std::uint32_t size = 0;                           ///< %Register size (in bits for DataType::Value, in bytes for DataType::ByteArray).
-    const std::uint32_t offs = 0;                           ///< %Register bit offset from its \ref addr "address" (only for DataType::Value).
-    const VariantValueType defaultValue = std::monostate{}; ///< Designated default register content.
+    const DataType type = DataType::Value;              ///< \copybrief DataType
+    const AccessMode mode = AccessMode::ReadWrite;      ///< \copybrief AccessMode
+    const std::uint32_t addr = 0;                       ///< %Register address in bytes.
+    const std::uint32_t size = 0;                       ///< %Register size (in bits for DataType::Value, in bytes for DataType::ByteArray).
+    const std::uint32_t offs = 0;                       ///< %Register bit offset from its \ref addr "address" (only for DataType::Value).
+    const VariantValueType defaultValue = std::monostate{};     ///< Designated default register content.
 };
 
 /*!
@@ -257,7 +257,7 @@ public:
         std::variant<std::uint64_t, std::vector<std::uint8_t>> get() const;     ///< \brief Read an integer or byte sequence from
                                                                                 ///  the register, according to its data type.
         //
-        void trigger();                                         ///< "Trigger" the (write-only) register by writing configured default or zero.
+        void trigger();                                     ///< "Trigger" the (write-only) register by writing configured default or zero.
 
     private:
         RegisterDriver& regDriver;      ///< %Driver to which the register belongs.

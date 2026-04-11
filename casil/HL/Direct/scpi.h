@@ -96,8 +96,8 @@ public:
     typedef std::variant<std::monostate, std::string, int, double> VariantValueType;        ///< Supported command argument types.
 
 private:
-    typedef std::map<std::string, std::vector<std::uint8_t>, std::less<>> CommandMapType;   ///< \brief Map type for commands (as byte sequence)
-                                                                                            ///  with the command names as keys.
+    typedef std::map<std::string, std::vector<std::uint8_t>, std::less<>> CommandMapType;   ///< \brief Map type for commands (as byte
+                                                                                            ///  sequence) with the command names as keys.
 
 public:
     SCPI(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig);            ///< Constructor.

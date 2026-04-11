@@ -49,7 +49,7 @@ boost::property_tree::ptree propertyTreeFromYAML(const std::string& pYAMLString)
 std::string propertyTreeToYAML(const boost::property_tree::ptree& pTree);           ///< Generate a YAML document from a Boost Property Tree.
 
 //TODO this is now unused but maybe still useful in the future or for python; keep it?
-std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString);         ///< Parse a sequence of unsigned integers from YAML format.
+std::vector<std::uint64_t> uintSeqFromYAML(const std::string& pYAMLString);     ///< Parse a sequence of unsigned integers from YAML format.
 
 //
 

@@ -43,10 +43,14 @@ Building the project can be configured with [CMake](https://cmake.org/) (>= v3.2
 You will need a `C++23` compatible compiler, probably at least `GCC 14` or equivalent.  
 
 Required additional libraries/packages:
-- [Python](https://www.python.org/) (>= v3.10)
-- [Boost](https://www.boost.org/) (>= v1.70; libraries: Algorithm, Asio, DynamicBitset, Predef, PropertyTree, System, Test (optional for unit tests))
-- [pybind11](https://github.com/pybind/pybind11) (>= v3.0.1; contained as `Git` submodule)
-- [yaml-cpp](https://github.com/jbeder/yaml-cpp) (>= v0.8.0; contained as `Git` submodule)
+- [Python](https://www.python.org/)
+  (>= v3.10)
+- [Boost](https://www.boost.org/)
+  (>= v1.70; libraries: Algorithm, Asio, DynamicBitset, Predef, PropertyTree, System, Test (optional for unit tests))
+- [pybind11](https://github.com/pybind/pybind11)
+  (>= v3.0.1; contained as `Git` submodule)
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+  (>= v0.8.0; contained as `Git` submodule)
 
 Optional packages:
 - Building the documentation requires [Doxygen](https://github.com/doxygen/doxygen) (>= v1.12)

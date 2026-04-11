@@ -277,7 +277,8 @@ private:
      *
      * See setChildFields() and StandardRegister::populateFieldTree().
      */
-    friend void StandardRegister::populateFieldTree(StandardRegister::FieldTree&, const boost::property_tree::ptree&, const std::string&) const;
+    friend void StandardRegister::populateFieldTree(StandardRegister::FieldTree&,
+                                                    const boost::property_tree::ptree&, const std::string&) const;
     /// \endcond INTERNAL
 
 private:

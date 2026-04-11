@@ -74,8 +74,8 @@ public:
     void close();                                               ///< Stop the continuous read buffer polling and close the serial port.
 
 private:
-    void pollReadBuffer();                                                                      ///< \brief Issue an async read to poll the
-                                                                                                ///  serial port (handler is handleAsyncRead()).
+    void pollReadBuffer();                                                                  ///< \brief Issue an async read to poll the
+                                                                                            ///  serial port (handler is handleAsyncRead()).
     void handleAsyncRead(const boost::system::error_code& pErrorCode, std::size_t pNumBytes);   ///< \brief Fill read buffer from single poll
                                                                                                 ///  by pollReadBuffer() and issue next poll.
 

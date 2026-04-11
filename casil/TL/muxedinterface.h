@@ -73,8 +73,8 @@ public:
      */
     virtual void write(std::uint64_t pAddr, const std::vector<std::uint8_t>& pData) = 0;
     virtual std::vector<std::uint8_t> query(std::uint64_t pWriteAddr, std::uint64_t pReadAddr,
-                                            const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;    ///< \brief Write a query to the
-                                                                                                            ///  interface and read the response.
+                                            const std::vector<std::uint8_t>& pData, int pSize = -1) = 0;
+                                                                                    ///< Write a query to the interface and read the response.
     //
     bool readBufferEmpty() const override = 0;
     void clearReadBuffer() override = 0;

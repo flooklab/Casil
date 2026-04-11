@@ -1685,10 +1685,8 @@ const BoolRef& RegField::operator[](const std::size_t pIdx) const
  * \param pLsbIdx Field-local bit number for the \e least significant bit of the selected slice.
  * \return New proxy class instance for <tt>field[pMsbIdx:pLsbIdx]</tt>.
  */
-RegField RegField::operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx)
+RegField RegField::operator[](const std::size_t pMsbIdx, const std::size_t pLsbIdx)
 {
-    //TODO this function should eventually become operator[] (need C++23 for multi-args there)
-
     if (pMsbIdx >= size)
     {
         throw std::invalid_argument("Most significant bit index " + std::to_string(pMsbIdx) +

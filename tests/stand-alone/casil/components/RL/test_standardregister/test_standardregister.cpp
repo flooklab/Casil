@@ -818,7 +818,7 @@ BOOST_AUTO_TEST_CASE(Test10_advancedSelect)
 
     StandardRegister& reg = dynamic_cast<StandardRegister&>(d.reg("reg"));
 
-    BOOST_CHECK_EQUAL((reg.root()(8, 0).toUInt()), 0u);
+    BOOST_CHECK_EQUAL((reg.root()[8, 0].toUInt()), 0u);
     BOOST_CHECK_EQUAL((reg.root()[{1,3,5}].toUInt()), 0u);
 
     reg.root()[{1, 3, 5, 0}] = 0b1100u;
@@ -827,24 +827,24 @@ BOOST_AUTO_TEST_CASE(Test10_advancedSelect)
     BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b000001010u);
 
     reg.root()[0] = true;
-    reg.root()(4, 1) = 0x0u;
+    reg.root()[4, 1] = 0x0u;
 
     BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b000000001u);
 
     reg.root() = 0b110010111u;
 
-    BOOST_CHECK_EQUAL((reg.root()(7, 2).toUInt()), 0b100101u);
+    BOOST_CHECK_EQUAL((reg.root()[7, 2].toUInt()), 0b100101u);
     BOOST_CHECK_EQUAL(reg["COMP1"].toUInt(), 0b11u);
     BOOST_CHECK_EQUAL(reg["COMP2"].toUInt(), 0b010111u);
-    BOOST_CHECK_EQUAL(reg["COMP2"](4, 2).toUInt(), 0b101u);
+    BOOST_CHECK_EQUAL((reg["COMP2"][4, 2].toUInt()), 0b101u);
 
-    reg["COMP2"](3, 3)[0] = true;
+    reg["COMP2"][3, 3][0] = true;
     reg["COMP1"][{0, 1}][1] = false;
     reg["COMP1"][{0, 1}][0] = true;
 
     BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b100011111u);
 
-    reg.root()(6, 3) = reg.root()(3, 6).toBits();   //Reverse some bits
+    reg.root()[6, 3] = reg.root()[3, 6].toBits();   //Reverse some bits
 
     BOOST_CHECK_EQUAL((reg.root().toUInt()), 0b101100111u);
 
@@ -853,16 +853,16 @@ BOOST_AUTO_TEST_CASE(Test10_advancedSelect)
     try { (void)reg.root()[{7, 1, 0}]; }                        //OK
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()(2, 1); }                             //OK
+    try { (void)reg.root()[2, 1]; }                             //OK
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()(1, 2); }                             //OK
+    try { (void)reg.root()[1, 2]; }                             //OK
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()(9, 1); }                             //Most significant bit out of range
+    try { (void)reg.root()[9, 1]; }                             //Most significant bit out of range
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
-    try { (void)reg.root()(1, 9); }                             //Least significant bit out of range
+    try { (void)reg.root()[1, 9]; }                             //Least significant bit out of range
     catch (const std::invalid_argument&) { ++exceptionCtr; }
 
     try { (void)reg.root()[std::vector<std::size_t>{}]; }       //Set is empty
@@ -1368,7 +1368,7 @@ BOOST_AUTO_TEST_CASE(Test17_loadDumpConf)
     BOOST_CHECK_EQUAL(reg["ROW.#1.InL"].toBits(), boost::dynamic_bitset(std::string("1010")));
     BOOST_CHECK_EQUAL(reg["ROW.#1.InR"].toBits(), boost::dynamic_bitset(std::string("0101")));
     BOOST_CHECK_EQUAL(reg["ROW.#0.InR"].toBits(), boost::dynamic_bitset(std::string("1101")));
-    BOOST_CHECK_EQUAL(reg["ROW"](65, 0).toBits(),   //[ROW.#2, ..., ROW.#7]
+    BOOST_CHECK_EQUAL((reg["ROW"][65, 0].toBits()),     //[ROW.#2, ..., ROW.#7]
                       boost::dynamic_bitset(std::string("101010101010101010101010101010101010101010101010101010101010101010")));
 
     BOOST_CHECK_EQUAL(reg["Test.Upper"].toBits(), boost::dynamic_bitset(std::string("000")));

@@ -59,8 +59,8 @@ public:
     //
     PyConstRegField operator[](const std::string_view pFieldName) const { return PyConstRegField(regField.operator[](pFieldName), false); }
     bool operator[](const std::size_t pIdx) const { return regField.operator[](pIdx).get(); }
-    PyConstRegField operator()(const std::size_t pMsbIdx, const std::size_t pLsbIdx) const
-        { return PyConstRegField(const_cast<RegField&>(regField).operator()(pMsbIdx, pLsbIdx), true); }
+    PyConstRegField operator[](const std::size_t pMsbIdx, const std::size_t pLsbIdx) const
+        { return PyConstRegField(const_cast<RegField&>(regField).operator[](pMsbIdx, pLsbIdx), true); }
     PyConstRegField operator[](const std::vector<std::size_t>& pIdxs) const
         { return PyConstRegField(const_cast<RegField&>(regField).operator[](pIdxs), true); }
     //
@@ -90,7 +90,7 @@ void bindRL_StandardRegister(py::module& pM)
                                     const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
                                     if (!pSlice.attr("step").is_none())
                                         throw std::invalid_argument("Step size definition for slices is unsupported.");
-                                    return pThis.operator()(msbIdx, lsbIdx);
+                                    return pThis.operator[](msbIdx, lsbIdx);
                                 }, "Access a slice of bits in the field.", py::arg("idxSlice"), py::is_operator())
             .def("__getitem__", [](RegField& pThis, const std::vector<std::size_t>& pIdxs) -> RegField
                                 { return pThis.operator[](pIdxs); }, "Access a set of unique bits in the field.",
@@ -137,7 +137,7 @@ void bindRL_StandardRegister(py::module& pM)
                                     const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
                                     if (!pSlice.attr("step").is_none())
                                         throw std::invalid_argument("Step size definition for slices is unsupported.");
-                                    pThis.operator()(msbIdx, lsbIdx) = pValue;
+                                    pThis.operator[](msbIdx, lsbIdx) = pValue;
                                 }, "Assign an integer value to a slice of bits in the field.",
                                 py::arg("idxSlice"), py::arg("value"), py::is_operator())
             .def("__setitem__", [](RegField& pThis, const py::slice& pSlice, const std::vector<bool>& pBits)
@@ -147,7 +147,7 @@ void bindRL_StandardRegister(py::module& pM)
                                     const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
                                     if (!pSlice.attr("step").is_none())
                                         throw std::invalid_argument("Step size definition for slices is unsupported.");
-                                    pThis.operator()(msbIdx, lsbIdx) = PyCasilUtils::bitsetFromBoolVec(pBits);
+                                    pThis.operator[](msbIdx, lsbIdx) = PyCasilUtils::bitsetFromBoolVec(pBits);
                                 }, "Assign a bit sequence to a slice of bits in the field.",
                                 py::arg("idxSlice"), py::arg("bits"), py::is_operator())
             .def("__setitem__", [](RegField& pThis, const py::slice& pSlice, py::object) -> void
@@ -159,7 +159,7 @@ void bindRL_StandardRegister(py::module& pM)
 
                                     try
                                     {
-                                        (void)pThis.operator()(msbIdx, lsbIdx);
+                                        (void)pThis.operator[](msbIdx, lsbIdx);
                                         throw py::type_error("Invalid assignment.");
                                     }
                                     catch (const std::invalid_argument&)
@@ -215,7 +215,7 @@ void bindRL_StandardRegister(py::module& pM)
                                     const std::size_t lsbIdx = pSlice.attr("stop").cast<std::size_t>();
                                     if (!pSlice.attr("step").is_none())
                                         throw std::invalid_argument("Step size definition for slices is unsupported.");
-                                    return pThis.operator()(msbIdx, lsbIdx);
+                                    return pThis.operator[](msbIdx, lsbIdx);
                                 }, "Access a slice of bits in the field.", py::arg("idxSlice"), py::is_operator())
             .def("__getitem__", [](const PyConstRegField& pThis, const std::vector<std::size_t>& pIdxs) -> PyConstRegField
                                 { return pThis.operator[](pIdxs); }, "Access a set of unique bits in the field.",

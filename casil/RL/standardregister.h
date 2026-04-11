@@ -244,7 +244,7 @@ public:
     const RegField& operator[](std::string_view pFieldName) const;                          ///< Access an immediate child field.
     BoolRef& operator[](std::size_t pIdx);                                                  ///< Access a specific bit in the field.
     const BoolRef& operator[](std::size_t pIdx) const;                                      ///< Access a specific bit in the field.
-    RegField operator()(std::size_t pMsbIdx, std::size_t pLsbIdx);                          ///< Access a slice of bits in the field.
+    RegField operator[](std::size_t pMsbIdx, std::size_t pLsbIdx);                          ///< Access a slice of bits in the field.
     RegField operator[](const std::vector<std::size_t>& pIdxs);                             ///< Access a set of unique bits in the field.
     RegField operator[](std::initializer_list<std::size_t> pIdxs);                          ///< Access a set of unique bits in the field.
     //

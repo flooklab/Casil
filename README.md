@@ -36,7 +36,7 @@ for an actual project one would need to port a whole lot of individual drivers a
 The whole `cocotb` simulation interface and accompanying simulation-driven unit tests would have to be ported too
 at some point. I do not see this happening anytime soon (unless maybe someone would want to help out).
 
-## Build
+## Building
 
 Building the project can be configured with [CMake](https://cmake.org/) (>= v3.23).  
 
@@ -54,6 +54,10 @@ Required additional libraries/packages:
 
 Optional packages:
 - Building the documentation requires [Doxygen](https://github.com/doxygen/doxygen) (>= v1.12)
+
+## Contributing
+
+If you want to contribute to this project, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License Information
 

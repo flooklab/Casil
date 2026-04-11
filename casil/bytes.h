@@ -154,6 +154,7 @@ constexpr std::vector<std::uint8_t> composeByteVec(const bool pBigEndian, Ts... 
     {
         if constexpr (std::is_same_v<Ts, std::uint8_t>)
         {
+            (void)pBigEndian;
             retVal.push_back(pArgs);
         }
         else if constexpr (std::is_same_v<Ts, std::uint16_t>)

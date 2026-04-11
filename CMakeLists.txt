@@ -326,7 +326,6 @@ endif()
 if(CASIL_BUILD_STATIC)
     add_library(CasilLibStatic STATIC $<TARGET_OBJECTS:CasilObjLib>)
     set_target_properties(CasilLibStatic PROPERTIES OUTPUT_NAME Casil)
-    set_target_properties(CasilLibStatic PROPERTIES VERSION ${PROJECT_VERSION})
     target_link_libraries(CasilLibStatic PRIVATE Threads::Threads)
     target_link_libraries(CasilLibStatic PRIVATE yaml-cpp)
     #target_link_libraries(CasilLibStatic PRIVATE ${Boost_LIBRARIES})   #Not needed for the currently used libraries

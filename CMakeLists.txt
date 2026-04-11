@@ -91,7 +91,7 @@ else()
                                 "/arch:SSE4.2;"
                                 "/GL;/GS;/guard:cf;/guard:ehcont")
     init_cache_variable(CASIL_CXX_FLAGS STRING "${TMP_CXX_FLAGS}" "Additional compiler flags.")
-    init_cache_variable(CASIL_LINK_FLAGS STRING "/CETCOMPAT;/DYNAMICBASE;/OPT;/LTCG" "Additional linker flags.")
+    init_cache_variable(CASIL_LINK_FLAGS STRING "/CETCOMPAT;/DYNAMICBASE;/GUARD:CF;/GUARD:EHCONT;/OPT;/LTCG" "Additional linker flags.")
     init_cache_variable(CASIL_LINK_FLAGS_DEBUG STRING "/DEBUG" "Additional linker flags to add for DEBUG builds.")
     init_cache_variable(CASIL_LINK_FLAGS_RELEASE STRING "" "Additional linker flags to add for non-DEBUG builds.")
 endif()

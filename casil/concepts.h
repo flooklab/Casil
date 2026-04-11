@@ -48,9 +48,9 @@ namespace Concepts
 {
 
 using Layers::TL::Interface;
-using HL::Driver;
-using HL::MuxedDriver;
-using HL::MetaDriver;
+using Layers::HL::Driver;
+using Layers::HL::MuxedDriver;
+using Layers::HL::MetaDriver;
 using Layers::RL::Register;
 
 /*!

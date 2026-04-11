@@ -23,11 +23,21 @@
 
 cmake_minimum_required(VERSION 3.23)
 
-if(NOT DEFINED CACHE{CMAKE_BUILD_TYPE})
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-endif()
+#Define a macro to predictably initialize cache variables
+macro(init_cache_variable VAR_NAME VAR_TYPE VAR_VALUE VAR_HELP)
+    if(NOT DEFINED CACHE{${VAR_NAME}})
+        if(DEFINED ${VAR_NAME})
+            set(${VAR_NAME} ${${VAR_NAME}} CACHE ${VAR_TYPE} ${VAR_HELP})
+        else()
+            set(${VAR_NAME} ${VAR_VALUE} CACHE ${VAR_TYPE} ${VAR_HELP})
+        endif()
+    endif()
+    unset(${VAR_NAME})
+endmacro()
 
-#Tweak CMake defaults for compiler flags
+#Set/tweak CMake defaults for build type and compiler flags
+
+init_cache_variable(CMAKE_BUILD_TYPE STRING "Release" "Choose the type of build.")
 
 if(NOT MSVC)
     set(DEFAULT_FLAGS "")
@@ -44,22 +54,16 @@ else()
     set(DEFAULT_FLAGS_RELWITHDEBINFO "/MD /Zi /O2 /Ob1 /DNDEBUG")
 endif()
 
-if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS})
-    set(CMAKE_CXX_FLAGS "${DEFAULT_FLAGS}" CACHE STRING "Flags used by the CXX compiler during all build types." FORCE)
-endif()
-if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_DEBUG})
-    set(CMAKE_CXX_FLAGS_DEBUG "${DEFAULT_FLAGS_DEBUG}" CACHE STRING "Flags used by the CXX compiler during DEBUG builds." FORCE)
-endif()
-if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_MINSIZEREL})
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "${DEFAULT_FLAGS_MINSIZEREL}" CACHE STRING "Flags used by the CXX compiler during MINSIZEREL builds." FORCE)
-endif()
-if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_RELEASE})
-    set(CMAKE_CXX_FLAGS_RELEASE "${DEFAULT_FLAGS_RELEASE}" CACHE STRING "Flags used by the CXX compiler during RELEASE builds." FORCE)
-endif()
-if(NOT DEFINED CACHE{CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${DEFAULT_FLAGS_RELWITHDEBINFO}" CACHE STRING
-        "Flags used by the CXX compiler during RELWITHDEBINFO builds." FORCE)
-endif()
+init_cache_variable(CMAKE_CXX_FLAGS STRING "${DEFAULT_FLAGS}"
+                    "Flags used by the CXX compiler during all build types.")
+init_cache_variable(CMAKE_CXX_FLAGS_DEBUG STRING "${DEFAULT_FLAGS_DEBUG}"
+                    "Flags used by the CXX compiler during DEBUG builds.")
+init_cache_variable(CMAKE_CXX_FLAGS_MINSIZEREL STRING "${DEFAULT_FLAGS_MINSIZEREL}"
+                    "Flags used by the CXX compiler during MINSIZEREL builds.")
+init_cache_variable(CMAKE_CXX_FLAGS_RELEASE STRING "${DEFAULT_FLAGS_RELEASE}"
+                    "Flags used by the CXX compiler during RELEASE builds.")
+init_cache_variable(CMAKE_CXX_FLAGS_RELWITHDEBINFO STRING "${DEFAULT_FLAGS_RELWITHDEBINFO}"
+                    "Flags used by the CXX compiler during RELWITHDEBINFO builds.")
 
 project(Casil VERSION 0.5.0 LANGUAGES CXX)
 
@@ -75,31 +79,32 @@ if(NOT MSVC)
     string(CONCAT TMP_CXX_FLAGS "-Wall;-Wextra;-Wshadow;-pedantic-errors;"
                                 "-pipe;-march=x86-64-v2;-mtune=generic;-Wp,-D_FORTIFY_SOURCE=3;-Wp,-D_GLIBCXX_ASSERTIONS;"
                                 "-fno-plt;-fstack-protector-strong;-fstack-clash-protection;-fcf-protection=full;-flto=auto")
-    set(CASIL_CXX_FLAGS "${TMP_CXX_FLAGS}" CACHE STRING "Additional compiler flags.")
-    set(CASIL_LINK_FLAGS "-Wl,--sort-common;-Wl,--as-needed;-Wl,-z,defs;-Wl,-z,relro;-Wl,-z,now;-Wl,-z,pack-relative-relocs"
-        CACHE STRING "Additional linker flags.")
-    set(CASIL_LINK_FLAGS_DEBUG "" CACHE STRING "Additional linker flags to add for DEBUG builds.")
-    set(CASIL_LINK_FLAGS_RELEASE "-Wl,-O1" CACHE STRING "Additional linker flags to add for non-DEBUG builds.")
+    init_cache_variable(CASIL_CXX_FLAGS STRING "${TMP_CXX_FLAGS}" "Additional compiler flags.")
+    init_cache_variable(CASIL_LINK_FLAGS STRING
+                        "-Wl,--sort-common;-Wl,--as-needed;-Wl,-z,defs;-Wl,-z,relro;-Wl,-z,now;-Wl,-z,pack-relative-relocs"
+                        "Additional linker flags.")
+    init_cache_variable(CASIL_LINK_FLAGS_DEBUG STRING "" "Additional linker flags to add for DEBUG builds.")
+    init_cache_variable(CASIL_LINK_FLAGS_RELEASE STRING "-Wl,-O1" "Additional linker flags to add for non-DEBUG builds.")
 else()
     #Those MSVC flags are probably not tested
     string(CONCAT TMP_CXX_FLAGS "/W4;/permissive-;"
                                 "/arch:SSE4.2;"
                                 "/GL;/GS;/guard:cf;/guard:ehcont")
-    set(CASIL_CXX_FLAGS "${TMP_CXX_FLAGS}" CACHE STRING "Additional compiler flags.")
-    set(CASIL_LINK_FLAGS "/CETCOMPAT;/DYNAMICBASE;/OPT;/LTCG" CACHE STRING "Additional linker flags.")
-    set(CASIL_LINK_FLAGS_DEBUG "/DEBUG" CACHE STRING "Additional linker flags to add for DEBUG builds.")
-    set(CASIL_LINK_FLAGS_RELEASE "" CACHE STRING "Additional linker flags to add for non-DEBUG builds.")
+    init_cache_variable(CASIL_CXX_FLAGS STRING "${TMP_CXX_FLAGS}" "Additional compiler flags.")
+    init_cache_variable(CASIL_LINK_FLAGS STRING "/CETCOMPAT;/DYNAMICBASE;/OPT;/LTCG" "Additional linker flags.")
+    init_cache_variable(CASIL_LINK_FLAGS_DEBUG STRING "/DEBUG" "Additional linker flags to add for DEBUG builds.")
+    init_cache_variable(CASIL_LINK_FLAGS_RELEASE STRING "" "Additional linker flags to add for non-DEBUG builds.")
 endif()
 
 if(NOT MSVC)
-    set(CASIL_ENABLE_GLIBCXX_DEBUG_MODE OFF CACHE BOOL "Add compiler flags to enable the debug mode of libstdc++.")
+    init_cache_variable(CASIL_ENABLE_GLIBCXX_DEBUG_MODE BOOL OFF "Add compiler flags to enable the debug mode of libstdc++.")
 endif()
 
-set(CASIL_BUILD_STATIC ON CACHE BOOL "Build static Casil library.")
-set(CASIL_BUILD_SHARED ON CACHE BOOL "Build shared Casil library.")
-set(CASIL_BUILD_BINDING ON CACHE BOOL "Build PyCasil Python binding.")
-set(CASIL_BUILD_EXAMPLE ON CACHE BOOL "Build example executable.")
-set(CASIL_BUILD_TESTS ON CACHE BOOL "Build Casil unit tests.")
+init_cache_variable(CASIL_BUILD_STATIC BOOL ON "Build static Casil library.")
+init_cache_variable(CASIL_BUILD_SHARED BOOL ON "Build shared Casil library.")
+init_cache_variable(CASIL_BUILD_BINDING BOOL ON "Build PyCasil Python binding.")
+init_cache_variable(CASIL_BUILD_EXAMPLE BOOL ON "Build example executable.")
+init_cache_variable(CASIL_BUILD_TESTS BOOL ON "Build Casil unit tests.")
 
 if((NOT CASIL_BUILD_STATIC) AND (NOT CASIL_BUILD_SHARED))
     message(FATAL_ERROR "Must build at least one version of the library (shared/static).")
@@ -109,9 +114,9 @@ if(CASIL_BUILD_BINDING AND (NOT CASIL_BUILD_STATIC))
     message(FATAL_ERROR "Casil will be statically linked to the PyCasil binding.")
 endif()
 
-set(CASIL_INSTALL_STATIC ON CACHE BOOL "Install static Casil library.")
-set(CASIL_INSTALL_SHARED ON CACHE BOOL "Install shared Casil library.")
-set(CASIL_INSTALL_BINDING ON CACHE BOOL "Install PyCasil Python binding.")
+init_cache_variable(CASIL_INSTALL_STATIC BOOL ON "Install static Casil library.")
+init_cache_variable(CASIL_INSTALL_SHARED BOOL ON "Install shared Casil library.")
+init_cache_variable(CASIL_INSTALL_BINDING BOOL ON "Install PyCasil Python binding.")
 
 if(CASIL_INSTALL_STATIC AND (NOT CASIL_BUILD_STATIC))
     message(FATAL_ERROR "Cannot install static library if not building it.")
@@ -123,22 +128,22 @@ if(CASIL_INSTALL_BINDING AND (NOT CASIL_BUILD_BINDING))
     message(FATAL_ERROR "Cannot install binding if not building it.")
 endif()
 
-set(CASIL_USE_SYSTEM_YAMLCPP OFF CACHE BOOL "Use system's yaml-cpp library.")
-set(CASIL_USE_SYSTEM_PYBIND11 OFF CACHE BOOL "Use system's pybind11 library.")
+init_cache_variable(CASIL_USE_SYSTEM_YAMLCPP BOOL OFF "Use system's yaml-cpp library.")
+init_cache_variable(CASIL_USE_SYSTEM_PYBIND11 BOOL OFF "Use system's pybind11 library.")
 
-set(CASIL_LINK_STATIC_BOOST OFF CACHE BOOL "Statically link boost libraries.")
+init_cache_variable(CASIL_LINK_STATIC_BOOST BOOL OFF "Statically link boost libraries.")
 
-set(CASIL_PYTHON_SITEPACKS_LIBDIR "" CACHE PATH "Python site-packages directory (relative to CMAKE_INSTALL_PREFIX).")
-set(CASIL_PYTHON_SITEPACKS_LIBDIR_AUTOSET OFF CACHE BOOL "Automatically determine CASIL_PYTHON_SITEPACKS_LIBDIR.")
+init_cache_variable(CASIL_PYTHON_SITEPACKS_LIBDIR PATH "" "Python site-packages directory (relative to CMAKE_INSTALL_PREFIX).")
+init_cache_variable(CASIL_PYTHON_SITEPACKS_LIBDIR_AUTOSET BOOL OFF "Automatically determine CASIL_PYTHON_SITEPACKS_LIBDIR.")
 
-set(CASIL_CMAKE_LICENSEDIR "${CMAKE_INSTALL_DATAROOTDIR}/licenses/${CMAKE_PROJECT_NAME}"
-    CACHE PATH "Install path for the LICENSE file (relative to CMAKE_INSTALL_PREFIX).")
+init_cache_variable(CASIL_CMAKE_LICENSEDIR PATH "${CMAKE_INSTALL_DATAROOTDIR}/licenses/${CMAKE_PROJECT_NAME}"
+                    "Install path for the LICENSE file (relative to CMAKE_INSTALL_PREFIX).")
 
-set(CASIL_CMAKE_DATADIR "${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_PROJECT_NAME}"
-    CACHE PATH "Install path for general project data (relative to CMAKE_INSTALL_PREFIX).")
+init_cache_variable(CASIL_CMAKE_DATADIR PATH "${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_PROJECT_NAME}"
+                    "Install path for general project data (relative to CMAKE_INSTALL_PREFIX).")
 
-set(CASIL_BUILD_DOCUMENTATION OFF CACHE BOOL "Build library documentation with Doxygen.")
-set(CASIL_BUILD_DOCUMENTATION_INTERNAL OFF CACHE BOOL "Include implementation details in the library documentation.")
+init_cache_variable(CASIL_BUILD_DOCUMENTATION BOOL OFF "Build library documentation with Doxygen.")
+init_cache_variable(CASIL_BUILD_DOCUMENTATION_INTERNAL BOOL OFF "Include implementation details in the library documentation.")
 
 #Configure source code macros
 
@@ -146,12 +151,12 @@ set(CASIL_DEVICE_DESCRIPTIONS_SUBDIR "device_descriptions/scpi")
 set(CASIL_DEVICE_DESCRIPTIONS_BUILDDIR "${PROJECT_BINARY_DIR}/${CASIL_DEVICE_DESCRIPTIONS_SUBDIR}")
 set(CASIL_DEVICE_DESCRIPTIONS_INSTALLDIR "${CASIL_CMAKE_DATADIR}/${CASIL_DEVICE_DESCRIPTIONS_SUBDIR}")
 
-set(CASIL_DEV_DESC_DIRS ""
-    CACHE PATH "Fixed path that will be compiled into the targets to search for the basil SCPI device descriptions (optional).")
-set(CASIL_DEV_DESC_DIRS_AUTOSET_BUILD OFF
-    CACHE BOOL "Set CASIL_DEV_DESC_DIRS to the device description folder that gets created in the build directory.")
-set(CASIL_DEV_DESC_DIRS_AUTOSET_INSTALL OFF
-    CACHE BOOL "Set CASIL_DEV_DESC_DIRS to the device description install path CASIL_CMAKE_DATADIR/${CASIL_DEVICE_DESCRIPTIONS_SUBDIR}.")
+init_cache_variable(CASIL_DEV_DESC_DIRS PATH ""
+                    "Fixed path that will be compiled into the targets to search for the basil SCPI device descriptions (optional).")
+init_cache_variable(CASIL_DEV_DESC_DIRS_AUTOSET_BUILD BOOL OFF
+                    "Set CASIL_DEV_DESC_DIRS to the device description folder that gets created in the build directory.")
+init_cache_variable(CASIL_DEV_DESC_DIRS_AUTOSET_INSTALL BOOL OFF
+                    "Set CASIL_DEV_DESC_DIRS to the device description install path CASIL_CMAKE_DATADIR/${CASIL_DEVICE_DESCRIPTIONS_SUBDIR}.")
 
 if(CASIL_DEV_DESC_DIRS_AUTOSET_BUILD AND CASIL_DEV_DESC_DIRS_AUTOSET_INSTALL)
     message(FATAL_ERROR "Can only auto-set CASIL_DEV_DESC_DIRS to one path at a time.")
@@ -165,7 +170,8 @@ elseif(CASIL_DEV_DESC_DIRS_AUTOSET_INSTALL)
         CACHE PATH "Fixed path that will be compiled into the targets to search for the basil SCPI device descriptions (optional)." FORCE)
 endif()
 
-set(CASIL_DEFINE_TEST_DATA_DIR OFF CACHE BOOL "Compile fixed test sources path (PROJECT_SOURCE_DIR/tests/stand-alone/casil) into unit tests.")
+init_cache_variable(CASIL_DEFINE_TEST_DATA_DIR BOOL OFF
+                    "Compile fixed test sources path (PROJECT_SOURCE_DIR/tests/stand-alone/casil) into unit tests.")
 
 if(CASIL_DEFINE_TEST_DATA_DIR AND (NOT CASIL_TEST_DATA_DIR))
     set(CASIL_TEST_DATA_DIR "${PROJECT_SOURCE_DIR}/tests/stand-alone/casil")
@@ -234,10 +240,10 @@ if(CASIL_LINK_STATIC_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
 
-set(BUILD_TESTING OFF CACHE BOOL "")    #Disable Boost tests
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)  #Disable Boost tests
 
 if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)       #Use BoostConfig.cmake
+    cmake_policy(SET CMP0167 NEW)           #Use BoostConfig.cmake
 endif()
 
 if(CASIL_BUILD_TESTS)
@@ -265,12 +271,12 @@ if(CASIL_PYTHON_SITEPACKS_LIBDIR_AUTOSET AND (NOT CASIL_PYTHON_SITEPACKS_LIBDIR)
     endif()
 endif()
 
-set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "")
-set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "")
-set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "")
-set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "")
-set(YAML_CPP_INSTALL OFF CACHE BOOL "")
-set(YAML_CPP_FORMAT_SOURCE OFF CACHE BOOL "")
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "" FORCE)
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(YAML_CPP_INSTALL OFF CACHE BOOL "" FORCE)
+set(YAML_CPP_FORMAT_SOURCE OFF CACHE BOOL "" FORCE)
 
 if(CASIL_USE_SYSTEM_YAMLCPP)
     find_package(yaml-cpp 0.8.0 REQUIRED)

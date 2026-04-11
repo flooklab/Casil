@@ -306,7 +306,7 @@ else()
 endif()
 
 if(CASIL_INSTALL_BINDING AND (NOT CASIL_PYTHON_SITEPACKS_LIBDIR))
-    message(FATAL_ERROR "Site-packages path to install PyCasil binding needs to be set.")
+    message(FATAL_ERROR "Installing the PyCasil binding requires the Python site-packages path to be set.")
 endif()
 
 if(CASIL_BUILD_DOCUMENTATION)

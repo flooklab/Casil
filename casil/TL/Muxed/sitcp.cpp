@@ -178,7 +178,7 @@ std::vector<std::uint8_t> SiTCP::read(const std::uint64_t pAddr, const int pSize
 
         try
         {
-            if (pSize <= rbcpMaxSize)
+            if (std::cmp_less_equal(pSize, rbcpMaxSize))
                 return readSingle(pAddr, pSize);
             else
             {

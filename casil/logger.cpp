@@ -417,14 +417,14 @@ bool Logger::includeLogLevel(const LogLevel pLevel)
  */
 void Logger::logMessage(const std::string_view pMessage, const LogLevel pLevel)
 {
-    auto now = std::chrono::system_clock::now();
-    std::time_t time = std::chrono::system_clock::to_time_t(now);
+    const auto now = std::chrono::system_clock::now();
+    const std::time_t time = std::chrono::system_clock::to_time_t(now);
 
     std::ostringstream osstr;
     osstr<<"["<<std::put_time(std::gmtime(&time), "%FT%T%Z")<<", "<<std::setw(5)<<logLevelToLabel(pLevel)<<std::setw(0)
          <<"|"<<std::this_thread::get_id()<<"] "<<pMessage<<"\n";
 
-    std::string msg = osstr.str();
+    const std::string msg = osstr.str();
 
     //Output log message to all configured output streams
     {

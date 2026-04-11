@@ -114,10 +114,15 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
     std::unique_lock<std::mutex> bufferLock(readBufferMutex);
     (void)bufferLock;
 
-    auto waitForNewData = [this, &bufferLock]() -> void
+    auto waitForNewData = [this, &bufferLock]() -> bool
     {
+        if (pollDataStopped.load())
+            return false;
+
         newData = false;
         newDataCondVar.wait(bufferLock, [this](){ return newData; });
+
+        return !pollDataStopped.load();
     };
 
     if (pSize == -1)
@@ -126,20 +131,55 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
 
         while (termPos == readBuffer.end())
         {
-            waitForNewData();
+            const bool ok = waitForNewData();
             termPos = std::search(readBuffer.begin(), readBuffer.end(), readTermination.begin(), readTermination.end());
+            if (!ok)
+            {
+                if (termPos == readBuffer.end())
+                {
+                    Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read "
+                                     "up to termination because polling was stopped due to previous errors.");
+                }
+                break;
+            }
         }
 
         std::vector<std::uint8_t> retVal(readBuffer.begin(), termPos);
 
-        readBuffer.erase(readBuffer.begin(), termPos + readTerminationLength);
+        if (termPos == readBuffer.end())    //Only possible if above waiting returned with error (polling stopped)
+            readBuffer.clear();
+        else
+            readBuffer.erase(readBuffer.begin(), termPos + readTerminationLength);
 
         return retVal;
     }
     else if (pSize > 0)
     {
         while (std::cmp_less(readBuffer.size(), pSize))
-            waitForNewData();
+        {
+            if (waitForNewData())
+                continue;
+            else
+            {
+                //Polling stopped from errors, hence need to handle possibly incomplete data
+                if (std::cmp_less(readBuffer.size(), pSize))
+                {
+                    Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read requested number "
+                                     "of bytes because polling was stopped due to previous errors. Filling with zeros...");
+
+                    //Fill returned data with zeros to obtain requested data size
+                    std::vector<std::uint8_t> retVal(readBuffer.begin(), readBuffer.begin() + readBuffer.size());
+                    retVal.resize(pSize, 0);
+
+                    readBuffer.clear();
+
+                    return retVal;
+                }
+                else
+                    break;  //If read data size is sufficient despite error, continue with regular processing
+            }
+        }
+
 
         if (std::cmp_equal(readBuffer.size(), pSize))
         {
@@ -177,14 +217,26 @@ std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
         std::unique_lock<std::mutex> bufferLock(readBufferMutex);
         (void)bufferLock;
 
-        auto waitForNewData = [this, &bufferLock]() -> void
+        auto waitForNewData = [this, &bufferLock]() -> bool
         {
+            if (pollDataStopped.load())
+                return false;
+
             newData = false;
             newDataCondVar.wait(bufferLock, [this](){ return newData; });
+
+            return !pollDataStopped.load();
         };
 
         while (readBuffer.size() == 0)
-            waitForNewData();
+        {
+            if (!waitForNewData())
+            {
+                Logger::logWarning("Problem while reading from serial port \"" + port + "\": Could not properly "
+                                   "read the data because polling was stopped due to previous errors.");
+                break;
+            }
+        }
 
         std::size_t readNum = std::min(readBuffer.size(), static_cast<std::size_t>(pSize));
 
@@ -366,6 +418,24 @@ void SerialPortWrapper::handleAsyncRead(const boost::system::error_code& pErrorC
         {
             pollData.store(false);
             Logger::logCritical("Exceeded maximum error count while polling serial port \"" + port + "\". Stopping...");
+
+            //Set stopped flag already here and notify about "new data" after that,
+            //such that read operations can check it in order to not get stuck
+            pollDataStopped.store(true);
+            pollDataStopped.notify_one();
+
+            //Need to resolve potential waiting in read functions even if there is no new data
+            if (pNumBytes == 0)
+            {
+                {
+                    const std::lock_guard<std::mutex> bufferLock(readBufferMutex);
+                    (void)bufferLock;
+                    newData = true;
+                }
+                newDataCondVar.notify_one();
+                return;
+            }
+
         }
     }
 

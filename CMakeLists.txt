@@ -110,10 +110,6 @@ if((NOT CASIL_BUILD_STATIC) AND (NOT CASIL_BUILD_SHARED))
     message(FATAL_ERROR "Must build at least one version of the library (shared/static).")
 endif()
 
-if(CASIL_BUILD_BINDING AND (NOT CASIL_BUILD_STATIC))
-    message(FATAL_ERROR "Casil will be statically linked to the PyCasil binding.")
-endif()
-
 init_cache_variable(CASIL_INSTALL_STATIC BOOL OFF "Install static Casil library.")
 init_cache_variable(CASIL_INSTALL_SHARED BOOL ON "Install shared Casil library.")
 init_cache_variable(CASIL_INSTALL_BINDING BOOL ON "Install PyCasil Python binding.")

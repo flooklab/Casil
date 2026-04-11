@@ -255,9 +255,9 @@ if(POLICY CMP0167)
 endif()
 
 if(CASIL_BUILD_TESTS)
-    find_package(Boost 1.70 REQUIRED COMPONENTS unit_test_framework)
+    find_package(Boost 1.70 REQUIRED COMPONENTS headers unit_test_framework)
 else()
-    find_package(Boost 1.70 REQUIRED)
+    find_package(Boost 1.70 REQUIRED COMPONENTS headers)
 endif()
 
 find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development)
@@ -329,9 +329,10 @@ if(CASIL_BUILD_SHARED)
     set_target_properties(CasilLibShared PROPERTIES OUTPUT_NAME Casil)
     set_target_properties(CasilLibShared PROPERTIES VERSION ${PROJECT_VERSION})
     set_target_properties(CasilLibShared PROPERTIES EXPORT_NAME CasilShared)
-    target_link_libraries(CasilLibShared PRIVATE Threads::Threads)
+    target_include_directories(CasilLibShared INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+    target_link_libraries(CasilLibShared PUBLIC Threads::Threads)
+    target_link_libraries(CasilLibShared PUBLIC Boost::headers)
     target_link_libraries(CasilLibShared PRIVATE yaml-cpp)
-    #target_link_libraries(CasilLibShared PRIVATE ${Boost_LIBRARIES})   #Not needed for the currently used libraries
 endif()
 
 if(CASIL_BUILD_STATIC)
@@ -339,9 +340,10 @@ if(CASIL_BUILD_STATIC)
     set_target_properties(CasilLibStatic PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(CasilLibStatic PROPERTIES OUTPUT_NAME Casil)
     set_target_properties(CasilLibStatic PROPERTIES EXPORT_NAME CasilStatic)
-    target_link_libraries(CasilLibStatic PRIVATE Threads::Threads)
-    target_link_libraries(CasilLibStatic PRIVATE yaml-cpp)
-    #target_link_libraries(CasilLibStatic PRIVATE ${Boost_LIBRARIES})   #Not needed for the currently used libraries
+    target_include_directories(CasilLibStatic INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+    target_link_libraries(CasilLibStatic PUBLIC Threads::Threads)
+    target_link_libraries(CasilLibStatic PUBLIC Boost::headers)
+    target_link_libraries(CasilLibStatic PUBLIC yaml-cpp)
 endif()
 
 if(CASIL_BUILD_EXAMPLE)
@@ -374,8 +376,8 @@ if(CASIL_BUILD_TESTS)
         target_compile_definitions(CasilTests PRIVATE "CASIL_TEST_DATA_DIR=${CASIL_TEST_DATA_DIR}")
     endif()
     target_link_libraries(CasilTests PRIVATE Threads::Threads)
+    target_link_libraries(CasilTests PRIVATE Boost::unit_test_framework)
     target_link_libraries(CasilTests PRIVATE yaml-cpp)
-    target_link_libraries(CasilTests PRIVATE ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 endif()
 
 if(CASIL_BUILD_DOCUMENTATION)
@@ -417,7 +419,8 @@ install(FILES "${PROJECT_SOURCE_DIR}/THIRD-PARTY-LICENSES" DESTINATION "${CASIL_
 install(DIRECTORY "${PROJECT_BINARY_DIR}/${CASIL_DEVICE_DESCRIPTIONS_SUBDIR}/" DESTINATION "${CASIL_DEVICE_DESCRIPTIONS_INSTALLDIR}"
         COMPONENT DeviceDescriptions)
 
-install(TARGETS CasilObjLib EXPORT CasilExport FILE_SET HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}" COMPONENT Headers)
+install(TARGETS CasilObjLib EXPORT CasilExport FILE_SET HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}" COMPONENT Headers
+        INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 if(CASIL_INSTALL_SHARED)
     if(NOT WIN32)

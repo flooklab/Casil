@@ -213,7 +213,7 @@ std::vector<std::uint8_t> GPIO::bytesFromBitset(const boost::dynamic_bitset<>& p
  * Warns if unsupported "init.output_en" is present in the component configuration
  * (direct default override via "init.OUTPUT_EN" must be used).
  *
- * \return True
+ * \return True.
  */
 bool GPIO::initModule()
 {

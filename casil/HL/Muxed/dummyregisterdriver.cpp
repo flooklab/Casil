@@ -52,7 +52,7 @@ DummyRegisterDriver::DummyRegisterDriver(std::string pName, InterfaceBaseType& p
  *
  * Does nothing except \ref casil::Logger::LogLevel::Debug "Debug"-logging the function call.
  *
- * \return True
+ * \return True.
  */
 bool DummyRegisterDriver::initModule()
 {

@@ -40,7 +40,7 @@ namespace Layers { namespace RL { class Register; } }
 
 /*!
  * \brief Factory for LayerBase classes of the three component layers \ref casil::Layers::TL "TL",
- * \ref casil::Layers::HL "HL" and \ref casil::Layers::RL "RL".
+ *        \ref casil::Layers::HL "HL" and \ref casil::Layers::RL "RL".
  *
  * Use createInterface() / createDriver() / createMetaDriver() / createRegister()
  * to construct layer components by their registered type names.

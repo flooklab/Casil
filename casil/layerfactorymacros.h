@@ -323,7 +323,7 @@ namespace RegistryImpl\
  * Use this macro multiple times to define multiple different aliases.
  *
  * \note You can only register aliases for the \e one component of the current translation unit (this macro utilizes and refers
- * to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_INTERFACE_CPP).
+ *       to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_INTERFACE_CPP).
  *
  * \param ALIAS_NAME An alternative type name to additionally register to the factory for the class.
  */
@@ -354,7 +354,7 @@ namespace RegistryImpl\
  * Use this macro multiple times to define multiple different aliases.
  *
  * \note You can only register aliases for the \e one component of the current translation unit (this macro utilizes and refers
- * to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_DRIVER_CPP).
+ *       to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_DRIVER_CPP).
  *
  * \param ALIAS_NAME An alternative type name to additionally register to the factory for the class.
  */
@@ -385,7 +385,7 @@ namespace RegistryImpl\
  * Use this macro multiple times to define multiple different aliases.
  *
  * \note You can only register aliases for the \e one component of the current translation unit (this macro utilizes and refers
- * to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_META_DRIVER_CPP).
+ *       to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_META_DRIVER_CPP).
  *
  * \param ALIAS_NAME An alternative type name to additionally register to the factory for the class.
  */
@@ -416,7 +416,7 @@ namespace RegistryImpl\
  * Use this macro multiple times to define multiple different aliases.
  *
  * \note You can only register aliases for the \e one component of the current translation unit (this macro utilizes and refers
- * to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_REGISTER_CPP).
+ *       to the the unnamed namespace of the translation unit that was previously opened by \ref CASIL_REGISTER_REGISTER_CPP).
  *
  * \param ALIAS_NAME An alternative type name to additionally register to the factory for the class.
  */

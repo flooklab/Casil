@@ -100,7 +100,8 @@ might be broken, some useful functionality might be incomplete or missing altoge
 When directly adapting basil code into Casil code, the original copyright and license must be retained.
 To comply with this for files that closely reproduce such adapted basil logic, copy the additionally required notice from
 a file that already contains it and insert it right below Casil's own notice (see e.g. [sitcp.h](casil/TL/Muxed/sitcp.h)).
-For simplicity, extend the respective `@YEARS@` range in the line `Copyright (C) @YEARS@ SiLab, Institute of Physics, University of Bonn`
+For simplicity, extend the respective `@YEARS@` range in the line  
+`Copyright (C) @YEARS@ SiLab, Institute of Physics, University of Bonn`  
 to the latest modification year of the specific basil file(s) that you used as reference.
 
 ### Code Style

@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -26,6 +26,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/udp.hpp>
+#include <boost/asio/serial_port.hpp>
 #include <boost/system/errc.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -57,53 +58,56 @@ namespace ASIOHelper
 {
 
 /*!
- * \brief Check if type is either a Boost %ASIO %TCP socket or a Boost %ASIO %UDP socket.
+ * \brief Check if type is a Boost %ASIO %TCP socket, a Boost %ASIO %UDP socket or a Boost %ASIO serial port.
  *
- * \tparam SocketT Type to be checked.
+ * \tparam T Type to be checked.
  */
-template<typename SocketT>
-concept IsSocket = (std::same_as<SocketT, boost::asio::ip::tcp::socket> || std::same_as<SocketT, boost::asio::ip::udp::socket>);
+template<typename T>
+concept IsSocketOrSerPort = (std::same_as<T, boost::asio::ip::tcp::socket> ||
+                             std::same_as<T, boost::asio::ip::udp::socket> ||
+                             std::same_as<T, boost::asio::serial_port>);
 
 /*!
- * \brief Check if a Boost %ASIO %TCP or %UDP socket has a \c cancel() function with \c void return type.
+ * \brief Check if a Boost %ASIO %TCP or %UDP socket or serial port has a \c cancel() function with \c void return type.
  *
- * \tparam SocketT Type to be checked.
+ * \tparam T Type to be checked.
  */
-template<typename SocketT>
-concept IsCancellableSocket = IsSocket<SocketT> && requires(SocketT sock)
+template<typename T>
+concept IsCancellableSocketOrSerPort = IsSocketOrSerPort<T> && requires(T sockPort)
 {
-    { sock.cancel() } -> std::same_as<void>;    //This check is kind of paranoid
+    { sockPort.cancel() } -> std::same_as<void>;    //This check is kind of paranoid
 };
 
-template<typename ReturnT, typename SocketT>
-    requires IsCancellableSocket<SocketT>
-ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, SocketT& pSocket, std::chrono::milliseconds pTimeout,
+template<typename ReturnT, typename T>
+    requires IsCancellableSocketOrSerPort<T>
+ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& pSocketOrPort, std::chrono::milliseconds pTimeout,
                                               const std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
                                                                             ///< \brief Wait for the future, get and return its value;
-                                                                            ///  cancel socket and throw an exception on timeout.
+                                                                            ///  cancel the socket/port and throw an exception on timeout.
 
-template<typename SocketT>
-    requires IsCancellableSocket<SocketT>
-std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPromiseN, SocketT& pSocket, std::chrono::milliseconds pTimeout,
+template<typename T>
+    requires IsCancellableSocketOrSerPort<T>
+std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPromiseN, T& pSocketOrPort, std::chrono::milliseconds pTimeout,
                                                   const std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
-                                                                            ///< \brief Wait for the promised future, get and return its value;
-                                                                            ///  cancel the socket on timeout but return future's value anyway.
+                                                                            ///< \brief Wait for the promised future, get and return
+                                                                            ///  its value; cancel the socket/port on timeout
+                                                                            ///  but return future's value anyway.
 
 void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t pNumBytes, std::promise<std::size_t>& pNumBytesPromise);
-                                                                            ///< \brief Handler for socket transfer operations
-                                                                            ///  that does not fail when the socket gets cancelled.
+                                                                            ///< \brief Handler for socket/port transfer operations
+                                                                            ///  that does not fail when the socket/port gets cancelled.
 
 
 //Template function definitions
 
 
 /*!
- * \brief Wait for the future, get and return its value; cancel socket and throw an exception on timeout.
+ * \brief Wait for the future, get and return its value; cancel the socket/port and throw an exception on timeout.
  *
- * This function should be used to retrieve the result of an asynchronous operation (in terms of the return value of the
- * equivalent synchronous call) on a socket \p pSocket using the built-in \c boost::asio::use_future handler when this very
- * result is not needed anymore if the operation times out. After \p pTimeout with still unfinished operation \p pSocket
- * will be cancelled. If the operation finishes before the timeout or during the cancelling of the socket, the result
+ * This function should be used to retrieve the result of an asynchronous operation (in terms of the return value of the equivalent
+ * synchronous call) on a socket/port \p pSocketOrPort using the built-in \c boost::asio::use_future handler when this very
+ * result is not needed anymore if the operation times out. After \p pTimeout with still unfinished operation \p pSocketOrPort
+ * will be cancelled. If the operation finishes before the timeout or during the cancelling of the socket/port, the result
  * will be returned. Otherwise an exception is thrown, in which case \p pTimedOut will be set to true (if defined).
  *
  * Note that \p pTimedOut is always set to false in the beginning, if defined.
@@ -113,16 +117,16 @@ void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t p
  * \throws boost::system::system_error If the handler throwed such an exception (other than from cancelling after timeout).
  *
  * \tparam ReturnT Return type of the handled operation (which is wrapped in \p pFuture).
- * \tparam SocketT Type of the socket (either %TCP or %UDP socket from the Boost %ASIO library).
+ * \tparam T Type of the socket/port (%TCP or %UDP socket or serial port from the Boost %ASIO library).
  * \param pFuture The future returned from initiating the async operation.
- * \param pSocket The socket on which the operation is performed.
+ * \param pSocketOrPort The socket or serial port on which the operation is performed.
  * \param pTimeout The timeout for the handled operation.
- * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocket cancelled and thrown exception was because of the timeout).
+ * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocketOrPort cancelled and thrown exception was because of the timeout).
  * \return Result of \p pFuture / the operation.
  */
-template<typename ReturnT, typename SocketT>
-    requires IsCancellableSocket<SocketT>
-ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, SocketT& pSocket, std::chrono::milliseconds pTimeout,
+template<typename ReturnT, typename T>
+    requires IsCancellableSocketOrSerPort<T>
+ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& pSocketOrPort, std::chrono::milliseconds pTimeout,
                                               const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (pTimedOut.has_value())
@@ -139,7 +143,7 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
     }
     else if (status == std::future_status::timeout)
     {
-        pSocket.cancel();
+        pSocketOrPort.cancel();
 
         pFuture.wait();
 
@@ -165,11 +169,11 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
 }
 
 /*!
- * \brief Wait for the promised future, get and return its value; cancel the socket on timeout but return future's value anyway.
+ * \brief Wait for the promised future, get and return its value; cancel the socket/port on timeout but return future's value anyway.
  *
- * This function should be used to retrieve the number of transferred bytes of an asynchronous operation on a socket \p pSocket
- * using readWriteHandler() as handler function when the bytes already transferred after a timeout must be processed in
- * any case. After \p pTimeout with still unfinished operation \p pSocket will be cancelled. In this case the expected
+ * This function should be used to retrieve the number of transferred bytes of an asynchronous operation on a socket/port \p pSocketOrPort
+ * using readWriteHandler() as handler function when the bytes already transferred after a timeout must be processed in any case.
+ * After \p pTimeout with still unfinished operation \p pSocketOrPort will be cancelled. In this case the expected
  * handler readWriteHandler() ensures that the number of already transferred bytes can still be obtained without
  * an exception being thrown (in contrast to the built-in \c boost::asio::use_future handler). As soon as the
  * handler completes by itself or after \p pTimeout the number of transferred bytes is returned.
@@ -178,16 +182,16 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, Soc
  *
  * \throws std::invalid_argument If \p pPromiseN has no shared state or already stores a value/exception.
  *
- * \tparam SocketT Type of the socket (either %TCP or %UDP socket from the Boost %ASIO library).
+ * \tparam T Type of the socket/port (%TCP or %UDP socket or serial port from the Boost %ASIO library).
  * \param pPromiseN The transferred bytes promise from the handler readWriteHandler().
- * \param pSocket The socket on which the operation is performed.
+ * \param pSocketOrPort The socket or serial port on which the operation is performed.
  * \param pTimeout The timeout for the handled operation.
- * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocket cancelled and transferred bytes maybe less than expected).
+ * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocketOrPort cancelled and transferred bytes maybe less than expected).
  * \return Number of successfully transferred bytes.
  */
-template<typename SocketT>
-    requires IsCancellableSocket<SocketT>
-std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPromiseN, SocketT& pSocket, std::chrono::milliseconds pTimeout,
+template<typename T>
+    requires IsCancellableSocketOrSerPort<T>
+std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPromiseN, T& pSocketOrPort, std::chrono::milliseconds pTimeout,
                                                   const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (pTimedOut.has_value())
@@ -212,7 +216,7 @@ std::size_t getAsyncTransferredWithTimedOutCancel(std::promise<std::size_t>& pPr
     }
     else if (status == std::future_status::timeout)
     {
-        pSocket.cancel();
+        pSocketOrPort.cancel();
 
         futureN.wait();
 

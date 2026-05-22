@@ -31,13 +31,13 @@ namespace casil::Layers::TL::CommonImpl::ASIOHelper
 {
 
 /*!
- * \brief Handler for socket transfer operations that does not fail when the socket gets cancelled.
+ * \brief Handler for socket/port transfer operations that does not fail when the socket/port gets cancelled.
  *
- * This is a handler prototype for asynchronous operations on Boost %ASIO's %TCP/%UDP sockets that transfer bytes and pass the number
- * of successfully transferred bytes to the handler (\p pNumBytes in this case). This handler treats both \e success and \e cancelled
+ * This is a handler prototype for asynchronous operations on Boost %ASIO's %TCP/%UDP sockets or serial ports that transfer bytes and pass the
+ * number of successfully transferred bytes to the handler (\p pNumBytes in this case). This handler treats both \e success and \e cancelled
  * error codes (\p pErrorCode equal to \c boost::system::errc::success or \c boost::system::errc::operation_canceled, respectively)
- * as successful outcome. This means that the value of \p pNumBytesPromise will be set to \p pNumBytes not only on success but also if
- * the socket gets cancelled before completion of the operation (i.e. retrieval of \e already transferred bytes from the promise/future is
+ * as successful outcome. This means that the value of \p pNumBytesPromise will be set to \p pNumBytes not only on success but also if the
+ * socket/port gets cancelled before completion of the operation (i.e. retrieval of \e already transferred bytes from the promise/future is
  * possible). For any \e other error code the \e exception of \p pNumBytesPromise is set to the corresponding \c boost::system::system_error.
  *
  * Use this function with \c std::bind to bind \p pNumBytesPromise and pass the bound function as actual handler.

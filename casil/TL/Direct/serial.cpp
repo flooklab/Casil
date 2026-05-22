@@ -346,7 +346,7 @@ std::vector<std::uint8_t> Serial::read(const int pSize)
  *
  * \internal See also CommonImpl::SerialPortWrapper::write() \endinternal
  *
- * \throws std::runtime_error If the write fails.
+ * \throws std::runtime_error If the write fails or the timeout is reached before completion.
  *
  * \copydetails DirectInterface::write()
  */

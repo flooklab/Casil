@@ -477,7 +477,7 @@ std::vector<std::uint8_t> SiTCP::getFifoData(const int pSize)
  * \copybrief MuxedInterface::initImpl()
  *
  * Connects the %UDP socket and, if %TCP is enabled (see SiTCP()), the %TCP socket to the configured host name
- * using the respective configured ports.
+ * using the respective configured ports. Uses the connect timeout from the component configuration, if set (see SiTCP()).
  *
  * If %TCP is enabled, resets the FIFO and starts a polling thread for the incoming FIFO data (see also pollFifo()).
  * Furthermore, if also "tcp_to_bus" is enabled, configures the %SiTCP core accordingly by calling enableTcpToBus().

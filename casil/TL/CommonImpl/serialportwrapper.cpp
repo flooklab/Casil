@@ -203,7 +203,7 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize, const std::ch
 
         std::vector<std::uint8_t> retVal(readBuffer.begin(), termPos);
 
-        if (termPos == readBuffer.end())    //Only possible if above waiting returned with error (polling stopped)
+        if (termPos == readBuffer.end())    //Only possible if above waiting returned with error (timeout or polling stopped)
             readBuffer.clear();
         else
             readBuffer.erase(readBuffer.begin(), termPos + readTerminationLength);

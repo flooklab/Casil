@@ -28,10 +28,13 @@
 #include <boost/system/error_code.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <condition_variable>
+#include <functional>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -69,9 +72,16 @@ public:
     SerialPortWrapper& operator=(SerialPortWrapper) = delete;   ///< Deleted copy assignment operator.
     SerialPortWrapper& operator=(SerialPortWrapper&&) = delete; ///< Deleted move assignment operator.
     //
-    std::vector<std::uint8_t> read(int pSize);                  ///< Read an amount of bytes from the read buffer, or until read termination.
-    std::vector<std::uint8_t> readMax(int pSize);               ///< Read maximally some amount of bytes from the read buffer.
-    void write(const std::vector<std::uint8_t>& pData);         ///< Write data to the port (automatically terminated).
+    std::vector<std::uint8_t> read(int pSize, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
+                                   std::chrono::milliseconds pInterCharTimeout = std::chrono::milliseconds::zero(),
+                                   std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                ///< Read an amount of bytes from the read buffer, or until read termination.
+    std::vector<std::uint8_t> readMax(int pSize, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
+                                      std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                ///< Read maximally some amount of bytes from the read buffer.
+    void write(const std::vector<std::uint8_t>& pData, std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
+               std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
+                                                                ///< Write data to the port (automatically terminated).
     //
     bool readBufferEmpty() const;                               ///< Check if the read buffer is empty.
     void clearReadBuffer();                                     ///< Clear the current contents of the read buffer.

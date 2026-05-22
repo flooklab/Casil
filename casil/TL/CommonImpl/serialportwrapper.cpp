@@ -26,17 +26,19 @@
 #include <casil/asio.h>
 #include <casil/bytes.h>
 #include <casil/logger.h>
+#include <casil/TL/CommonImpl/asiohelper.h>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/completion_condition.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/read.hpp>
+#include <boost/asio/use_future.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/system/errc.hpp>
 #include <boost/system/system_error.hpp>
 
 #include <algorithm>
-#include <functional>
+#include <future>
 #include <stdexcept>
 #include <utility>
 
@@ -125,18 +127,49 @@ SerialPortWrapper::~SerialPortWrapper()
  * \param pSize Number of bytes to read or -1.
  * \return Byte sequence of requested length or up to (but excluding) termination.
  */
-std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
+std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize, const std::chrono::milliseconds pTimeout,
+                                                  const std::chrono::milliseconds pInterCharTimeout,
+                                                  std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     std::unique_lock<std::mutex> bufferLock(readBufferMutex);
     (void)bufferLock;
 
-    auto waitForNewData = [this, &bufferLock]() -> bool
+    //Assign optional reference if was not passed by caller in order to facilitate communication of timeout within this function
+    bool tTimedOutFallback = false;                                     // cppcheck-suppress variableScope symbolName=tTimedOutFallback
+    if (!pTimedOut.has_value())
+        pTimedOut = std::ref(tTimedOutFallback);
+
+    const bool useMaxTimeout = (pTimeout > std::chrono::milliseconds::zero());
+    const bool useInterTimeout = (pInterCharTimeout > std::chrono::milliseconds::zero());
+    const auto tMax = std::chrono::steady_clock::now() + pTimeout;
+
+    auto waitForNewData = [this, &bufferLock, useMaxTimeout, useInterTimeout, tMax, pInterCharTimeout, &pTimedOut]() -> bool
     {
         if (pollDataStopped.load())
             return false;
 
         newData = false;
-        newDataCondVar.wait(bufferLock, [this](){ return newData; });
+
+        if (useMaxTimeout || useInterTimeout)
+        {
+            auto tNext = tMax;
+
+            if (useInterTimeout)
+            {
+                const auto tInter = std::chrono::steady_clock::now() + pInterCharTimeout;
+                if (!useMaxTimeout || (useMaxTimeout && (tInter < tMax)))
+                    tNext = tInter;
+            }
+
+            if (!newDataCondVar.wait_until(bufferLock, tNext, [this](){ return newData; }))
+            {
+                pTimedOut->get() = true;
+                Logger::logWarning("Timeout was reached while trying to read from serial port \"" + port + "\".");
+                return false;
+            }
+        }
+        else
+            newDataCondVar.wait(bufferLock, [this](){ return newData; });
 
         return !pollDataStopped.load();
     };
@@ -153,8 +186,16 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
             {
                 if (termPos == readBuffer.end())
                 {
-                    Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read "
-                                     "up to termination because polling was stopped due to previous errors.");
+                    if (pTimedOut->get() == true)
+                    {
+                        Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read "
+                                         "up to termination because the timeout was reached.");
+                    }
+                    else
+                    {
+                        Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read "
+                                         "up to termination because polling was stopped due to previous errors.");
+                    }
                 }
                 break;
             }
@@ -177,11 +218,19 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
                 continue;
             else
             {
-                //Polling stopped from errors, hence need to handle possibly incomplete data
+                //Either timeout or polling stopped from errors, hence need to handle possibly incomplete data
                 if (std::cmp_less(readBuffer.size(), pSize))
                 {
-                    Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read requested number "
-                                     "of bytes because polling was stopped due to previous errors. Filling with zeros...");
+                    if (pTimedOut->get() == true)
+                    {
+                        Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read requested number "
+                                         "of bytes because the timeout was reached. Filling with zeros...");
+                    }
+                    else
+                    {
+                        Logger::logError("Problem while reading from serial port \"" + port + "\": Could not read requested number "
+                                         "of bytes because polling was stopped due to previous errors. Filling with zeros...");
+                    }
 
                     //Fill returned data with zeros to obtain requested data size
                     std::vector<std::uint8_t> retVal(readBuffer.begin(), readBuffer.begin() + readBuffer.size());
@@ -195,7 +244,6 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
                     break;  //If read data size is sufficient despite error, continue with regular processing
             }
         }
-
 
         if (std::cmp_equal(readBuffer.size(), pSize))
         {
@@ -231,31 +279,55 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize)
  * \param pSize Maximum number of bytes to read.
  * \return Maximally \p pSize bytes long byte sequence.
  */
-std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
+std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize, const std::chrono::milliseconds pTimeout,
+                                                     std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (pSize > 0)
     {
         std::unique_lock<std::mutex> bufferLock(readBufferMutex);
         (void)bufferLock;
 
-        auto waitForNewData = [this, &bufferLock]() -> bool
+        //Assign optional reference if was not passed by caller in order to facilitate communication of timeout within this function
+        bool tTimedOutFallback = false;                                     // cppcheck-suppress variableScope symbolName=tTimedOutFallback
+        if (!pTimedOut.has_value())
+            pTimedOut = std::ref(tTimedOutFallback);
+
+        auto waitForNewData = [this, &bufferLock, pTimeout, &pTimedOut]() -> bool
         {
             if (pollDataStopped.load())
                 return false;
 
             newData = false;
-            newDataCondVar.wait(bufferLock, [this](){ return newData; });
+
+            if (pTimeout > std::chrono::milliseconds::zero())
+            {
+                if (!newDataCondVar.wait_until(bufferLock, std::chrono::steady_clock::now() + pTimeout, [this](){ return newData; }))
+                {
+                    pTimedOut->get() = true;
+                    Logger::logWarning("Timeout was reached while trying to read from serial port \"" + port + "\".");
+                    return false;
+                }
+            }
+            else
+                newDataCondVar.wait(bufferLock, [this](){ return newData; });
 
             return !pollDataStopped.load();
         };
 
-        while (readBuffer.size() == 0)
+        if (readBuffer.size() == 0)
         {
             if (!waitForNewData())
             {
-                Logger::logWarning("Problem while reading from serial port \"" + port + "\": Could not properly "
-                                   "read the data because polling was stopped due to previous errors.");
-                break;
+                if (pTimedOut->get() == true)
+                {
+                    Logger::logWarning("Problem while reading from serial port \"" + port + "\": "
+                                       "Could not read any data because the timeout was reached.");
+                }
+                else
+                {
+                    Logger::logWarning("Problem while reading from serial port \"" + port + "\": Could not properly "
+                                       "read the data because polling was stopped due to previous errors.");
+                }
             }
         }
 
@@ -291,16 +363,51 @@ std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize)
  *
  * \param pData Data to be written (excluding termination).
  */
-void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData)
+void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData, const std::chrono::milliseconds pTimeout,
+                              std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     try
     {
-        boost::asio::write(serialPort, boost::asio::buffer(pData.data(), pData.size()));
-        boost::asio::write(serialPort, boost::asio::buffer(writeTermination));
+        if (pTimeout <= std::chrono::milliseconds::zero())
+        {
+            boost::asio::write(serialPort, boost::asio::buffer(pData.data(), pData.size()));
+            boost::asio::write(serialPort, boost::asio::buffer(writeTermination));
+        }
+        else
+        {
+            std::future<std::size_t> futureN = boost::asio::async_write(serialPort, boost::asio::buffer(pData.data(), pData.size()),
+                                                                        boost::asio::use_future);
+
+            const auto timeoutRefTime = std::chrono::steady_clock::now();
+
+            (void)ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(futureN, serialPort, pTimeout, pTimedOut);
+
+            futureN = boost::asio::async_write(serialPort, boost::asio::buffer(writeTermination), boost::asio::use_future);
+
+            const auto reducedTimeout = pTimeout - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+                                                                                                         timeoutRefTime);
+
+            if (reducedTimeout <= std::chrono::milliseconds::zero())
+            {
+                if (pTimedOut.has_value())
+                    pTimedOut->get() = true;
+                throw std::runtime_error("Timeout.");
+            }
+
+            (void)ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(futureN, serialPort, reducedTimeout, pTimedOut);
+        }
     }
     catch (const boost::system::system_error& exc)
     {
         throw std::runtime_error(std::string("Exception while writing to serial port: ") + exc.what());
+    }
+    catch (const std::runtime_error& exc)
+    {
+        throw std::runtime_error(std::string("Exception while writing to serial port: ") + exc.what());
+    }
+    catch (const std::invalid_argument&)
+    {
+        throw std::runtime_error("Invalid future argument. THIS SHOULD NEVER HAPPEN!");
     }
 }
 

@@ -168,6 +168,7 @@ set(TESTS_FILE_NAMES
     components/RL/test_standardregister/test_standardregister.cpp
     components/RL/test_standardregister/testreadbackdriver.cpp
     components/RL/test_standardregister/testreadbackdriver.h
+    components/TL/test_serial/test_serial.cpp
     components/TL/test_tcp/test_tcp.cpp
     components/TL/test_udp/test_udp.cpp
 )

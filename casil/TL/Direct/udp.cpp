@@ -62,6 +62,10 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
 
     if (config.contains(LayerConfig::fromYAML("{init: {encoding: }}"), false))
         logger.logWarning("The \"init.encoding\" setting is unsupported but set. It will have no effect.");
+    if (config.contains(LayerConfig::fromYAML("{init: {read_termination: }}"), false))
+        logger.logWarning("Termination is not supported for UDP but the \"init.read_termination\" setting is set. It will have no effect.");
+    if (config.contains(LayerConfig::fromYAML("{init: {write_termination: }}"), false))
+        logger.logWarning("Termination is not supported for UDP but the \"init.write_termination\" setting is set. It will have no effect.");
 }
 
 /*!

@@ -69,7 +69,7 @@ private:
     const std::string readTermination;      ///< Read termination to detect end of read data stream.
     const std::string writeTermination;     ///< Write termination to append to written data.
     //
-    const int baudRate;                     ///< Baud rate setting for the serial communication.
+    const unsigned int baudRate;            ///< Baud rate setting for the serial communication.
     const unsigned int characterSize;       ///< Character size setting for the serial communication.
     const std::string parity;               ///< Parity setting for the serial communication.
     const std::string stopBits;             ///< Stop bit setting for the serial communication.

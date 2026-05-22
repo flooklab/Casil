@@ -59,7 +59,7 @@ public:
     enum class PortFlowControl : std::uint8_t;
 
 public:
-    SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination, int pBaudRate,
+    SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination, unsigned int pBaudRate,
                       unsigned int pCharacterSize, PortParity pParity, PortStopBits pStopBits, PortFlowControl pFlowControl);
                                                                 ///< Constructor.
     SerialPortWrapper(const SerialPortWrapper&) = delete;       ///< Deleted copy constructor.
@@ -92,7 +92,7 @@ private:
     const std::vector<std::uint8_t> writeTermination;       ///< Write termination to append to written data.
     const std::size_t writeTerminationLength;               ///< Number of write termination bytes.
     //
-    const int baudRate;                                     ///< Baud rate setting.
+    const unsigned int baudRate;                            ///< Baud rate setting.
     const unsigned int characterSize;                       ///< Character size setting.
     const PortParity parityOption;                          ///< Parity setting.
     const PortStopBits stopBitsOption;                      ///< Stop bit setting.

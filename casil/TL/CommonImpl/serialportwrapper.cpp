@@ -61,7 +61,7 @@ using casil::Layers::TL::CommonImpl::SerialPortWrapper;
  * \param pFlowControl Flow control setting for the serial connection.
  */
 SerialPortWrapper::SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination,
-                                     const int pBaudRate, const unsigned int pCharacterSize,
+                                     const unsigned int pBaudRate, const unsigned int pCharacterSize,
                                      const PortParity pParity, const PortStopBits pStopBits, const PortFlowControl pFlowControl) :
     port(std::move(pPort)),
     readTermination(Bytes::byteVecFromStr(pReadTermination)),

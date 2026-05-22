@@ -227,7 +227,8 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  *
  * Initializes the device name of the serial port to be opened from the mandatory "init.port" string in \p pConfig.
  *
- * Initializes the baud rate setting for the serial communication from the mandatory "init.baudrate" value (integer type) in \p pConfig.
+ * Initializes the baud rate setting for the serial communication from the mandatory "init.baudrate" value
+ * (unsigned integer type) in \p pConfig.
  *
  * Initializes the character size setting for the serial communication from the optional "init.bytesize"
  * value (unsigned integer type, default: 8) in \p pConfig. Supported values are 5, 6, 7 and 8.
@@ -250,7 +251,7 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  * if not defined, to the same sequence as the read termination.
  *
  * \throws std::runtime_error If "init.port" is empty.
- * \throws std::runtime_error If "init.baudrate" is zero or negative.
+ * \throws std::runtime_error If "init.baudrate" is zero.
  * \throws std::runtime_error If "init.bytesize" is not in <tt>{5, 6, 7, 8}</tt>.
  * \throws std::runtime_error If "init.parity" is not in <tt>{'N', 'O', 'E'}</tt>.
  * \throws std::runtime_error If "init.stopbits" is not in <tt>{"1", "1.5", "2"}</tt>.
@@ -266,12 +267,12 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  */
 Serial::Serial(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
-                        "{init: {port: string, read_termination: string, baudrate: int}}")
+                        "{init: {port: string, read_termination: string, baudrate: uint}}")
                     ),
     port(config.getStr("init.port", "")),
     readTermination(config.getStr("init.read_termination", "\r\n")),
     writeTermination(config.getStr("init.write_termination", readTermination)),
-    baudRate(config.getInt("init.baudrate", 9600)),
+    baudRate(config.getUInt("init.baudrate", 9600)),
     characterSize(config.getUInt("init.bytesize", 8)),
     parity(config.getStr("init.parity", "N")),
     stopBits(config.getStr("init.stopbits", "1")),
@@ -283,8 +284,8 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
 {
     if (port == "")
         throw std::runtime_error("No serial port set for " + getSelfDescription() + ".");
-    if (baudRate <= 0)
-        throw std::runtime_error("Negative baud rate set for " + getSelfDescription() + ".");
+    if (baudRate == 0)
+        throw std::runtime_error("Baud rate set to zero for " + getSelfDescription() + ".");
     if (characterSize < 5 || characterSize > 8)
         throw std::runtime_error("Invalid character/byte size set for " + getSelfDescription() + " (must be one of {5, 6, 7, 8}).");
 }

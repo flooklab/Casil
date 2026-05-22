@@ -84,10 +84,10 @@ CASIL_REGISTER_INTERFACE_ALIAS("SiTcp")
  *
  * Initializes the host name to connect to from the mandatory "init.ip" string in \p pConfig.
  *
- * Initializes the network port for the %UDP communication from the mandatory "init.udp_port" value (integer type) in \p pConfig.
+ * Initializes the network port for the %UDP communication from the mandatory "init.udp_port" value (unsigned integer type) in \p pConfig.
  *
  * Initializes the network port for the optional %TCP connection (see below) from the optional "init.tcp_port" value
- * in \p pConfig (integer type, default: 0).
+ * (unsigned integer type, default: 0) in \p pConfig.
  *
  * Enables using the %TCP connection depending on the optional "init.tcp_connection" value in \p pConfig (boolean type, default: false).
  *
@@ -108,11 +108,11 @@ CASIL_REGISTER_INTERFACE_ALIAS("SiTcp")
  */
 SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
     MuxedInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
-                       "{init: {ip: string, udp_port: int}}")
+                       "{init: {ip: string, udp_port: uint}}")
                     ),
     hostName(config.getStr("init.ip", "")),
-    udpPort(config.getInt("init.udp_port", 0)),
-    tcpPort(config.getInt("init.tcp_port", 0)),
+    udpPort(config.getUInt("init.udp_port", 0)),
+    tcpPort(config.getUInt("init.tcp_port", 0)),
     useTcp(config.getBool("init.tcp_connection", false)),
     useTcpToBus(config.getBool("init.tcp_to_bus", false)),
     connectTimeoutSecs(config.getDbl("init.connect_timeout", 5.0)),
@@ -129,9 +129,9 @@ SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
 {
     if (hostName == "")
         throw std::runtime_error("No address/hostname set for " + getSelfDescription() + ".");
-    if (udpPort <= 0 || udpPort > 65535)
+    if (udpPort == 0 || udpPort > 65535)
         throw std::runtime_error("Invalid UDP port number set for " + getSelfDescription() + ".");
-    if (useTcp && (tcpPort <= 0 || tcpPort > 65535))
+    if (useTcp && (tcpPort == 0 || tcpPort > 65535))
         throw std::runtime_error("Invalid TCP port number set for " + getSelfDescription() + ".");
     if (useTcpToBus && !useTcp)
         throw std::runtime_error("Contradictory TCP settings for " + getSelfDescription() + ".");

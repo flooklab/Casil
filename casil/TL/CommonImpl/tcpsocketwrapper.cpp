@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -57,7 +57,7 @@ using casil::Layers::TL::CommonImpl::TCPSocketWrapper;
  * \param pReadTermination Termination sequence for non-sized read operations.
  * \param pWriteTermination Termination sequence to append for write operations.
  */
-TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const int pPort,
+TCPSocketWrapper::TCPSocketWrapper(std::string pHostName, const std::uint64_t pPort,
                                    std::string pReadTermination, const std::string& pWriteTermination) :
     hostName(std::move(pHostName)),
     port(pPort),

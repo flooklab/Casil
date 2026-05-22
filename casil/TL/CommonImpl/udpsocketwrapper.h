@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -54,13 +54,13 @@ namespace CommonImpl
 class UDPSocketWrapper
 {
 public:
-    UDPSocketWrapper(std::string pHostName, int pPort);         ///< Constructor.
-    UDPSocketWrapper(const UDPSocketWrapper&) = delete;         ///< Deleted copy constructor.
-    UDPSocketWrapper(UDPSocketWrapper&&) = default;             ///< Default move constructor.
-    ~UDPSocketWrapper() = default;                              ///< Default destructor.
+    UDPSocketWrapper(std::string pHostName, std::uint64_t pPort);   ///< Constructor.
+    UDPSocketWrapper(const UDPSocketWrapper&) = delete;             ///< Deleted copy constructor.
+    UDPSocketWrapper(UDPSocketWrapper&&) = default;                 ///< Default move constructor.
+    ~UDPSocketWrapper() = default;                                  ///< Default destructor.
     //
-    UDPSocketWrapper& operator=(UDPSocketWrapper) = delete;     ///< Deleted copy assignment operator.
-    UDPSocketWrapper& operator=(UDPSocketWrapper&&) = delete;   ///< Deleted move assignment operator.
+    UDPSocketWrapper& operator=(UDPSocketWrapper) = delete;         ///< Deleted copy assignment operator.
+    UDPSocketWrapper& operator=(UDPSocketWrapper&&) = delete;       ///< Deleted move assignment operator.
     //
     std::vector<std::uint8_t> read(std::chrono::milliseconds pTimeout = std::chrono::milliseconds::zero(),
                                    std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
@@ -81,7 +81,7 @@ public:
 
 private:
     const std::string hostName;                             ///< Host name of the remote endpoint.
-    const int port;                                         ///< Used network port.
+    const std::uint64_t port;                               ///< Used network port.
     //
     boost::asio::ip::udp::socket socket;                    ///< %UDP socket.
     //

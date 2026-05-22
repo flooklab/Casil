@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -66,7 +66,7 @@ private:
 
 private:
     const std::string hostName;                     ///< Host name of the remote endpoint.
-    const int port;                                 ///< Used network port.
+    const std::uint64_t port;                       ///< Used network port.
     //
     const std::unique_ptr<CommonImpl::UDPSocketWrapper> socketWrapperPtr;   ///< Detailed %UDP socket logic wrapper.
 

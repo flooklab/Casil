@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -50,7 +50,7 @@ using casil::Layers::TL::CommonImpl::UDPSocketWrapper;
  * \param pHostName Host name of the remote endpoint.
  * \param pPort Network port to be used.
  */
-UDPSocketWrapper::UDPSocketWrapper(std::string pHostName, const int pPort) :
+UDPSocketWrapper::UDPSocketWrapper(std::string pHostName, const std::uint64_t pPort) :
     hostName(std::move(pHostName)),
     port(pPort),
     socket(ASIO::getIOContext()),

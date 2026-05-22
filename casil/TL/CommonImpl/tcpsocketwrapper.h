@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -53,7 +53,7 @@ namespace CommonImpl
 class TCPSocketWrapper
 {
 public:
-    TCPSocketWrapper(std::string pHostName, int pPort, std::string pReadTermination, const std::string& pWriteTermination);
+    TCPSocketWrapper(std::string pHostName, std::uint64_t pPort, std::string pReadTermination, const std::string& pWriteTermination);
                                                                 ///< Constructor.
     TCPSocketWrapper(const TCPSocketWrapper&) = delete;         ///< Deleted copy constructor.
     TCPSocketWrapper(TCPSocketWrapper&&) = default;             ///< Default move constructor.
@@ -82,7 +82,7 @@ public:
 
 private:
     const std::string hostName;                         ///< Host name of the remote endpoint.
-    const int port;                                     ///< Used network port.
+    const std::uint64_t port;                           ///< Used network port.
     const std::string readTerminationStr;               ///< Read termination to detect end of read data stream (as string).
     const std::vector<std::uint8_t> readTermination;    ///< Read termination to detect end of read data stream (as byte sequence).
     const std::size_t readTerminationLength;            ///< Number of read termination characters/bytes.

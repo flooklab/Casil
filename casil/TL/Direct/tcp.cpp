@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -40,7 +40,7 @@ CASIL_REGISTER_INTERFACE_ALIAS("Socket")
  *
  * Initializes the host name to connect to from the mandatory "init.address" string in \p pConfig.
  *
- * Initializes the network port for the connection from the mandatory "init.port" value (integer type) in \p pConfig.
+ * Initializes the network port for the connection from the mandatory "init.port" value (unsigned integer type) in \p pConfig.
  *
  * Initializes the termination sequence for non-sized read operations from the mandatory "init.read_termination" string in \p pConfig.
  *
@@ -56,17 +56,17 @@ CASIL_REGISTER_INTERFACE_ALIAS("Socket")
  */
 TCP::TCP(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
-                        "{init: {address: string, port: int, read_termination: string}}")
+                        "{init: {address: string, port: uint, read_termination: string}}")
                     ),
     hostName(config.getStr("init.address", "")),
-    port(config.getInt("init.port", 1)),
+    port(config.getUInt("init.port", 1)),
     readTermination(config.getStr("init.read_termination", "\r\n")),
     writeTermination(config.getStr("init.write_termination", readTermination)),
     socketWrapperPtr(std::make_unique<CommonImpl::TCPSocketWrapper>(hostName, port, readTermination, writeTermination))
 {
     if (hostName == "")
         throw std::runtime_error("No address/hostname set for " + getSelfDescription() + ".");
-    if (port <= 0 || port > 65535)
+    if (port == 0 || port > 65535)
         throw std::runtime_error("Invalid port number set for " + getSelfDescription() + ".");
 
     if (config.getStrOpt("init.encoding").has_value())

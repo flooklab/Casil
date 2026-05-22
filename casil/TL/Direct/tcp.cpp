@@ -68,6 +68,9 @@ TCP::TCP(std::string pName, LayerConfig pConfig) :
         throw std::runtime_error("No address/hostname set for " + getSelfDescription() + ".");
     if (port <= 0 || port > 65535)
         throw std::runtime_error("Invalid port number set for " + getSelfDescription() + ".");
+
+    if (config.getStrOpt("init.encoding").has_value())
+        logger.logWarning("The \"init.encoding\" setting is unsupported but set. It will have no effect.");
 }
 
 /*!

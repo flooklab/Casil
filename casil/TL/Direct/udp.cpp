@@ -52,7 +52,7 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
                         "{init: {address: string, port: uint}}")
                     ),
     hostName(config.getStr("init.address", "")),
-    port(config.getUInt("init.port", 1)),
+    port(config.getUInt("init.port", 0)),
     socketWrapperPtr(std::make_unique<CommonImpl::UDPSocketWrapper>(hostName, port))
 {
     if (hostName == "")

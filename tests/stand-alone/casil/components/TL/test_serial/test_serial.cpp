@@ -38,7 +38,7 @@ BOOST_FIXTURE_TEST_SUITE(Components_Tests, DataDirFixture)
 
 BOOST_AUTO_TEST_SUITE(Serial_Tests)
 
-BOOST_AUTO_TEST_CASE(Test1_portSettings)
+BOOST_AUTO_TEST_CASE(Test1_configValues)
 {
     //Valid sets of init options
     const std::vector<std::string> optsStrs1 = {", baudrate: 9600, read_termination: \"\"",

@@ -237,7 +237,7 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  * \p pConfig. Available options are "N" (no parity), "O" (odd parity), "E" (even parity). Neither \e mark nor \e space parity are supported.
  *
  * Initializes the stop bit setting for the serial communication from the optional "init.stopbits" value (\e string type, default: "1")
- * in \p pConfig. Available options are (all \e verbatim!) "1" (one stop bit), "1.5" (one and a half stop bits), "2" (two stop bits).
+ * in \p pConfig. Available options are (all <em>verbatim</em>!) "1" (one stop bit), "1.5" (one and a half stop bits), "2" (two stop bits).
  *
  * Initializes the flow control setting for the serial communication from the optional "init.flow_ctrl" value (string type, default: "N")
  * in \p pConfig. Available options are "N" (no flow control), "S" (software flow control), "H" (hardware flow control). Additionally,

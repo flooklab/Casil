@@ -171,7 +171,7 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize, const std::ch
             if (useInterTimeout)
             {
                 const auto tInter = std::chrono::steady_clock::now() + pInterCharTimeout;
-                if (!useMaxTimeout || (useMaxTimeout && (tInter < tMax)))
+                if (!useMaxTimeout || (useMaxTimeout && (tInter < tMax)))                           // cppcheck-suppress redundantCondition
                     tNext = tInter;
             }
 

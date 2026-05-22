@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -68,7 +68,12 @@ private:
     const std::string port;                 ///< %Serial port identifier (e.g. device file).
     const std::string readTermination;      ///< Read termination to detect end of read data stream.
     const std::string writeTermination;     ///< Write termination to append to written data.
+    //
     const int baudRate;                     ///< Baud rate setting for the serial communication.
+    const unsigned int characterSize;       ///< Character size setting for the serial communication.
+    const std::string parity;               ///< Parity setting for the serial communication.
+    const std::string stopBits;             ///< Stop bit setting for the serial communication.
+    const std::string flowControl;          ///< Flow control setting for the serial communication.
     //
     const std::unique_ptr<CommonImpl::SerialPortWrapper> serialPortWrapperPtr;  ///< Detailed serial port logic wrapper.
 

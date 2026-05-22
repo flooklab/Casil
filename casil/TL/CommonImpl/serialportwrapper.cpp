@@ -55,15 +55,24 @@ using casil::Layers::TL::CommonImpl::SerialPortWrapper;
  * \param pReadTermination Termination sequence for non-sized read operations.
  * \param pWriteTermination Termination sequence to append for write operations.
  * \param pBaudRate Baud rate to be used for the serial connection.
+ * \param pCharacterSize Number of character bits (use 5, 6, 7 or 8) to be used for the serial connection.
+ * \param pParity Parity setting for the serial connection.
+ * \param pStopBits Stop bit setting for the serial connection.
+ * \param pFlowControl Flow control setting for the serial connection.
  */
 SerialPortWrapper::SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination,
-                                     const int pBaudRate) :
+                                     const int pBaudRate, const unsigned int pCharacterSize,
+                                     const PortParity pParity, const PortStopBits pStopBits, const PortFlowControl pFlowControl) :
     port(std::move(pPort)),
     readTermination(Bytes::byteVecFromStr(pReadTermination)),
     readTerminationLength(readTermination.size()),
     writeTermination(Bytes::byteVecFromStr(pWriteTermination)),
     writeTerminationLength(writeTermination.size()),
     baudRate(pBaudRate),
+    characterSize(pCharacterSize),
+    parityOption(pParity),
+    stopBitsOption(pStopBits),
+    flowControlOption(pFlowControl),
     serialPort(ASIO::getIOContext()),
     readBuffer(),
     intermediateReadBuffer(),
@@ -326,11 +335,11 @@ void SerialPortWrapper::clearReadBuffer()
 /*!
  * \brief Open the serial port and start continuous read buffer polling.
  *
- * Opens the serial port using the configured device name, sets the configured baud rate
- * and enables continuous read buffer polling and starts it by calling pollReadBuffer().
+ * Opens the serial port using the configured device name, sets the configured baud rate and other options (character size,
+ * parity, stop bits, flow control) and enables continuous read buffer polling and starts it by calling pollReadBuffer().
  *
  * \throws std::runtime_error If no IO context threads are running (see ASIO::ioContextThreadsRunning()).
- * \throws std::runtime_error If opening the serial port or setting the baud rate fails.
+ * \throws std::runtime_error If opening the serial port or setting the baud rate or any of the other options fails.
  */
 void SerialPortWrapper::init()
 {
@@ -353,6 +362,111 @@ void SerialPortWrapper::init()
     catch (const boost::system::system_error& exc)
     {
         throw std::runtime_error(std::string("Exception while setting baud rate for serial port: ") + exc.what());
+    }
+
+    try
+    {
+        serialPort.set_option(boost::asio::serial_port::character_size(characterSize));
+    }
+    catch (const boost::system::system_error& exc)
+    {
+        throw std::runtime_error(std::string("Exception while setting character size for serial port: ") + exc.what());
+    }
+
+    try
+    {
+        using parity = boost::asio::serial_port::parity;
+
+        switch (parityOption)
+        {
+            case PortParity::None:
+            {
+                serialPort.set_option(parity(parity::none));
+                break;
+            }
+            case PortParity::Odd:
+            {
+                serialPort.set_option(parity(parity::odd));
+                break;
+            }
+            case PortParity::Even:
+            {
+                serialPort.set_option(parity(parity::even));
+                break;
+            }
+            default:
+                throw std::runtime_error("Exception while setting parity for serial port: Invalid parity option. THIS SHOULD NEVER HAPPEN!");
+        }
+    }
+    catch (const boost::system::system_error& exc)
+    {
+        throw std::runtime_error(std::string("Exception while setting parity for serial port: ") + exc.what());
+    }
+
+    try
+    {
+        using stop_bits = boost::asio::serial_port::stop_bits;
+
+        switch (stopBitsOption)
+        {
+            case PortStopBits::One:
+            {
+                serialPort.set_option(stop_bits(stop_bits::one));
+                break;
+            }
+            case PortStopBits::OnePointFive:
+            {
+                serialPort.set_option(stop_bits(stop_bits::onepointfive));
+                break;
+            }
+            case PortStopBits::Two:
+            {
+                serialPort.set_option(stop_bits(stop_bits::two));
+                break;
+            }
+            default:
+            {
+                throw std::runtime_error("Exception while setting number of stop bits for serial port: "
+                                         "Invalid stop bits option. THIS SHOULD NEVER HAPPEN!");
+            }
+        }
+    }
+    catch (const boost::system::system_error& exc)
+    {
+        throw std::runtime_error(std::string("Exception while setting number of stop bits for serial port: ") + exc.what());
+    }
+
+    try
+    {
+        using flow_control = boost::asio::serial_port::flow_control;
+
+        switch (flowControlOption)
+        {
+            case PortFlowControl::None:
+            {
+                serialPort.set_option(flow_control(flow_control::none));
+                break;
+            }
+            case PortFlowControl::Software:
+            {
+                serialPort.set_option(flow_control(flow_control::software));
+                break;
+            }
+            case PortFlowControl::Hardware:
+            {
+                serialPort.set_option(flow_control(flow_control::hardware));
+                break;
+            }
+            default:
+            {
+                throw std::runtime_error("Exception while setting flow control for serial port: "
+                                         "Invalid flow control option. THIS SHOULD NEVER HAPPEN!");
+            }
+        }
+    }
+    catch (const boost::system::system_error& exc)
+    {
+        throw std::runtime_error(std::string("Exception while setting flow control for serial port: ") + exc.what());
     }
 
     pollData.store(true);

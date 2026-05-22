@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -54,7 +54,13 @@ namespace CommonImpl
 class SerialPortWrapper
 {
 public:
-    SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination, int pBaudRate);
+    enum class PortParity : std::uint8_t;
+    enum class PortStopBits : std::uint8_t;
+    enum class PortFlowControl : std::uint8_t;
+
+public:
+    SerialPortWrapper(std::string pPort, const std::string& pReadTermination, const std::string& pWriteTermination, int pBaudRate,
+                      unsigned int pCharacterSize, PortParity pParity, PortStopBits pStopBits, PortFlowControl pFlowControl);
                                                                 ///< Constructor.
     SerialPortWrapper(const SerialPortWrapper&) = delete;       ///< Deleted copy constructor.
     SerialPortWrapper(SerialPortWrapper&&) = delete;            ///< Deleted move constructor.
@@ -85,7 +91,12 @@ private:
     const std::size_t readTerminationLength;                ///< Number of read termination bytes.
     const std::vector<std::uint8_t> writeTermination;       ///< Write termination to append to written data.
     const std::size_t writeTerminationLength;               ///< Number of write termination bytes.
+    //
     const int baudRate;                                     ///< Baud rate setting.
+    const unsigned int characterSize;                       ///< Character size setting.
+    const PortParity parityOption;                          ///< Parity setting.
+    const PortStopBits stopBitsOption;                      ///< Stop bit setting.
+    const PortFlowControl flowControlOption;                ///< Flow control setting.
     //
     boost::asio::serial_port serialPort;                    ///< %Serial port.
     //
@@ -100,6 +111,41 @@ private:
 
 private:
     static constexpr std::size_t maxBufferErrorCount = 10;  ///< Maximum error count for the read buffer polling before it stops itself.
+
+public:
+    /*!
+     * \brief Parity mode of the serial communication.
+     *
+     * Select whether to use a parity bit per character transmission and whether to use even or odd parity.
+     */
+    enum class PortParity : std::uint8_t
+    {
+        None = 0,           ///< No parity bit.
+        Odd = 1,            ///< Parity bit with odd parity (i.e. odd number of <tt>1</tt>-bits)
+        Even = 2            ///< Parity bit with even parity (i.e. even number of <tt>1</tt>-bits)
+    };
+    /*!
+     * \brief Number of stop bits to use for the serial communication.
+     *
+     * Select which stop bit timing to use for every character transmission termination.
+     */
+    enum class PortStopBits : std::uint8_t
+    {
+        One = 0,            ///< One stop bit.
+        OnePointFive = 1,   ///< One and a half stop bits.
+        Two = 2             ///< Two stop bits.
+    };
+    /*!
+     * \brief Type of flow control to use for the serial communication.
+     *
+     * Select whether to use flow control and which type (software-based or hardware-based handshaking).
+     */
+    enum class PortFlowControl : std::uint8_t
+    {
+        None = 0,           ///< No flow control.
+        Software = 1,       ///< Flow control handled in software.
+        Hardware = 2        ///< Flow control handled in hardware.
+    };
 };
 
 } // namespace CommonImpl

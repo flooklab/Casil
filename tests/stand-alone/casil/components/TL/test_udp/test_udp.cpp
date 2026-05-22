@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -37,6 +37,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <stdexcept>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -56,7 +58,55 @@ BOOST_FIXTURE_TEST_SUITE(Components_Tests, DataDirFixture)
 
 BOOST_AUTO_TEST_SUITE(UDP_Tests)
 
-BOOST_AUTO_TEST_CASE(Test1_read)
+BOOST_AUTO_TEST_CASE(Test1_configValues)
+{
+    //Valid sets of init options
+    const std::vector<std::string> optsStrs1 = {"address: 127.0.0.1, port: 10355"};
+
+    int numOptsOk = 0;
+
+    for (const auto& optsStr : optsStrs1)
+    {
+        try
+        {
+            Device d("{transfer_layer: [{name: intf, type: UDP, init: {" + optsStr + "}}], hw_drivers: [], registers: []}");
+            (void)d;
+        }
+        catch (const std::runtime_error&)
+        {
+            continue;   //Skip incrementing success counter on error
+        }
+        ++numOptsOk;
+    }
+
+    BOOST_CHECK_EQUAL(numOptsOk, optsStrs1.size());
+
+    //Invalid sets of init options
+    const std::vector<std::string> optsStrs2 = {"address: \"\", port: 10355",
+                                                "address: 127.0.0.1, port: 0",
+                                                "address: 127.0.0.1, port: \"abc\"",
+                                                "address: 127.0.0.1",
+                                                "port: 10355"};
+
+    int numOptsErr = 0;
+
+    for (const auto& optsStr : optsStrs2)
+    {
+        try
+        {
+            Device d("{transfer_layer: [{name: intf, type: UDP, init: {" + optsStr + "}}], hw_drivers: [], registers: []}");
+            (void)d;
+        }
+        catch (const std::runtime_error&)
+        {
+            ++numOptsErr;    //Increment error counter on error
+        }
+    }
+
+    BOOST_CHECK_EQUAL(numOptsErr, optsStrs2.size());
+}
+
+BOOST_AUTO_TEST_CASE(Test2_read)
 {
     Device d("{transfer_layer: [{name: intf, type: UDP, init: {address: 127.0.0.1, port: 10355}}], hw_drivers: [], registers: []}");
 
@@ -106,7 +156,7 @@ BOOST_AUTO_TEST_CASE(Test1_read)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Test2_write)
+BOOST_AUTO_TEST_CASE(Test3_write)
 {
     Device d("{transfer_layer: [{name: intf, type: UDP, init: {address: 127.0.0.1, port: 10355}}], hw_drivers: [], registers: []}");
 
@@ -142,7 +192,7 @@ BOOST_AUTO_TEST_CASE(Test2_write)
     BOOST_CHECK_EQUAL(dataChunks[1], (std::vector<std::uint8_t>{0x35u}));
 }
 
-BOOST_AUTO_TEST_CASE(Test3_query)
+BOOST_AUTO_TEST_CASE(Test4_query)
 {
     Device d("{transfer_layer: [{name: intf, type: UDP, init: {address: 127.0.0.1, port: 10355}}], hw_drivers: [], registers: []}");
 
@@ -204,7 +254,7 @@ BOOST_AUTO_TEST_CASE(Test3_query)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Test4_readBufferFunctions)
+BOOST_AUTO_TEST_CASE(Test5_readBufferFunctions)
 {
     Device d("{transfer_layer: [{name: intf, type: UDP, init: {address: 127.0.0.1, port: 10355}}], hw_drivers: [], registers: []}");
 
@@ -264,7 +314,7 @@ BOOST_AUTO_TEST_CASE(Test4_readBufferFunctions)
     }
 }
 
-BOOST_AUTO_TEST_CASE(Test5_requireIOContextThreads)
+BOOST_AUTO_TEST_CASE(Test6_requireIOContextThreads)
 {
     Device d("{transfer_layer: [{name: intf, type: UDP, init: {address: 127.0.0.1, port: 10355}}], hw_drivers: [], registers: []}");
 

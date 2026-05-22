@@ -60,7 +60,7 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
     if (port == 0 || port > 65535)
         throw std::runtime_error("Invalid port number set for " + getSelfDescription() + ".");
 
-    if (config.getStrOpt("init.encoding").has_value())
+    if (config.contains(LayerConfig::fromYAML("{init: {encoding: }}"), false))
         logger.logWarning("The \"init.encoding\" setting is unsupported but set. It will have no effect.");
 }
 

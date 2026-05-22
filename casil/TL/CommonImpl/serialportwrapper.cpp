@@ -117,14 +117,28 @@ SerialPortWrapper::~SerialPortWrapper()
  * number of bytes up to (but excluding) the configured read termination if \p pSize is -1.
  * Other values for \p pSize are not useful (will then return an empty sequence).
  *
- * \note When the read buffer polling stops (or if it stopped already) because of repeated read errors
- *       \internal (see handleAsyncRead()) \endinternal \e before the requested data gets complete
- *       (i.e. still waiting for termination or \p pSize), then this function will \e not block
- *       indefinitely but instead return the available incomplete data regardless. In case of
- *       positive \p pSize, the returned data will be filled with trailing zeros to \p pSize.
- *       \e If the returned data is incomplete/filled, this will be logged as an error.
+ * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will be set to true (if defined) and
+ * the \e already read bytes will be returned, filled with trailing zeros to \p pSize for positive \p pSize.
+ * Note that, if reading until termination (\p pSize equal -1) in such a case, the read termination
+ * will \e only be excluded from the returned sequence if it was \e fully read into the buffer
+ * (which is unlikely but can actually happen). Otherwise \e nothing will be stripped off.
+ *
+ * The same applies to \p pInterCharTimeout, except that this is not a total timeout for the whole fuction call but is rather
+ * used to limit the time between arriving partial chunks of data (which could also be just individual bytes/characters,
+ * hence the name). This means that every time that any amount of new data arrives from the ASIO library that timeout
+ * is reset and starts again from zero. Note that both timeouts can be used simultaneously.
+ *
+ * \note When the read buffer polling stops (or if it stopped already) because of repeated read errors (see handleAsyncRead())
+ *       \e before the requested data gets complete (i.e. still waiting for termination or \p pSize), then this
+ *       function will \e not block indefinitely but instead return the available incomplete data regardless.
+ *       In case of positive \p pSize, the returned data will be filled with trailing zeros to \p pSize.
+ *
+ * \note \e If the returned data is incomplete/filled (due to timeout or polling stopped), this will be logged as an error.
  *
  * \param pSize Number of bytes to read or -1.
+ * \param pTimeout The overall/maximum timeout for the read operation.
+ * \param pInterCharTimeout The "inter-character" timeout for the read operation.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
  * \return Byte sequence of requested length or up to (but excluding) termination.
  */
 std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize, const std::chrono::milliseconds pTimeout,
@@ -271,12 +285,18 @@ std::vector<std::uint8_t> SerialPortWrapper::read(const int pSize, const std::ch
  *
  * Reads and returns maximally \p pSize bytes from the read buffer. Returns an empty sequence for negative \p pSize.
  *
- * \note This function normally waits until at least \e some data is available. However, when the read buffer polling stops
- *       (or if it stopped already) because of repeated read errors \internal (see handleAsyncRead()) \endinternal
- *       \e before any data got available, then this function will \e not block indefinitely but instead
- *       just return an empty byte sequence. This type of event will be logged as a warning.
+ * If \p pTimeout is non-zero and that timeout is reached before any bytes were read, \p pTimedOut will be set to true (if defined)
+ * and the function simply returns the current buffer content, which should be an \e empty byte sequence in this case.
+ *
+ * \note This function normally waits until at least \e some data is available. However, when the read buffer polling
+ *       stops (or if it stopped already) because of repeated read errors (see handleAsyncRead()) \e before any data
+ *       got available, then this function will \e not block indefinitely but instead just return an empty byte sequence.
+ *
+ * \note \e If the returned data is empty (due to timeout or polling stopped), this will be logged as a warning.
  *
  * \param pSize Maximum number of bytes to read.
+ * \param pTimeout The timeout for the read operation.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
  * \return Maximally \p pSize bytes long byte sequence.
  */
 std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize, const std::chrono::milliseconds pTimeout,
@@ -358,10 +378,15 @@ std::vector<std::uint8_t> SerialPortWrapper::readMax(const int pSize, const std:
  * \brief Write data to the port (automatically terminated).
  *
  * Writes \p pData to the serial port, automatically followed by the configured write termination.
+ * If \p pTimeout is non-zero, it is used as timeout for the write attempt.
+ * If the timeout is reached, \p pTimedOut will be set to true (if defined) and an exception is thrown.
  *
+ * \throws std::runtime_error On timeout.
  * \throws std::runtime_error If accessing the serial port fails.
  *
  * \param pData Data to be written (excluding termination).
+ * \param pTimeout The timeout for the write operation.
+ * \param pTimedOut Gets set (if defined) when \p pTimeout was reached.
  */
 void SerialPortWrapper::write(const std::vector<std::uint8_t>& pData, const std::chrono::milliseconds pTimeout,
                               std::optional<std::reference_wrapper<bool>> pTimedOut)

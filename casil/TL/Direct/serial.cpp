@@ -270,9 +270,9 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
                         "{init: {port: string, baudrate: uint, read_termination: string}}")
                     ),
     port(config.getStr("init.port", "")),
-    readTermination(config.getStr("init.read_termination", "\r\n")),
+    readTermination(config.getStr("init.read_termination", "")),
     writeTermination(config.getStr("init.write_termination", readTermination)),
-    baudRate(config.getUInt("init.baudrate", 9600)),
+    baudRate(config.getUInt("init.baudrate", 0)),
     characterSize(config.getUInt("init.bytesize", 8)),
     parity(config.getStr("init.parity", "N")),
     stopBits(config.getStr("init.stopbits", "1")),

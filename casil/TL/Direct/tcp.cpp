@@ -60,7 +60,7 @@ TCP::TCP(std::string pName, LayerConfig pConfig) :
                     ),
     hostName(config.getStr("init.address", "")),
     port(config.getUInt("init.port", 0)),
-    readTermination(config.getStr("init.read_termination", "\r\n")),
+    readTermination(config.getStr("init.read_termination", "")),
     writeTermination(config.getStr("init.write_termination", readTermination)),
     socketWrapperPtr(std::make_unique<CommonImpl::TCPSocketWrapper>(hostName, port, readTermination, writeTermination))
 {

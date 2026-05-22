@@ -87,7 +87,7 @@ CASIL_REGISTER_DRIVER_ALIAS("gpio")
  */
 GPIO::GPIO(std::string pName, InterfaceBaseType& pInterface, const LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, pConfig, LayerConfig::fromYAML("{size: uint}"), getRegisterDescrs(pConfig)),
-    size(config.getUInt("size", 8)),
+    size(config.getUInt("size", 0)),
     ioBytes(((size - 1) / 8) + 1)
 {
     if (size == 0)

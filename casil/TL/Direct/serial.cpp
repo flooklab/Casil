@@ -267,7 +267,7 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  */
 Serial::Serial(std::string pName, LayerConfig pConfig) :
     DirectInterface(typeName, std::move(pName), std::move(pConfig), LayerConfig::fromYAML(
-                        "{init: {port: string, read_termination: string, baudrate: uint}}")
+                        "{init: {port: string, baudrate: uint, read_termination: string}}")
                     ),
     port(config.getStr("init.port", "")),
     readTermination(config.getStr("init.read_termination", "\r\n")),

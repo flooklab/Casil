@@ -29,6 +29,7 @@
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -74,6 +75,13 @@ private:
     const std::string parity;               ///< Parity setting for the serial communication.
     const std::string stopBits;             ///< Stop bit setting for the serial communication.
     const std::string flowControl;          ///< Flow control setting for the serial communication.
+    //
+    const double readTimeoutSecs;           ///< Configured overall/maximum read timeout value in seconds.
+    const double readInterCharTimeoutSecs;  ///< Configured "inter-character" read timeout value in seconds.
+    const double writeTimeoutSecs;          ///< Configured write timeout value in seconds.
+    const std::chrono::milliseconds readTimeout;            ///< Rounded chrono version of readTimeoutSecs.
+    const std::chrono::milliseconds readInterCharTimeout;   ///< Rounded chrono version of readInterCharTimeoutSecs.
+    const std::chrono::milliseconds writeTimeout;           ///< Rounded chrono version of writeTimeoutSecs.
     //
     const std::unique_ptr<CommonImpl::SerialPortWrapper> serialPortWrapperPtr;  ///< Detailed serial port logic wrapper.
 

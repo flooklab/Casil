@@ -24,6 +24,7 @@
 #include <casil/TL/Direct/serial.h>
 
 #include <casil/asio.h>
+#include <casil/auxil.h>
 #include <casil/logger.h>
 #include <casil/TL/CommonImpl/serialportwrapper.h>
 
@@ -250,6 +251,17 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  * Initializes the termination sequence for write operations from the optional "init.write_termination" string in \p pConfig or,
  * if not defined, to the same sequence as the read termination.
  *
+ * Initializes the overall/maximum timeout for read operations (see read()) from the optional "init.timeout" value
+ * in \p pConfig (floating-point value in seconds, default: 0.0 (i.e. no timeout)).
+ *
+ * Initializes the "inter-character" timeout for read operations (see read()) from the optional "init.inter_byte_timeout" value
+ * in \p pConfig (floating-point value in seconds, default: 0.0 (i.e. no timeout)). This specific timeout gets reset every time
+ * that new partial data arrives (before data is complete according to requested amount of bytes or termination).
+ * It can be combined with the regular maximum timeout above.
+ *
+ * Initializes the timeout for write operations (see write()) from the optional "init.write_timeout" value
+ * in \p pConfig (floating-point value in seconds, default: 0.0 (i.e. no timeout)).
+ *
  * \throws std::runtime_error If "init.port" is empty.
  * \throws std::runtime_error If "init.baudrate" is zero.
  * \throws std::runtime_error If "init.bytesize" is not in <tt>{5, 6, 7, 8}</tt>.
@@ -261,6 +273,7 @@ CASIL_REGISTER_INTERFACE_CPP(Serial)
  * \throws std::runtime_error If "init.flow_ctrl" \e and one of "init.xonxoff" or "init.rtscts" are set.
  * \throws std::runtime_error If "init.xonxoff" (software flow control) and "init.rtscts" (hardware flow control) are both true.
  * \throws std::runtime_error If "init.read_termination" is not defined.
+ * \throws std::runtime_error For negative timeout values ("init.timeout", "init.inter_byte_timeout", "init.write_timeout").
  *
  * \param pName Component instance name.
  * \param pConfig Component configuration.
@@ -278,6 +291,12 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
     stopBits(config.getStr("init.stopbits", "1")),
     flowControl(::checkFlowControl(config.getStr("init.flow_ctrl", ""), config.getStr("init.xonxoff", ""),
                                    config.getStr("init.rtscts", ""), config.getStr("init.dsrdtr", ""))),
+    readTimeoutSecs(config.getDbl("init.timeout", 0.0)),
+    readInterCharTimeoutSecs(config.getDbl("init.inter_byte_timeout", 0.0)),
+    writeTimeoutSecs(config.getDbl("init.write_timeout", 0.0)),
+    readTimeout(Auxil::getChronoMilliSecs(readTimeoutSecs)),
+    readInterCharTimeout(Auxil::getChronoMilliSecs(readInterCharTimeoutSecs)),
+    writeTimeout(Auxil::getChronoMilliSecs(writeTimeoutSecs)),
     serialPortWrapperPtr(std::make_unique<CommonImpl::SerialPortWrapper>(port, readTermination, writeTermination, baudRate, characterSize,
                                                                          ::parseParity(parity), ::parseStopBits(stopBits),
                                                                          ::parseFlowControl(flowControl)))
@@ -288,6 +307,12 @@ Serial::Serial(std::string pName, LayerConfig pConfig) :
         throw std::runtime_error("Baud rate set to zero for " + getSelfDescription() + ".");
     if (characterSize < 5 || characterSize > 8)
         throw std::runtime_error("Invalid character/byte size set for " + getSelfDescription() + " (must be one of {5, 6, 7, 8}).");
+    if (readTimeoutSecs < 0.0)
+        throw std::runtime_error("Negative read timeout set for " + getSelfDescription() + ".");
+    if (readInterCharTimeoutSecs < 0.0)
+        throw std::runtime_error("Negative inter-character read timeout set for " + getSelfDescription() + ".");
+    if (writeTimeoutSecs < 0.0)
+        throw std::runtime_error("Negative write timeout set for " + getSelfDescription() + ".");
 }
 
 /*!
@@ -300,19 +325,26 @@ Serial::~Serial() = default;
 /*!
  * \copybrief DirectInterface::read()
  *
- * Reads \p pSize bytes if \p pSize is positive and any number of bytes up
- * to (but excluding) the configured read termination if \p pSize is -1.
- * Other negative values return an empty sequence.
+ * Reads \p pSize bytes if \p pSize is positive and any number of bytes up to (but excluding) the configured read termination if \p pSize
+ * is -1. Other negative values return an empty sequence. Uses the timeouts from the component configuration, if set (see Serial()).
+ * Note that in case of a timeout or other errors the returned data might be incomplete or contain part of the read termination.
+ * If a specific (i.e. positive) \p pSize is requested, the data will, however, be filled with trailing zeros to match \p pSize.
+ *
+ * \internal See also CommonImpl::SerialPortWrapper::read() \endinternal
  *
  * \copydetails DirectInterface::read()
  */
 std::vector<std::uint8_t> Serial::read(const int pSize)
 {
-    return serialPortWrapperPtr->read(pSize);
+    return serialPortWrapperPtr->read(pSize, readTimeout, readInterCharTimeout);
 }
 
 /*!
  * \copybrief DirectInterface::write()
+ *
+ * Uses the write timeout from the component configuration, if set (see Serial()).
+ *
+ * \internal See also CommonImpl::SerialPortWrapper::write() \endinternal
  *
  * \throws std::runtime_error If the write fails.
  *
@@ -322,7 +354,7 @@ void Serial::write(const std::vector<std::uint8_t>& pData)
 {
     try
     {
-        serialPortWrapperPtr->write(pData);
+        serialPortWrapperPtr->write(pData, writeTimeout);
     }
     catch (const std::runtime_error& exc)
     {

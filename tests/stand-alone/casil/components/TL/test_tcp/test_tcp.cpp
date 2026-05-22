@@ -63,7 +63,11 @@ BOOST_AUTO_TEST_CASE(Test1_configValues)
     //Valid sets of init options
     const std::vector<std::string> optsStrs1 = {"address: 127.0.0.1, port: 10354, read_termination: \"\\n\"",
                                                 "address: 127.0.0.1, port: 10354, read_termination: \"\"",
-                                                "address: 127.0.0.1, port: 10354, read_termination: \"\\n\", write_termination: \"\\r\""};
+                                                "address: 127.0.0.1, port: 10354, read_termination: \"\\n\", write_termination: \"\\r\"",
+                                                "address: 127.0.0.1, port: 10354, read_termination: \"\", "
+                                                    "connect_timeout: 0.0, timeout: 0.0, write_timeout: 0.0",
+                                                "address: 127.0.0.1, port: 10354, read_termination: \"\", "
+                                                    "connect_timeout: 3, timeout: 1.2, write_timeout: 5.0"};
 
     int numOptsOk = 0;
 
@@ -88,7 +92,10 @@ BOOST_AUTO_TEST_CASE(Test1_configValues)
                                                 "address: \"\", port: 10354, read_termination: \"\\n\"",
                                                 "address: 127.0.0.1, read_termination: \"\\n\"",
                                                 "address: 127.0.0.1, port: 0, read_termination: \"\\n\"",
-                                                "address: 127.0.0.1, port: 10354"};
+                                                "address: 127.0.0.1, port: 10354",
+                                                "address: 127.0.0.1, port: 10354, read_termination: \"\", connect_timeout: -2",
+                                                "address: 127.0.0.1, port: 10354, read_termination: \"\", timeout: -1.0",
+                                                "address: 127.0.0.1, port: 10354, read_termination: \"\", write_timeout: -0.1"};
 
     int numOptsErr = 0;
 

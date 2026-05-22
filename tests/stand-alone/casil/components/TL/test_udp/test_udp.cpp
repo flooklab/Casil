@@ -61,7 +61,9 @@ BOOST_AUTO_TEST_SUITE(UDP_Tests)
 BOOST_AUTO_TEST_CASE(Test1_configValues)
 {
     //Valid sets of init options
-    const std::vector<std::string> optsStrs1 = {"address: 127.0.0.1, port: 10355"};
+    const std::vector<std::string> optsStrs1 = {"address: 127.0.0.1, port: 10355",
+                                                "address: 127.0.0.1, port: 10355, connect_timeout: 0.0, timeout: 0.0, write_timeout: 0.0",
+                                                "address: 127.0.0.1, port: 10355, connect_timeout: 3, timeout: 1.2, write_timeout: 5.0"};
 
     int numOptsOk = 0;
 
@@ -86,7 +88,10 @@ BOOST_AUTO_TEST_CASE(Test1_configValues)
                                                 "address: 127.0.0.1, port: 0",
                                                 "address: 127.0.0.1, port: \"abc\"",
                                                 "address: 127.0.0.1",
-                                                "port: 10355"};
+                                                "port: 10355",
+                                                "address: 127.0.0.1, port: 10355, connect_timeout: -2",
+                                                "address: 127.0.0.1, port: 10355, timeout: -1.0",
+                                                "address: 127.0.0.1, port: 10355, write_timeout: -0.1"};
 
     int numOptsErr = 0;
 

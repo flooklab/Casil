@@ -51,7 +51,11 @@ BOOST_AUTO_TEST_CASE(Test1_portSettings)
                                                 ", baudrate: 9600, read_termination: \"\\n\", dsrdtr: false",
                                                 ", baudrate: 9600, read_termination: \"\\n\", xonxoff: false, rtscts: false",
                                                 ", baudrate: 9600, read_termination: \"\\n\", xonxoff: true, rtscts: false",
-                                                ", baudrate: 9600, read_termination: \"\\n\", xonxoff: false, rtscts: true"};
+                                                ", baudrate: 9600, read_termination: \"\\n\", xonxoff: false, rtscts: true",
+                                                ", baudrate: 9600, read_termination: \"\", "
+                                                    "timeout: 0.0, inter_byte_timeout: 0.0, write_timeout: 0.0",
+                                                ", baudrate: 9600, read_termination: \"\", "
+                                                    "timeout: 3.0, inter_byte_timeout: 1.2, write_timeout: 5"};
 
     int numOptsOk = 0;
 
@@ -87,7 +91,10 @@ BOOST_AUTO_TEST_CASE(Test1_portSettings)
                                                 ", baudrate: 9600, read_termination: \"\\n\", dsrdtr: true",
                                                 ", baudrate: 9600, read_termination: \"\\n\", flow_ctrl: H, dsrdtr: true",
                                                 ", baudrate: 9600, read_termination: \"\\n\", flow_ctrl: H, xonxoff: false, rtscts: false",
-                                                ", baudrate: 9600, read_termination: \"\\n\", xonxoff: true, rtscts: true"};
+                                                ", baudrate: 9600, read_termination: \"\\n\", xonxoff: true, rtscts: true",
+                                                ", baudrate: 9600, read_termination: \"\", timeout: -2",
+                                                ", baudrate: 9600, read_termination: \"\", inter_byte_timeout: -1.0",
+                                                ", baudrate: 9600, read_termination: \"\", write_timeout: -0.1"};
 
     int numOptsErr = 0;
 

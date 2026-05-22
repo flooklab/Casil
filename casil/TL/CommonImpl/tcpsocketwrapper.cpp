@@ -263,8 +263,8 @@ std::vector<std::uint8_t> TCPSocketWrapper::read(const int pSize, const std::chr
  * If the buffer already/still contains some data, no read will performed on the socket
  * and instead maximally \p pSize bytes will be directly returned from the buffer.
  *
- * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will
- * be set to true (if defined) and the already read bytes will be returned.
+ * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will be set to true (if defined) and the already read bytes
+ * will be returned. This should be an \e empty byte sequence in this case as there would not have been a timeout otherwise.
  *
  * Note: Tries to close() the socket on EOF error (\c boost::system::errc::no_such_file_or_directory),
  * i.e. if the connection was terminated, in order to ensure proper error handling for \e successive async read calls.

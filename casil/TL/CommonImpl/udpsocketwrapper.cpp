@@ -115,8 +115,8 @@ std::vector<std::uint8_t> UDPSocketWrapper::read(const std::chrono::milliseconds
  * Reads one datagram from the socket, stopping after maximally \p pSize bytes, and returns the contained data as byte sequence.
  * Returns an empty sequence for negative \p pSize.
  *
- * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will
- * be set to true (if defined) and the already read bytes will be returned.
+ * If \p pTimeout is non-zero and that timeout is reached, \p pTimedOut will be set to true (if defined) and the already read bytes
+ * will be returned. This should be an \e empty byte sequence in this case as there would not have been a timeout otherwise.
  *
  * \throws std::runtime_error If reading from the socket fails.
  *

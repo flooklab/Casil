@@ -123,7 +123,7 @@ SiTCP::SiTCP(std::string pName, LayerConfig pConfig) :
     fifoBuffer(),
     fifoMutex(),
     tcpSocketMutex(),
-    wantLockTCPSocket(ATOMIC_FLAG_INIT),
+    wantLockTCPSocket(),
     pollFIFO(false),
     rbcpId(0)
 {

@@ -29,6 +29,7 @@
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -67,6 +68,13 @@ private:
 private:
     const std::string hostName;                     ///< Host name of the remote endpoint.
     const std::uint64_t port;                       ///< Used network port.
+    //
+    const double connectTimeoutSecs;                ///< Configured connect timeout value in seconds (for init()).
+    const double readTimeoutSecs;                   ///< Configured read timeout value in seconds.
+    const double writeTimeoutSecs;                  ///< Configured write timeout value in seconds.
+    const std::chrono::milliseconds connectTimeout; ///< Rounded chrono version of connectTimeoutSecs.
+    const std::chrono::milliseconds readTimeout;    ///< Rounded chrono version of readTimeoutSecs.
+    const std::chrono::milliseconds writeTimeout;   ///< Rounded chrono version of writeTimeoutSecs.
     //
     const std::unique_ptr<CommonImpl::UDPSocketWrapper> socketWrapperPtr;   ///< Detailed %UDP socket logic wrapper.
 

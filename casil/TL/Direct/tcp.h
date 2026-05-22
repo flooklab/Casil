@@ -29,6 +29,7 @@
 #include <casil/layerconfig.h>
 #include <casil/layerfactorymacros.h>
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -69,6 +70,13 @@ private:
     const std::uint64_t port;                       ///< Used network port.
     const std::string readTermination;              ///< Read termination to detect end of read data stream.
     const std::string writeTermination;             ///< Write termination to append to written data.
+    //
+    const double connectTimeoutSecs;                ///< Configured connect timeout value in seconds (for init()).
+    const double readTimeoutSecs;                   ///< Configured read timeout value in seconds.
+    const double writeTimeoutSecs;                  ///< Configured write timeout value in seconds.
+    const std::chrono::milliseconds connectTimeout; ///< Rounded chrono version of connectTimeoutSecs.
+    const std::chrono::milliseconds readTimeout;    ///< Rounded chrono version of readTimeoutSecs.
+    const std::chrono::milliseconds writeTimeout;   ///< Rounded chrono version of writeTimeoutSecs.
     //
     const std::unique_ptr<CommonImpl::TCPSocketWrapper> socketWrapperPtr;   ///< Detailed %TCP socket logic wrapper.
 

@@ -23,6 +23,7 @@
 
 #include <casil/TL/Direct/udp.h>
 
+#include <casil/auxil.h>
 #include <casil/TL/CommonImpl/udpsocketwrapper.h>
 
 #include <stdexcept>
@@ -41,8 +42,18 @@ CASIL_REGISTER_INTERFACE_CPP(UDP)
  *
  * Initializes the network port for the communication from the mandatory "init.port" value (unsigned integer type) in \p pConfig.
  *
+ * Initializes the timeout for establishing a connection (see init()) from the optional "init.connect_timeout" value
+ * in \p pConfig (floating-point value in seconds, default: 0.0 (i.e. no timeout)).
+ *
+ * Initializes the timeout for read operations (see read()) from the optional "init.timeout" value
+ * in \p pConfig (floating-point value in seconds, default: 0.0 (i.e. no timeout)).
+ *
+ * Initializes the timeout for write operations (see write()) from the optional "init.write_timeout" value
+ * in \p pConfig (floating-point value in seconds, default: 0.0 (i.e. no timeout)).
+ *
  * \throws std::runtime_error If "init.address" is empty.
  * \throws std::runtime_error If "init.port" is out of range (must be in <tt>(0, 65535]</tt>).
+ * \throws std::runtime_error For negative timeout values ("init.connect_timeout", "init.timeout", "init.write_timeout").
  *
  * \param pName Component instance name.
  * \param pConfig Component configuration.
@@ -53,12 +64,24 @@ UDP::UDP(std::string pName, LayerConfig pConfig) :
                     ),
     hostName(config.getStr("init.address", "")),
     port(config.getUInt("init.port", 0)),
+    connectTimeoutSecs(config.getDbl("init.connect_timeout", 0.0)),
+    readTimeoutSecs(config.getDbl("init.timeout", 0.0)),
+    writeTimeoutSecs(config.getDbl("init.write_timeout", 0.0)),
+    connectTimeout(Auxil::getChronoMilliSecs(connectTimeoutSecs)),
+    readTimeout(Auxil::getChronoMilliSecs(readTimeoutSecs)),
+    writeTimeout(Auxil::getChronoMilliSecs(writeTimeoutSecs)),
     socketWrapperPtr(std::make_unique<CommonImpl::UDPSocketWrapper>(hostName, port))
 {
     if (hostName == "")
         throw std::runtime_error("No address/hostname set for " + getSelfDescription() + ".");
     if (port == 0 || port > 65535)
         throw std::runtime_error("Invalid port number set for " + getSelfDescription() + ".");
+    if (connectTimeoutSecs < 0.0)
+        throw std::runtime_error("Negative connect timeout set for " + getSelfDescription() + ".");
+    if (readTimeoutSecs < 0.0)
+        throw std::runtime_error("Negative read timeout set for " + getSelfDescription() + ".");
+    if (writeTimeoutSecs < 0.0)
+        throw std::runtime_error("Negative write timeout set for " + getSelfDescription() + ".");
 
     if (config.contains(LayerConfig::fromYAML("{init: {encoding: }}"), false))
         logger.logWarning("The \"init.encoding\" setting is unsupported but set. It will have no effect.");
@@ -80,6 +103,11 @@ UDP::~UDP() = default;
  *
  * Receives and returns a single incoming datagram, ignoring \p pSize.
  *
+ * Uses the timeout from the component configuration, if set (see UDP()).
+ * Note that in case of a timeout the returned data might be incomplete.
+ *
+ * \internal See also CommonImpl::UDPSocketWrapper::read() \endinternal
+ *
  * \throws std::runtime_error If the read fails.
  *
  * \param pSize Ignored.
@@ -91,7 +119,7 @@ std::vector<std::uint8_t> UDP::read(const int pSize)
 
     try
     {
-        return socketWrapperPtr->read();
+        return socketWrapperPtr->read(readTimeout);
     }
     catch (const std::runtime_error& exc)
     {
@@ -104,7 +132,11 @@ std::vector<std::uint8_t> UDP::read(const int pSize)
  *
  * Sends a single datagram with payload \p pData.
  *
- * \throws std::runtime_error If the write fails.
+ * Uses the write timeout from the component configuration, if set (see UDP()).
+ *
+ * \internal See also CommonImpl::UDPSocketWrapper::write() \endinternal
+ *
+ * \throws std::runtime_error If the write fails or the timeout is reached before completion.
  *
  * \copydetails DirectInterface::write()
  */
@@ -112,7 +144,7 @@ void UDP::write(const std::vector<std::uint8_t>& pData)
 {
     try
     {
-        socketWrapperPtr->write(pData);
+        socketWrapperPtr->write(pData, writeTimeout);
     }
     catch (const std::runtime_error& exc)
     {
@@ -181,6 +213,7 @@ void UDP::clearReadBuffer()
  * \copybrief DirectInterface::initImpl()
  *
  * Resolves the configured host name and connects the socket to this endpoint via the configured port.
+ * Uses the connect timeout from the component configuration, if set (see UDP()).
  *
  * \note Requires IO context threads to be running already (see ASIO::ioContextThreadsRunning()).
  *
@@ -190,7 +223,7 @@ bool UDP::initImpl()
 {
     try
     {
-        socketWrapperPtr->init();
+        socketWrapperPtr->init(connectTimeout);
     }
     catch (const std::runtime_error& exc)
     {

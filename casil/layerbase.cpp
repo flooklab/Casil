@@ -182,7 +182,7 @@ bool LayerBase::close(const bool pForce)
  * are only used when the component is initialized.
  *
  * \param pConf Desired runtime configuration as a YAML document.
- * \return If successful.
+ * \return True if successful.
  */
 bool LayerBase::loadRuntimeConfiguration(const std::string& pConf)
 {

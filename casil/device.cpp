@@ -433,7 +433,7 @@ bool Device::close(const bool pForce)
  * Elements in \p pConf that refer to non-existent components will be ignored.
  *
  * \param pConf Map of runtime configurations (as YAML documents) with the component names as keys.
- * \return If successful.
+ * \return True if successful.
  */
 bool Device::loadRuntimeConfiguration(const std::map<std::string, std::string>& pConf) const
 {

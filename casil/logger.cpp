@@ -175,7 +175,7 @@ void Logger::removeOutputClog()
  * Opens a file with file name \p pFileName and adds it as log output stream (see addOutput()).
  *
  * \param pFileName File name of the log file.
- * \return If successful.
+ * \return True if successful.
  */
 bool Logger::addLogFile(const std::string& pFileName)
 {

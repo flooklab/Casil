@@ -325,7 +325,7 @@ std::uint16_t I2C::getSize() const
 void I2C::setSize(const int pSize)
 {
     if (pSize < -1)
-        throw std::invalid_argument("Invalid number of bytes to read for I2C driver \"" + name + "\".");
+        throw std::invalid_argument("Invalid transaction length for I2C driver \"" + name + "\".");
     else if (pSize == -1)
         setValue("SIZE", seqMemSize);
     else if (std::cmp_greater(pSize, seqMemSize))

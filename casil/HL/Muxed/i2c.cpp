@@ -105,9 +105,10 @@ I2C::I2C(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) 
  *
  * \throws std::invalid_argument If \p pSize is invalid (i.e. smaller than -1).
  * \throws std::invalid_argument If \p pSize \c + \p pAddrOffs exceeds the memory size of the %I2C module instance.
+ * \throws std::invalid_argument If \p pAddrOffs exceeds the memory size of the %I2C module instance, in case of automatic \p pSize (i.e. -1).
  * \throws std::runtime_error If reading the data fails.
  *
- * \param pSize Number of bytes to read, or -1 to read the whole \c MEM_BYTES.
+ * \param pSize Number of bytes to read, or -1 to read the whole \c MEM_BYTES (modulo \p pAddrOffs).
  * \param pAddrOffs Data offset as number of bytes.
  * \return Current state of the %I2C transaction memory as byte sequence.
  */

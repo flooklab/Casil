@@ -135,7 +135,7 @@ private:
     std::uint8_t getModuleFirmwareVersion() override;
 
 private:
-    std::uint32_t seqMemSize;                                   ///< Size of the firmware module instance's transaction memory.
+    std::uint32_t seqMemSize;                                   ///< Size of the firmware module instance's transaction memory in bytes.
 
 private:
     static constexpr std::uint8_t requireFirmwareVersion = 1;   ///< Compatible version of the controlled firmware module.

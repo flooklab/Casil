@@ -51,6 +51,7 @@ set(HEADER_FILE_NAMES
     HL/Muxed/gpio.h
     HL/Muxed/i2c.h
     HL/Muxed/sitcpfifo.h
+    HL/Muxed/spi.h
     RL/dummyregister.h
     RL/register.h
     RL/standardregister.h
@@ -103,6 +104,7 @@ set(SOURCE_FILE_NAMES
     HL/Muxed/gpio
     HL/Muxed/i2c
     HL/Muxed/sitcpfifo
+    HL/Muxed/spi
     RL/dummyregister
     RL/register
     RL/standardregister

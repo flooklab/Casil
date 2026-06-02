@@ -33,6 +33,7 @@ extern void bindHL_RegisterDriver(py::module&);
 
 extern void bindHL_DummyDriver(py::module&);
 extern void bindHL_SCPI(py::module&);
+extern void bindHL_SensirionEKH4(py::module&);
 extern void bindHL_TTiQL355TP(py::module&);
 extern void bindHL_VirtEcho(py::module&);
 
@@ -57,6 +58,7 @@ void bindHL(py::module& pM)
 
     bindHL_DummyDriver(pM);
     bindHL_SCPI(pM);
+    bindHL_SensirionEKH4(pM);
     bindHL_TTiQL355TP(pM);
     bindHL_VirtEcho(pM);
 

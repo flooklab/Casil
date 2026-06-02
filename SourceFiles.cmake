@@ -44,6 +44,7 @@ set(HEADER_FILE_NAMES
     HL/registerdriver.h
     HL/Direct/dummydriver.h
     HL/Direct/scpi.h
+    HL/Direct/sensirion_ekh4.h
     HL/Direct/tti_ql355tp.h
     HL/Direct/virtecho.h
     HL/Muxed/dummymetadriver.h
@@ -99,6 +100,7 @@ set(SOURCE_FILE_NAMES
     HL/registerdriver
     HL/Direct/dummydriver
     HL/Direct/scpi
+    HL/Direct/sensirion_ekh4
     HL/Direct/tti_ql355tp
     HL/Direct/virtecho
     HL/Muxed/dummymetadriver

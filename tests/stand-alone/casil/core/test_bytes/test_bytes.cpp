@@ -123,7 +123,14 @@ BOOST_AUTO_TEST_CASE(Test3_composeUIntNTypesException)
     BOOST_CHECK_EQUAL(exceptionCtr, 6);
 }
 
-BOOST_AUTO_TEST_CASE(Test4_bitsetFromBytes)
+BOOST_AUTO_TEST_CASE(Test4_makeByteVec)
+{
+    using Bytes::makeByteVec;
+
+    BOOST_CHECK_EQUAL(makeByteVec(0x49u), (std::vector<std::uint8_t>{73}));
+}
+
+BOOST_AUTO_TEST_CASE(Test5_bitsetFromBytes)
 {
     using Bytes::bitsetFromBytes;
     using boost::dynamic_bitset;
@@ -158,7 +165,7 @@ BOOST_AUTO_TEST_CASE(Test4_bitsetFromBytes)
                       dynamic_bitset(std::string("00100100101101110100010")));
 }
 
-BOOST_AUTO_TEST_CASE(Test5_bytesFromBitset)
+BOOST_AUTO_TEST_CASE(Test6_bytesFromBitset)
 {
     using Bytes::bytesFromBitset;
     using boost::dynamic_bitset;
@@ -192,7 +199,7 @@ BOOST_AUTO_TEST_CASE(Test5_bytesFromBitset)
                       (std::vector<std::uint8_t>{0b0, 0b00010010, 0b01011011, 0b10100010}));
 }
 
-BOOST_AUTO_TEST_CASE(Test6_byteVecToFromStrConversion)
+BOOST_AUTO_TEST_CASE(Test7_byteVecToFromStrConversion)
 {
     using Bytes::byteVecFromStr;
     using Bytes::strFromByteVec;
@@ -204,7 +211,7 @@ BOOST_AUTO_TEST_CASE(Test6_byteVecToFromStrConversion)
     BOOST_CHECK(strFromByteVec({90, 48, 67, 36, 45}) == "Z0C$-");
 }
 
-BOOST_AUTO_TEST_CASE(Test7_appendToByteVec)
+BOOST_AUTO_TEST_CASE(Test8_appendToByteVec)
 {
     using Bytes::appendToByteVec;
 
@@ -219,7 +226,7 @@ BOOST_AUTO_TEST_CASE(Test7_appendToByteVec)
     BOOST_CHECK_EQUAL(v, (std::vector<std::uint8_t>{1, 2, 3, 4, 5, 6, 7, 8, 9}));
 }
 
-BOOST_AUTO_TEST_CASE(Test6_toStringFormatting)
+BOOST_AUTO_TEST_CASE(Test9_toStringFormatting)
 {
     using Bytes::formatHex;
     using Bytes::formatByteVec;

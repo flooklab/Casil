@@ -44,6 +44,7 @@ set(HEADER_FILE_NAMES
     HL/registerdriver.h
     HL/Direct/dummydriver.h
     HL/Direct/scpi.h
+    HL/Direct/tti_ql355tp.h
     HL/Direct/virtecho.h
     HL/Muxed/dummymetadriver.h
     HL/Muxed/dummymuxeddriver.h
@@ -98,6 +99,7 @@ set(SOURCE_FILE_NAMES
     HL/registerdriver
     HL/Direct/dummydriver
     HL/Direct/scpi
+    HL/Direct/tti_ql355tp
     HL/Direct/virtecho
     HL/Muxed/dummymetadriver
     HL/Muxed/dummymuxeddriver

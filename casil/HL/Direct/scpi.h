@@ -89,6 +89,9 @@ namespace Layers::HL
  * Controls arbitrary %SCPI hardware, given that a corresponding basil \e device \e description \e file,
  * which defines the available commands for a specific device, exists and can be found. The file name is
  * derived from the \e device \e type that must be defined in the driver component configuration. See also SCPI().
+ *
+ * Note: The device identifier of the connected device is initially queried (during init()) via the \c *IDN? command and compared
+ *       to the expected identifier from the loaded device description and init() fails (returning false) if they do not match.
  */
 class SCPI final : public DirectDriver
 {

@@ -54,10 +54,8 @@ void bindBytes(py::module& pM)
     pM.def("bytesFromBitset", [](const std::vector<bool>& pBits, const std::size_t pByteSize) -> std::vector<std::uint8_t>
                               { return Bytes::bytesFromBitset(PyCasilUtils::bitsetFromBoolVec(pBits), pByteSize); },
                               "Convert a dynamic bitset to a sequence of bytes.", py::arg("bits"), py::arg("byteSize"));
-
     pM.def("byteVecFromStr", &Bytes::byteVecFromStr, "Interpret a character string as a sequence of bytes.", py::arg("str"));
     pM.def("strFromByteVec", &Bytes::strFromByteVec, "Interpret a sequence of bytes as a character string.", py::arg("vec"));
-
     pM.def("formatHex", [](const std::uint64_t pNumber) -> std::string { return Bytes::formatHex<std::uint64_t>(pNumber, false); },
            "Format an unsigned integer as hexadecimal literal.", py::arg("number"));
     pM.def("formatByteVec", &Bytes::formatByteVec,

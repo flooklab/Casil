@@ -95,7 +95,7 @@ SensirionEKH4::SensirionEKH4(std::string pName, InterfaceBaseType& pInterface, L
  * Determines and returns all four temperatures at once. Individual channel values will be set to \c std::nullopt
  * if either the received data cannot be properly interpreted or no sensor is connected to that channel.
  *
- * \interface \sa getValues() \endinternal
+ * \internal See also getValues(). \endinternal
  *
  * \throws std::runtime_error If writing to or reading from the interface fails.
  *
@@ -112,7 +112,7 @@ std::array<std::optional<double>, 4> SensirionEKH4::getTemperatures() const
  * Determines and returns all four humidities at once. Individual channel values will be set to \c std::nullopt
  * if either the received data cannot be properly interpreted or no sensor is connected to that channel.
  *
- * \interface \sa getValues() \endinternal
+ * \internal See also getValues(). \endinternal
  *
  * \throws std::runtime_error If writing to or reading from the interface fails.
  *
@@ -129,7 +129,7 @@ std::array<std::optional<double>, 4> SensirionEKH4::getHumidities() const
  * Determines and returns all four dew points at once. Individual channel values will be set to \c std::nullopt
  * if either the received data cannot be properly interpreted or no sensor is connected to that channel.
  *
- * \interface \sa getValues() \endinternal
+ * \internal See also getValues(). \endinternal
  *
  * \throws std::runtime_error If writing to or reading from the interface fails.
  *

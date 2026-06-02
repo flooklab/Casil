@@ -83,11 +83,13 @@ namespace Layers::HL
  *
  * This can be used to read up to four channels of Sensirion sensors for temperature and humidity. The dew point can be obtained as well.
  *
- * \note The device uses a type-length-value (TLV) protocol (via serial port at a baud rate of 115200). Apparently, the type byte
- *       definitions could not be found online and also the data returned by the device is often too long. Overall, the protocol
- *       is not well understood, but some conditions can be detected and fixed/interpreted \internal (see getValues()) \endinternal
- *       by this driver accordingly. Nevertheless, it can happen that data of some channels cannot be reconstructed,
- *       in which case the returned results for those channels will simply be \c std::nullopt.
+ * \note The device uses a type-length-value (TLV) protocol (via serial port at a baud rate of 115200).
+ *       Apparently, the type byte definitions could not be found online and also the data returned by the device
+ *       is often too long. Overall, the protocol is not well understood, but some conditions can be detected and
+ *       fixed/interpreted by this driver accordingly. Nevertheless, it can happen that data of some channels cannot
+ *       be reconstructed, in which case the returned results for those channels will simply be \c std::nullopt.
+ *
+ * \internal \note See also getValues() for more notes on that protocol and how it is parsed. \endinternal
  */
 class SensirionEKH4 final : public DirectDriver
 {

@@ -84,6 +84,10 @@ constexpr std::uint64_t composeUInt64(std::span<const std::uint8_t, 8> pBytes, b
 
 //
 
+constexpr std::vector<std::uint8_t> makeByteVec(std::uint8_t pByte);        ///< Construct a byte sequence from a single unsigned integer.
+
+//
+
 boost::dynamic_bitset<> bitsetFromBytes(const std::vector<std::uint8_t>& pBytes, std::size_t pBitSize);
                                                                                     ///< Convert a sequence of bytes to a dynamic bitset.
 std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits, std::size_t pByteSize);
@@ -424,6 +428,19 @@ constexpr std::uint64_t composeUInt64(const std::vector<std::uint8_t>& pBytes, c
 constexpr std::uint64_t composeUInt64(const std::span<const std::uint8_t, 8> pBytes, const bool pBigEndian)
 {
     return BytesImpl::composeUInt<std::uint64_t, 8>(pBigEndian, pBytes);
+}
+
+//
+
+/*!
+ * \brief Construct a byte sequence from a single unsigned integer.
+ *
+ * \param pByte Unsigned integer to use as only element of the returned sequence.
+ * \return The byte sequence (vector of size one containing \p pByte).
+ */
+constexpr std::vector<std::uint8_t> makeByteVec(const std::uint8_t pByte)
+{
+    return std::vector<std::uint8_t>{pByte};
 }
 
 //

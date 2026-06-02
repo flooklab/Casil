@@ -50,6 +50,7 @@ set(HEADER_FILE_NAMES
     HL/Muxed/dummyregisterdriver.h
     HL/Muxed/gpio.h
     HL/Muxed/i2c.h
+    HL/Muxed/si570.h
     HL/Muxed/sitcpfifo.h
     HL/Muxed/spi.h
     RL/dummyregister.h
@@ -103,6 +104,7 @@ set(SOURCE_FILE_NAMES
     HL/Muxed/dummyregisterdriver
     HL/Muxed/gpio
     HL/Muxed/i2c
+    HL/Muxed/si570
     HL/Muxed/sitcpfifo
     HL/Muxed/spi
     RL/dummyregister

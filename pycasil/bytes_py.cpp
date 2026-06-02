@@ -47,7 +47,7 @@ void bindBytes(py::module& pM)
                             { return Bytes::composeUInt64(pBytes, pBigEndian); },
            "Create a 64 bit unsigned integer from an eight byte sequence of a certain endianness.",
            py::arg("bytes"), py::arg("bigEndian") = true);
-
+    pM.def("makeByteVec", &Bytes::makeByteVec, "Construct a byte sequence from a single unsigned integer.", py::arg("byte"));
     pM.def("bitsetFromBytes", [](const std::vector<std::uint8_t>& pBytes, const std::size_t pBitSize) -> std::vector<bool>
                               { return PyCasilUtils::boolVecFromBitset(Bytes::bitsetFromBytes(pBytes, pBitSize)); },
                               "Convert a sequence of bytes to a dynamic bitset.", py::arg("bytes"), py::arg("bitSize"));

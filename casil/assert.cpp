@@ -27,7 +27,8 @@
 #include <cstdint>
 #include <type_traits>
 
-//Require equivalent use of std::uint8_t and (unsigned) char as 8 bit wide bytes (see https://stackoverflow.com/a/16261758/13684381)
+//Require equivalent use of std::uint8_t and (unsigned) char as 8 bit wide bytes
+//(see "https://stackoverflow.com/questions/16260033/reinterpret-cast-between-char-and-stduint8-t-safe/16261758#16261758")
 static_assert(CHAR_BIT == 8, "Number of bits in a byte must be 8.");
 static_assert(std::is_same_v<std::uint8_t, char> || std::is_same_v<std::uint8_t, unsigned char>,
               "Type std::uint8_t must be either char or unsigned char.");

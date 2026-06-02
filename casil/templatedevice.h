@@ -353,6 +353,12 @@ struct RegistersConf
 
 //
 
+//The below declaration of TemplateDevice by means of a partial template specialization and
+//using the TmplDev::...Conf helper structs is a trick to allow specifying multiple parameter packs
+//(in this case three separate lists of component configurations for interfaces, drivers and registers)
+//as template parameters for TemplateDevice. It was likely adopted from this thread/answer:
+//"https://stackoverflow.com/questions/9831501/how-can-i-have-multiple-parameter-packs-in-a-variadic-template/52561399#52561399"
+
 /*!
  * \brief Type-safe wrapper for the "plain" Device class.
  *

@@ -100,7 +100,10 @@ Si570::Si570(std::string pName, MuxedDriver& pBackendDriver, LayerConfig pConfig
     initFrequency(config.getDbl("frequency", 0.0))
 {
     if (i2cDrv.memSize() < 7)
-        throw std::runtime_error("Transaction memory of backend driver " + i2cDrv.getName() + " too small for " + getSelfDescription() + ".");
+    {
+        throw std::runtime_error("Transaction memory of backend driver \"" + i2cDrv.getName() + "\" "
+                                 "too small for " + getSelfDescription() + ".");
+    }
     if (initFrequency == 0.0 || initFrequency < 0.0)
         throw std::runtime_error("Invalid frequency set for " + getSelfDescription() + ".");
 }

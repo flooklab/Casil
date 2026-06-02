@@ -113,7 +113,7 @@ private:
      */
     bool initImpl() override = 0;
     /*!
-     * \brief Perform driver-specific closing logic for init().
+     * \brief Perform driver-specific closing logic for close().
      *
      * \copydetails LayerBase::closeImpl()
      */

@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -172,7 +172,7 @@ std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits, 
  * \param pStr The character string to be converted.
  * \return The equivalent byte sequence.
  */
-std::vector<std::uint8_t> byteVecFromStr(const std::string& pStr)
+std::vector<std::uint8_t> byteVecFromStr(const std::string_view pStr)
 {
     return std::vector<std::uint8_t>(pStr.begin(), pStr.end());
 }

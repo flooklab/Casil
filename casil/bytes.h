@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -32,6 +32,7 @@
 #include <span>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -95,7 +96,7 @@ std::vector<std::uint8_t> bytesFromBitset(const boost::dynamic_bitset<>& pBits, 
 
 //
 
-std::vector<std::uint8_t> byteVecFromStr(const std::string& pStr);                  ///< Interpret a character string as a sequence of bytes.
+std::vector<std::uint8_t> byteVecFromStr(std::string_view pStr);                    ///< Interpret a character string as a sequence of bytes.
 std::string strFromByteVec(const std::vector<std::uint8_t>& pVec);                  ///< Interpret a sequence of bytes as a character string.
 
 void appendToByteVec(std::vector<std::uint8_t>& pVec, const std::vector<std::uint8_t>& pAppend);    ///< Concatenate two sequences of bytes.

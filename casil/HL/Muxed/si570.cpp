@@ -161,7 +161,7 @@ void Si570::changeFrequency(const double pFreqMHz)
 
     if (newFDCO < 4850.0 || newFDCO > 5670.0)
     {
-        logger.logDebug("Large frequency change for Si570: Recalculating HS_DIV and N1...");
+        logger.logDebug("Large frequency change for Si570. Recalculating HS_DIV and N1...");
 
         bool foundNewVals = false;
 

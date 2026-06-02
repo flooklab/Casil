@@ -111,7 +111,7 @@ TCP::~TCP() = default;
  * Note that in case of a timeout the returned data might be incomplete or contain part of the read termination.
  * If a specific (i.e. positive) \p pSize is requested, the data will, however, be filled with trailing zeros to match \p pSize.
  *
- * \internal See also CommonImpl::TCPSocketWrapper::read() \endinternal
+ * \internal See also CommonImpl::TCPSocketWrapper::read(). \endinternal
  *
  * \throws std::runtime_error If the read fails.
  *
@@ -134,7 +134,7 @@ std::vector<std::uint8_t> TCP::read(const int pSize)
  *
  * Uses the write timeout from the component configuration, if set (see TCP()).
  *
- * \internal See also CommonImpl::TCPSocketWrapper::write() \endinternal
+ * \internal See also CommonImpl::TCPSocketWrapper::write(). \endinternal
  *
  * \throws std::runtime_error If the write fails or the timeout is reached before completion.
  *

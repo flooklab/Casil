@@ -106,7 +106,7 @@ UDP::~UDP() = default;
  * Uses the timeout from the component configuration, if set (see UDP()).
  * Note that in case of a timeout the returned data might be incomplete.
  *
- * \internal See also CommonImpl::UDPSocketWrapper::read() \endinternal
+ * \internal See also CommonImpl::UDPSocketWrapper::read(). \endinternal
  *
  * \throws std::runtime_error If the read fails.
  *
@@ -134,7 +134,7 @@ std::vector<std::uint8_t> UDP::read(const int pSize)
  *
  * Uses the write timeout from the component configuration, if set (see UDP()).
  *
- * \internal See also CommonImpl::UDPSocketWrapper::write() \endinternal
+ * \internal See also CommonImpl::UDPSocketWrapper::write(). \endinternal
  *
  * \throws std::runtime_error If the write fails or the timeout is reached before completion.
  *

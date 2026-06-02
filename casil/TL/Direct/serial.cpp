@@ -330,7 +330,7 @@ Serial::~Serial() = default;
  * Note that in case of a timeout or other errors the returned data might be incomplete or contain part of the read termination.
  * If a specific (i.e. positive) \p pSize is requested, the data will, however, be filled with trailing zeros to match \p pSize.
  *
- * \internal See also CommonImpl::SerialPortWrapper::read() \endinternal
+ * \internal See also CommonImpl::SerialPortWrapper::read(). \endinternal
  *
  * \copydetails DirectInterface::read()
  */
@@ -344,7 +344,7 @@ std::vector<std::uint8_t> Serial::read(const int pSize)
  *
  * Uses the write timeout from the component configuration, if set (see Serial()).
  *
- * \internal See also CommonImpl::SerialPortWrapper::write() \endinternal
+ * \internal See also CommonImpl::SerialPortWrapper::write(). \endinternal
  *
  * \throws std::runtime_error If the write fails or the timeout is reached before completion.
  *

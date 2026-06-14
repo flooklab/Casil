@@ -282,10 +282,10 @@ std::map<std::string, casil::HL::RegisterDescr, std::less<>> GPIO::getRegisterDe
     const std::uint32_t numIOBytes = ((pConfig.getUInt("size", 8) - 1) / 8) + 1;
 
     return {
-        {"RESET",     {.type{DataType::Value},     .mode{AccessMode::WriteOnly}, .addr{0},                .size{8},          .offs{0}}},
-        {"VERSION",   {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0},                .size{8},          .offs{0}}},
-        {"INPUT",     {.type{DataType::ByteArray}, .mode{AccessMode::ReadOnly},  .addr{1},                .size{numIOBytes}, .offs{0}}},
-        {"OUTPUT",    {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{1 + 1*numIOBytes}, .size{numIOBytes}, .offs{0}}},
-        {"OUTPUT_EN", {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{1 + 2*numIOBytes}, .size{numIOBytes}, .offs{0}}}
+        {"RESET",     {.type{DT::Value},     .mode{AM::WriteOnly}, .addr{0},                .size{8},          .offs{0}}},
+        {"VERSION",   {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0},                .size{8},          .offs{0}}},
+        {"INPUT",     {.type{DT::ByteArray}, .mode{AM::ReadOnly},  .addr{1},                .size{numIOBytes}, .offs{0}}},
+        {"OUTPUT",    {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{1 + 1*numIOBytes}, .size{numIOBytes}, .offs{0}}},
+        {"OUTPUT_EN", {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{1 + 2*numIOBytes}, .size{numIOBytes}, .offs{0}}}
     };
 }

@@ -79,15 +79,15 @@ CASIL_REGISTER_DRIVER_ALIAS("spi")
  */
 SPI::SPI(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig(),
-       {{"RESET",     {.type{DataType::Value},     .mode{AccessMode::WriteOnly}, .addr{0},  .size{8},  .offs{0}}},
-        {"VERSION",   {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0},  .size{8},  .offs{0}}},
-        {"START",     {.type{DataType::Value},     .mode{AccessMode::WriteOnly}, .addr{1},  .size{8},  .offs{0}}},
-        {"READY",     {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{1},  .size{1},  .offs{0}}},
-        {"SIZE",      {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{3},  .size{16}, .offs{0}}},
-        {"WAIT",      {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{5},  .size{32}, .offs{0}}},
-        {"REPEAT",    {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{9},  .size{32}, .offs{0}}},
-        {"EN",        {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{13}, .size{1},  .offs{0}}},
-        {"MEM_BYTES", {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{14}, .size{16}, .offs{0}}}}),
+       {{"RESET",     {.type{DT::Value},     .mode{AM::WriteOnly}, .addr{0},  .size{8},  .offs{0}}},
+        {"VERSION",   {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0},  .size{8},  .offs{0}}},
+        {"START",     {.type{DT::Value},     .mode{AM::WriteOnly}, .addr{1},  .size{8},  .offs{0}}},
+        {"READY",     {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{1},  .size{1},  .offs{0}}},
+        {"SIZE",      {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{3},  .size{16}, .offs{0}}},
+        {"WAIT",      {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{5},  .size{32}, .offs{0}}},
+        {"REPEAT",    {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{9},  .size{32}, .offs{0}}},
+        {"EN",        {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{13}, .size{1},  .offs{0}}},
+        {"MEM_BYTES", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{14}, .size{16}, .offs{0}}}}),
     seqMemSize(0)
 {
 }

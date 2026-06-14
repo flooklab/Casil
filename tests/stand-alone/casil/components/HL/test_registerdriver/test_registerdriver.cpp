@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(RegisterDriver_Tests)
 
 BOOST_AUTO_TEST_CASE(Test1_invalidRegisterDefinitions)
 {
-    static constexpr int numFailureModes = 8;
+    static constexpr int numFailureModes = 10;
 
     int exceptionCtr = 0;
 
@@ -207,8 +207,10 @@ BOOST_AUTO_TEST_CASE(Test5_readDefaults)
     BOOST_CHECK_EQUAL(drv.getValue("FOOBAR"), 582);
     BOOST_CHECK_EQUAL(drv.getBytes("INPUT"), (std::vector<std::uint8_t>{0b10110001}));
     BOOST_CHECK_EQUAL(drv.getBytes("OUTPUT"), (std::vector<std::uint8_t>{0x56u, 0x78u, 0x9Au}));
-    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR"), (std::vector<std::uint8_t>{0xDE, 0xBC}));
+    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR"), (std::vector<std::uint8_t>{0xDEu, 0xBCu}));
+    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR_LIT"), (std::vector<std::uint8_t>{0xBCu, 0xDEu}));
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL"), 0xABCDu);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_LIT"), 0xCDABu);
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_A"), 0);
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_B"), 0);
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_C"), 0);
@@ -247,7 +249,9 @@ BOOST_AUTO_TEST_CASE(Test5_readDefaults)
     BOOST_CHECK_EQUAL(drv2.getBytes("INPUT"), (std::vector<std::uint8_t>{0b10110001}));
     BOOST_CHECK_EQUAL(drv2.getBytes("OUTPUT"), (std::vector<std::uint8_t>{0x11, 0x22, 0x44}));
     BOOST_CHECK_EQUAL(drv2.getBytes("TESTARR"), (std::vector<std::uint8_t>{0x87, 0x4E}));
+    BOOST_CHECK_EQUAL(drv2.getBytes("TESTARR_LIT"), (std::vector<std::uint8_t>{0x4E, 0x87}));
     BOOST_CHECK_EQUAL(drv2.getValue("TESTVAL"), 0x91A2u);
+    BOOST_CHECK_EQUAL(drv2.getValue("TESTVAL_LIT"), 0xA291u);
     BOOST_CHECK_EQUAL(drv2.getValue("TESTVAL_A"), 0x23432u);
     BOOST_CHECK_EQUAL(drv2.getValue("TESTVAL_B"), 0b10110111001u);
     BOOST_CHECK_EQUAL(drv2.getValue("TESTVAL_C"), 0b10110111001u);
@@ -328,6 +332,14 @@ BOOST_AUTO_TEST_CASE(Test6_writeAndRead)
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_E"), 0);
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_F"), 0);
     BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_G"), 0);
+
+    drv.setBytes("TESTARR_LIT", std::vector<std::uint8_t>{0x37, 0x29});
+    drv.setValue("TESTVAL_LIT", 0x175C);
+
+    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR"), (std::vector<std::uint8_t>{0x29, 0x37}));
+    BOOST_CHECK_EQUAL(drv.getBytes("TESTARR_LIT"), (std::vector<std::uint8_t>{0x37, 0x29}));
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL"), 0x5C17);
+    BOOST_CHECK_EQUAL(drv.getValue("TESTVAL_LIT"), 0x175C);
 }
 
 BOOST_AUTO_TEST_CASE(Test7_applyDefaults)
@@ -417,7 +429,9 @@ BOOST_AUTO_TEST_CASE(Test8_genericGetSet)
     BOOST_CHECK_EQUAL(std::get<std::vector<std::uint8_t>>(drv.get("INPUT")), (std::vector<std::uint8_t>{0b10110001}));
     BOOST_CHECK_EQUAL(std::get<std::vector<std::uint8_t>>(drv.get("OUTPUT")), (std::vector<std::uint8_t>{0x56u, 0x78u, 0x9Au}));
     BOOST_CHECK_EQUAL(std::get<std::vector<std::uint8_t>>(drv.get("TESTARR")), (std::vector<std::uint8_t>{0xDE, 0xBC}));
+    BOOST_CHECK_EQUAL(std::get<std::vector<std::uint8_t>>(drv.get("TESTARR_LIT")), (std::vector<std::uint8_t>{0xBC, 0xDE}));
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL")), 0xABCDu);
+    BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_LIT")), 0xCDABu);
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_A")), 0x23432u);
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_B")), 0b10110111001u);
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_C")), 0b10110111001u);
@@ -449,6 +463,14 @@ BOOST_AUTO_TEST_CASE(Test8_genericGetSet)
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_E")), 0x255F42EE0u);
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_F")), 0x1D186AB43D452E2u);
     BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_G")), 0x6EFCD1A87B1674F9u);
+
+    drv.set("TESTARR_LIT", std::vector<std::uint8_t>{0xDCu, 0x28u});
+    drv.set("TESTVAL_LIT", 0xA64Eu);
+
+    BOOST_CHECK_EQUAL(std::get<std::vector<std::uint8_t>>(drv.get("TESTARR")), (std::vector<std::uint8_t>{0x28u, 0xDCu}));
+    BOOST_CHECK_EQUAL(std::get<std::vector<std::uint8_t>>(drv.get("TESTARR_LIT")), (std::vector<std::uint8_t>{0xDCu, 0x28u}));
+    BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL")), 0x4EA6u);
+    BOOST_CHECK_EQUAL(std::get<std::uint64_t>(drv.get("TESTVAL_LIT")), 0xA64Eu);
 }
 
 BOOST_AUTO_TEST_CASE(Test9_subscriptOperator)
@@ -705,7 +727,9 @@ BOOST_AUTO_TEST_CASE(Test13_testRegisterName)
     BOOST_CHECK(drv.testRegisterName("OUTPUT"));
     BOOST_CHECK(drv.testRegisterName("TRIGGER"));
     BOOST_CHECK(drv.testRegisterName("TESTARR"));
+    BOOST_CHECK(drv.testRegisterName("TESTARR_LIT"));
     BOOST_CHECK(drv.testRegisterName("TESTVAL"));
+    BOOST_CHECK(drv.testRegisterName("TESTVAL_LIT"));
     BOOST_CHECK(drv.testRegisterName("TESTVAL_A"));
     BOOST_CHECK(drv.testRegisterName("TESTVAL_B"));
     BOOST_CHECK(drv.testRegisterName("TESTVAL_C"));

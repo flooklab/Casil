@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -92,6 +92,8 @@ using casil::Layers::HL::RegisterDriver;
  * \throws std::runtime_error If the size is set to zero for one of the registers.
  * \throws std::runtime_error If the size is larger than 64 bit for one of the value registers.
  * \throws std::runtime_error If the offset is non-zero for one of the byte array registers.
+ * \throws std::runtime_error If the byte order is little endian but the register does not have a
+ *                            full byte size or has a non-zero offset for one of the value registers.
  * \throws std::runtime_error If a default value is set for one of the read-only registers.
  * \throws std::runtime_error If the type of the default value does not match the register's data type for one of the registers.
  * \throws std::runtime_error If the length of the default byte sequence does not match the register size for one of the byte array registers.
@@ -142,6 +144,11 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
         {
             throw std::runtime_error("Offset is non-zero for byte array register \"" + regName + "\" " +
                                      "of register driver \"" + name + "\".");
+        }
+        if (regDescr.type == DataType::Value && regDescr.order == ByteOrder::Little && (regDescr.offs != 0 || regDescr.size % 8 != 0))
+        {
+            throw std::runtime_error("Unsupported combination of little endian byte order and register with non-zero offset or no "
+                                     "full byte size for value register \"" + regName + "\" of register driver \"" + name + "\".");
         }
         if (regDescr.mode == AccessMode::ReadOnly && !std::holds_alternative<std::monostate>(regDescr.defaultValue))
         {
@@ -347,7 +354,7 @@ std::vector<std::uint8_t> RegisterDriver::getBytes(const std::string_view pRegNa
 
     try
     {
-        std::vector<std::uint8_t> retVal = getRegBytes(reg.addr, reg.size);
+        const std::vector<std::uint8_t> retVal = getRegBytes(reg.addr, reg.size, (reg.order == ByteOrder::Little));
 
         if (reg.mode == AccessMode::ReadWrite)
         {
@@ -454,7 +461,7 @@ void RegisterDriver::setBytes(const std::string_view pRegName, const std::vector
 
     try
     {
-        setRegBytes(reg.addr, pData);
+        setRegBytes(reg.addr, (reg.order == ByteOrder::Little), pData);
     }
     catch (const std::runtime_error& exc)
     {
@@ -509,7 +516,7 @@ std::uint64_t RegisterDriver::getValue(const std::string_view pRegName)
 
     try
     {
-        std::uint64_t retVal = getRegValue(reg.addr, reg.size, reg.offs);
+        const std::uint64_t retVal = getRegValue(reg.addr, reg.size, reg.offs, (reg.order == ByteOrder::Little));
 
         if (reg.mode == AccessMode::ReadWrite)
         {
@@ -610,7 +617,7 @@ void RegisterDriver::setValue(const std::string_view pRegName, const std::uint64
 
     try
     {
-        setRegValue(reg.addr, reg.size, reg.offs, pValue);
+        setRegValue(reg.addr, reg.size, reg.offs, (reg.order == ByteOrder::Little), pValue);
     }
     catch (const std::runtime_error& exc)
     {
@@ -1093,18 +1100,24 @@ bool RegisterDriver::checkVersionRequirement()
  *
  * Reads \p pRegSize bytes at register address \p pRegAddr via read().
  *
+ * Returns the received byte sequence in \e reverse order if \p pLittle is true.
+ *
  * \throws std::runtime_error If read() fails or the number of received bytes differs from \p pRegSize.
  *
  * \param pRegAddr Module-local register address.
  * \param pRegSize Register size in bytes.
+ * \param pLittle Assume \e little endian byte order (and thus \e reverse received byte sequence) if true.
  * \return Read bytes.
  */
-std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAddr, const std::uint32_t pRegSize) const
+std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAddr, const std::uint32_t pRegSize, const bool pLittle) const
 {
-    const std::vector<std::uint8_t> readBytes = read(pRegAddr, pRegSize);
+    std::vector<std::uint8_t> readBytes = read(pRegAddr, pRegSize);
 
     if (readBytes.size() != pRegSize)
         throw std::runtime_error("Read wrong number of bytes.");
+
+    if (pLittle)
+        std::reverse(readBytes.begin(), readBytes.end());
 
     return readBytes;
 }
@@ -1114,14 +1127,20 @@ std::vector<std::uint8_t> RegisterDriver::getRegBytes(const std::uint32_t pRegAd
  *
  * Writes \p pData to register address \p pRegAddr via write().
  *
+ * Writes the data in \e reverse order if \p pLittle is true.
+ *
  * \throws std::runtime_error If write() fails.
  *
  * \param pRegAddr Module-local register address.
+ * \param pLittle Assume \e little endian byte order of the register (and thus send \p pData in \e reversed order) if true.
  * \param pData Byte sequence to be written.
  */
-void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const std::vector<std::uint8_t>& pData) const
+void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const bool pLittle, const std::vector<std::uint8_t>& pData) const
 {
-    write(pRegAddr, pData);
+    if (pLittle)
+        write(pRegAddr, std::vector<std::uint8_t>(pData.rbegin(), pData.rend()));
+    else
+        write(pRegAddr, pData);
 }
 
 //
@@ -1132,14 +1151,20 @@ void RegisterDriver::setRegBytes(const std::uint32_t pRegAddr, const std::vector
  * Reads \c N full bytes at register address \p pRegAddr via read(), with \c N such that the contained integer
  * value at bit offset \p pRegOffs and with bit size \p pRegSize can be determined. This value will be returned.
  *
+ * Interprets the received byte sequence in \e reverse order if \p pLittle is true,
+ * which means that in this case the \e first received byte (at \p pRegAddr \c + \c 0)
+ * is assumed to be the \e least significant byte of the represented integer value.
+ *
  * \throws std::runtime_error If read() fails or the number of received bytes differs from \c N.
  *
  * \param pRegAddr Module-local register address (in bytes).
  * \param pRegSize Register size in bits (i.e. bit length of stored value).
  * \param pRegOffs Register offset in bits (i.e. bit offset of stored value with respect to \p pRegAddr).
+ * \param pLittle Assume \e little endian byte order (and thus \e reverse received bytes before interpretation) if true.
  * \return Read value.
  */
-std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize, const std::uint32_t pRegOffs) const
+std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize, const std::uint32_t pRegOffs,
+                                          const bool pLittle) const
 {
     const std::uint32_t byteOffs = pRegOffs / 8;
     const std::uint32_t bitOffs = pRegOffs % 8;
@@ -1148,7 +1173,11 @@ std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const st
     if ((bitOffs + pRegSize) % 8 > 0)
         ++readByteSize;
 
-    const std::vector<std::uint8_t> readBytes = read(pRegAddr + byteOffs, readByteSize);
+    std::vector<std::uint8_t> readBytes = read(pRegAddr + byteOffs, readByteSize);
+
+    //Reverse received bytes in case of little endian order
+    if (pLittle)                                            //This simple reversion only makes sense if both 'pRegSize' and 'pRegOffs' are
+        std::reverse(readBytes.begin(), readBytes.end());   //multiples of eight; but constructor checks that registers comply with that
 
     if (readBytes.size() != readByteSize)
         throw std::runtime_error("Read wrong number of bytes.");
@@ -1224,16 +1253,20 @@ std::uint64_t RegisterDriver::getRegValue(const std::uint32_t pRegAddr, const st
  * modifies only the bits in <tt>[pRegOffs, pRegOffs+pRegSize)</tt>, which represent the stored
  * value, and then writes back the partially modified byte sequence to \p pRegAddr using write().
  *
+ * In the full byte case, writes the value as a byte sequence in \e little endian byte order
+ * if \p pLittle is true (\e least significant byte of \p pValue is sent first).
+ *
  * \throws std::runtime_error If the potential read() fails or the number of received bytes differs from \c N.
  * \throws std::runtime_error If write() fails.
  *
  * \param pRegAddr Module-local register address (in bytes).
  * \param pRegSize Register size in bits (i.e. bit length of stored value).
  * \param pRegOffs Register offset in bits (i.e. bit offset of stored value with respect to \p pRegAddr).
+ * \param pLittle Assume \e little endian byte order of the register (and thus send \c pValue[LSB] first) if true.
  * \param pValue Value to be written.
  */
 void RegisterDriver::setRegValue(const std::uint32_t pRegAddr, const std::uint32_t pRegSize,
-                                 const std::uint32_t pRegOffs, const std::uint64_t pValue) const
+                                 const std::uint32_t pRegOffs, const bool pLittle, const std::uint64_t pValue) const
 {
     const std::uint32_t byteOffs = pRegOffs / 8;
     const std::uint32_t bitOffs = pRegOffs % 8;
@@ -1244,42 +1277,57 @@ void RegisterDriver::setRegValue(const std::uint32_t pRegAddr, const std::uint32
 
     if (bitOffs == 0 && (pRegSize % 8) == 0)
     {
+        //Note: Here it is assumed that, if 'pLittle' is true, 'byteOffs' is also zero, as constructor checks that registers comply with that
+
         if (writeByteSize > 8)
         {
             throw std::runtime_error("Write size of register without offset exceeds 8 bytes. THIS SHOULD NEVER HAPPEN!");
         }
         else if (writeByteSize == 8)
         {
-            write(pRegAddr + byteOffs, Bytes::composeByteVec(true, static_cast<std::uint64_t>(pValue)));
+            write(pRegAddr + byteOffs, Bytes::composeByteVec(!pLittle, static_cast<std::uint64_t>(pValue)));
         }
         else if (writeByteSize > 4)
         {
-            const std::vector<std::uint8_t> writeBytes = Bytes::composeByteVec(true, static_cast<std::uint64_t>(pValue));
+            const std::vector<std::uint8_t> writeBytes = Bytes::composeByteVec(!pLittle, static_cast<std::uint64_t>(pValue));
             std::vector<std::uint8_t> writeBytesTruncated(writeByteSize, 0);
 
-            const std::size_t skipBytes = 8 - writeByteSize;
-            std::copy(writeBytes.begin()+skipBytes, writeBytes.end(), writeBytesTruncated.begin());
+            if (pLittle)
+                std::copy(writeBytes.begin(), writeBytes.begin()+writeByteSize, writeBytesTruncated.begin());
+            else
+            {
+                const std::size_t skipBytes = 8 - writeByteSize;
+                std::copy(writeBytes.begin()+skipBytes, writeBytes.end(), writeBytesTruncated.begin());
+            }
 
             write(pRegAddr + byteOffs, writeBytesTruncated);
         }
         else if (writeByteSize == 4)
         {
-            write(pRegAddr + byteOffs, Bytes::composeByteVec(true, static_cast<std::uint32_t>(pValue)));
+            write(pRegAddr + byteOffs, Bytes::composeByteVec(!pLittle, static_cast<std::uint32_t>(pValue)));
         }
         else if (writeByteSize == 3)
         {
-            const std::vector<std::uint8_t> writeBytes = Bytes::composeByteVec(true, static_cast<std::uint32_t>(pValue));
-            const std::vector<std::uint8_t> writeBytesTruncated {writeBytes[1], writeBytes[2], writeBytes[3]};
+            const std::vector<std::uint8_t> writeBytes = Bytes::composeByteVec(!pLittle, static_cast<std::uint32_t>(pValue));
 
-            write(pRegAddr + byteOffs, writeBytesTruncated);
+            if (pLittle)
+            {
+                const std::vector<std::uint8_t> writeBytesTruncated {writeBytes[0], writeBytes[1], writeBytes[2]};
+                write(pRegAddr + byteOffs, writeBytesTruncated);
+            }
+            else
+            {
+                const std::vector<std::uint8_t> writeBytesTruncated {writeBytes[1], writeBytes[2], writeBytes[3]};
+                write(pRegAddr + byteOffs, writeBytesTruncated);
+            }
         }
         else if (writeByteSize == 2)
         {
-            write(pRegAddr + byteOffs, Bytes::composeByteVec(true, static_cast<std::uint16_t>(pValue)));
+            write(pRegAddr + byteOffs, Bytes::composeByteVec(!pLittle, static_cast<std::uint16_t>(pValue)));
         }
         else if (writeByteSize == 1)
         {
-            write(pRegAddr + byteOffs, Bytes::composeByteVec(true, static_cast<std::uint8_t>(pValue)));
+            write(pRegAddr + byteOffs, Bytes::composeByteVec(!pLittle, static_cast<std::uint8_t>(pValue)));
         }
         else
         {

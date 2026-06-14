@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -63,41 +63,45 @@ std::map<std::string, casil::HL::RegisterDescr, std::less<>> InvalidRegDriver::g
     switch (failureMode)
     {
         case 0:
-            return {{"Version", {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0}, .size{8},  .offs{0}}}};    //Name
+            return {{"Version", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0}, .size{8},  .offs{0}}}};    //Name
         case 1:
-            return {{"VERSION", {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0}, .size{0},  .offs{0}}}};    //Size
+            return {{"VERSION", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0}, .size{0},  .offs{0}}}};    //Size
         case 2:
-            return {{"VERSION", {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0}, .size{65}, .offs{0}}}};    //Size
+            return {{"VERSION", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0}, .size{65}, .offs{0}}}};    //Size
         case 3:
-            return {{"OUTPUT",  {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{4}, .size{3},  .offs{1}}}};    //Offset
+            return {{"OUTPUT",  {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{4}, .size{3},  .offs{1}}}};    //Offset
         case 4:
-        {
-            return {{"VERSION", {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0}, .size{8},  .offs{0},   //Default for R/O
-                                 .defaultValue{std::uint64_t{0}}}}};
-        }
+            return {{"SOMEREG", {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{7}, .size{15}, .offs{0}, .order{BO::Little}}}};  //Size
         case 5:
-        {
-            return {{"FOOBAR",  {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{1}, .size{10}, .offs{3},   //Default type
-                                 .defaultValue{std::vector<std::uint8_t>{0xDE, 0xBC}}}}};
-        }
+            return {{"SOMEREG", {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{7}, .size{8}, .offs{8}, .order{BO::Little}}}};   //Offset
         case 6:
         {
-            return {{"OUTPUT",  {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{4}, .size{3},  .offs{0},   //Default type
+            return {{"VERSION", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0}, .size{8},  .offs{0},   //Default for R/O
                                  .defaultValue{std::uint64_t{0}}}}};
         }
         case 7:
         {
-            return {{"OUTPUT",  {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{4}, .size{3},  .offs{0},   //Default length
+            return {{"FOOBAR",  {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{1}, .size{10}, .offs{3},   //Default type
+                                 .defaultValue{std::vector<std::uint8_t>{0xDE, 0xBC}}}}};
+        }
+        case 8:
+        {
+            return {{"OUTPUT",  {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{4}, .size{3},  .offs{0},   //Default type
+                                 .defaultValue{std::uint64_t{0}}}}};
+        }
+        case 9:
+        {
+            return {{"OUTPUT",  {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{4}, .size{3},  .offs{0},   //Default length
                                  .defaultValue{std::vector<std::uint8_t>{0xDE, 0xBC}}}}};
         }
         case -1:
         default:    //No failure
         {
-            return {{"VERSION", {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0}, .size{8},  .offs{0}}},
-                    {"FOOBAR",  {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{1}, .size{10}, .offs{3},
-                                 .defaultValue{std::uint64_t{0}}}},
-                    {"OUTPUT",  {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{4}, .size{3},  .offs{0},
-                                 .defaultValue{std::vector<std::uint8_t>{0xDE, 0xBC, 0x9A}}}}};
+            return {{"VERSION", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0}, .size{8},  .offs{0}}},
+                    {"FOOBAR",  {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{1}, .size{10}, .offs{3}, .defaultValue{std::uint64_t{0}}}},
+                    {"OUTPUT",  {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{4}, .size{3},  .offs{0},
+                                 .defaultValue{std::vector<std::uint8_t>{0xDE, 0xBC, 0x9A}}}},
+                    {"SOMEREG", {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{7}, .size{16}, .offs{0}, .order{BO::Little}}}};
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -33,24 +33,26 @@ CASIL_REGISTER_DRIVER_CPP(TestRegDriver)
 
 TestRegDriver::TestRegDriver(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) :
     RegisterDriver(typeName, std::move(pName), pInterface, std::move(pConfig), LayerConfig(),
-       {{"RESET",     {.type{DataType::Value},     .mode{AccessMode::WriteOnly}, .addr{0},  .size{8},  .offs{0}}},
-        {"VERSION",   {.type{DataType::Value},     .mode{AccessMode::ReadOnly},  .addr{0},  .size{8},  .offs{0}}},
-        {"FOOBAR",    {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{1},  .size{10}, .offs{3}}},
-        {"INPUT",     {.type{DataType::ByteArray}, .mode{AccessMode::ReadOnly},  .addr{3},  .size{1},  .offs{0}}},
-        {"OUTPUT",    {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{4},  .size{3},  .offs{0}}},
-        {"TRIGGER",   {.type{DataType::ByteArray}, .mode{AccessMode::WriteOnly}, .addr{7},  .size{2},  .offs{0}}},
-        {"TESTARR",   {.type{DataType::ByteArray}, .mode{AccessMode::ReadWrite}, .addr{9},  .size{2},  .offs{0},
+       {{"RESET",       {.type{DT::Value},     .mode{AM::WriteOnly}, .addr{0},  .size{8},  .offs{0}}},
+        {"VERSION",     {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{0},  .size{8},  .offs{0}}},
+        {"FOOBAR",      {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{1},  .size{10}, .offs{3}}},
+        {"INPUT",       {.type{DT::ByteArray}, .mode{AM::ReadOnly},  .addr{3},  .size{1},  .offs{0}}},
+        {"OUTPUT",      {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{4},  .size{3},  .offs{0}}},
+        {"TRIGGER",     {.type{DT::ByteArray}, .mode{AM::WriteOnly}, .addr{7},  .size{2},  .offs{0}}},
+        {"TESTARR",     {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{9},  .size{2},  .offs{0},
                                                                                  .defaultValue{std::vector<std::uint8_t>{0xDE, 0xBC}}}},
-        {"TESTVAL",   {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{11}, .size{16}, .offs{0}, .defaultValue{0xABCDu}}},
+        {"TESTARR_LIT", {.type{DT::ByteArray}, .mode{AM::ReadWrite}, .addr{9},  .size{2},  .offs{0}, .order{BO::Little}}},
+        {"TESTVAL",     {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{11}, .size{16}, .offs{0}, .defaultValue{0xABCDu}}},
+        {"TESTVAL_LIT", {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{11}, .size{16}, .offs{0}, .order{BO::Little}}},
         //
-        {"TESTVAL_A", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{13}, .size{18}, .offs{3}}},
-        {"TESTVAL_B", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{16}, .size{11}, .offs{5}}},
-        {"TESTVAL_C", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{18}, .size{11}, .offs{0}}},
+        {"TESTVAL_A",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{13}, .size{18}, .offs{3}}},
+        {"TESTVAL_B",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{16}, .size{11}, .offs{5}}},
+        {"TESTVAL_C",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{18}, .size{11}, .offs{0}}},
         //
-        {"TESTVAL_D", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{20}, .size{26}, .offs{3}}},
-        {"TESTVAL_E", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{24}, .size{34}, .offs{3}}},
-        {"TESTVAL_F", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{29}, .size{58}, .offs{3}}},
-        {"TESTVAL_G", {.type{DataType::Value},     .mode{AccessMode::ReadWrite}, .addr{37}, .size{63}, .offs{3}}}}),
+        {"TESTVAL_D",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{20}, .size{26}, .offs{3}}},
+        {"TESTVAL_E",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{24}, .size{34}, .offs{3}}},
+        {"TESTVAL_F",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{29}, .size{58}, .offs{3}}},
+        {"TESTVAL_G",   {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{37}, .size{63}, .offs{3}}}}),
     initCount(0),
     closeCount(0)
 {

@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -110,6 +110,26 @@ struct RegisterDescr
         ReadWrite = 0b11    ///< Can read from and write to the register.
     };
     //
+    /*!
+     * \brief Byte order of the register as used by the firmware module in bus transactions.
+     *
+     * When a multi-byte register that is defined here to be at bus address \c A actually sends/accepts its \e most significant
+     * byte at the \e smallest address \c A \c + \c 0 on reads/writes, the register uses a Big endian byte order. The byte
+     * order is Little endian instead if the firmware module maps the \e least significant byte to address \c A \c + \c 0.
+     *
+     * \note Big endian byte order is assumed to be the most natural choice and is hence the default.
+     *       In this case, for DataType::ByteArray, the data are retrieved/written by RegisterDriver
+     *       as is, and they are retrieved/written in \e reverse order for Little endian byte order.
+     *       For DataType::Value, the byte order is used by RegisterDriver to properly encode/decode the represented
+     *       numerical value, if possible. This, however, only makes sense with Little endian (i.e. \e inverse) order
+     *       if there is no offset and the register spans \e full bytes. Big endian order must be used otherwise.
+     */
+    enum class ByteOrder : std::uint8_t
+    {
+        Big = 0,    ///< Big endian.
+        Little = 1  ///< Little endian.
+    };
+    //
     typedef std::variant<std::monostate, std::uint64_t, std::vector<std::uint8_t>> VariantValueType;
                                                         ///< Variant to optionally store the two possible types of register content.
     //
@@ -118,6 +138,7 @@ struct RegisterDescr
     const std::uint32_t addr = 0;                       ///< %Register address in bytes.
     const std::uint32_t size = 0;                       ///< %Register size (in bits for DataType::Value, in bytes for DataType::ByteArray).
     const std::uint32_t offs = 0;                       ///< %Register bit offset from its \ref addr "address" (only for DataType::Value).
+    const ByteOrder order = ByteOrder::Big;             ///< \copybrief ByteOrder
     const VariantValueType defaultValue = std::monostate{};     ///< Designated default register content.
 };
 
@@ -143,6 +164,10 @@ protected:
     //Declaring these aliases to make definition of registers in implementations more compact
     using DataType = RegisterDescr::DataType;       ///< \copybrief casil::HL::RegisterDescr::DataType
     using AccessMode = RegisterDescr::AccessMode;   ///< \copybrief casil::HL::RegisterDescr::AccessMode
+    using ByteOrder = RegisterDescr::ByteOrder;     ///< \copybrief casil::HL::RegisterDescr::ByteOrder
+    using DT = RegisterDescr::DataType;             ///< \copybrief casil::HL::RegisterDescr::DataType
+    using AM = RegisterDescr::AccessMode;           ///< \copybrief casil::HL::RegisterDescr::AccessMode
+    using BO = RegisterDescr::ByteOrder;            ///< \copybrief casil::HL::RegisterDescr::ByteOrder
 
 public:
     class RegisterProxy;
@@ -210,12 +235,13 @@ private:
                                                                             ///< Check if software version is compatible with firmware version.
     bool checkVersionRequirement();                                         ///< \copybrief checkVersionRequirement(std::uint8_t, std::uint8_t)
     //
-    std::vector<std::uint8_t> getRegBytes(std::uint32_t pRegAddr, std::uint32_t pRegSize) const;
+    std::vector<std::uint8_t> getRegBytes(std::uint32_t pRegAddr, std::uint32_t pRegSize, bool pLittle) const;
                                                                                             ///< Read a byte sequence from a register address.
-    void setRegBytes(std::uint32_t pRegAddr, const std::vector<std::uint8_t>& pData) const; ///< Write a byte sequence to a register address.
-    std::uint64_t getRegValue(std::uint32_t pRegAddr, std::uint32_t pRegSize, std::uint32_t pRegOffs) const;
+    void setRegBytes(std::uint32_t pRegAddr, bool pLittle, const std::vector<std::uint8_t>& pData) const;
+                                                                                            ///< Write a byte sequence to a register address.
+    std::uint64_t getRegValue(std::uint32_t pRegAddr, std::uint32_t pRegSize, std::uint32_t pRegOffs, bool pLittle) const;
                                                                                             ///< Read an integer value from a register address.
-    void setRegValue(std::uint32_t pRegAddr, std::uint32_t pRegSize, std::uint32_t pRegOffs, std::uint64_t pValue) const;
+    void setRegValue(std::uint32_t pRegAddr, std::uint32_t pRegSize, std::uint32_t pRegOffs, bool pLittle, std::uint64_t pValue) const;
                                                                                             ///< Write an integer value to a register address.
 
 protected:

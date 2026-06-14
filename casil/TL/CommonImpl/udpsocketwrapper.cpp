@@ -276,17 +276,39 @@ void UDPSocketWrapper::init(const std::chrono::milliseconds pConnectTimeout, con
 
     try
     {
-        boost::asio::ip::udp::resolver resolver(ASIO::getIOContext());
+        using boost::asio::ip::udp;
+
+        udp::resolver resolver(ASIO::getIOContext());
 
         if (pConnectTimeout <= std::chrono::milliseconds::zero())
             boost::asio::connect(socket, resolver.resolve(hostName, std::to_string(port)));
         else
         {
-            std::future<boost::asio::ip::udp::endpoint> endpoint = boost::asio::async_connect(socket,
-                                                                                              resolver.resolve(hostName, std::to_string(port)),
-                                                                                              boost::asio::use_future);
+            std::future<udp::resolver::results_type> futureResolvResults = resolver.async_resolve(hostName,
+                                                                                                  std::to_string(port),
+                                                                                                  boost::asio::use_future);
 
-            (void)ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(endpoint, socket, pConnectTimeout, pTimedOut);
+            const auto timeoutRefTime = std::chrono::steady_clock::now();
+
+            const udp::resolver::results_type resolvResults = ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(futureResolvResults,
+                                                                                                                resolver,
+                                                                                                                pConnectTimeout,
+                                                                                                                pTimedOut);
+
+            std::future<udp::endpoint> endpoint = boost::asio::async_connect(socket, resolvResults, boost::asio::use_future);
+
+            const auto reducedTimeout = pConnectTimeout -
+                                        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+                                                                                              timeoutRefTime);
+
+            if (reducedTimeout <= std::chrono::milliseconds::zero())
+            {
+                if (pTimedOut.has_value())
+                    pTimedOut->get() = true;
+                throw std::runtime_error("Timeout.");
+            }
+
+            (void)ASIOHelper::getAsyncBoostFutureWithTimedOutCancel(endpoint, socket, reducedTimeout, pTimedOut);
         }
     }
     catch (const boost::system::system_error& exc)

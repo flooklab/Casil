@@ -68,6 +68,15 @@ concept IsSocketOrSerPort = (std::same_as<T, boost::asio::ip::tcp::socket> ||
                              std::same_as<T, boost::asio::serial_port>);
 
 /*!
+ * \brief Check if type is a Boost %ASIO %TCP resolver or a Boost %ASIO %UDP resolver.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept IsResolver = (std::same_as<T, boost::asio::ip::tcp::resolver> ||
+                      std::same_as<T, boost::asio::ip::udp::resolver>);
+
+/*!
  * \brief Check if a Boost %ASIO %TCP or %UDP socket or serial port has a \c cancel() function with \c void return type.
  *
  * \tparam T Type to be checked.
@@ -78,12 +87,23 @@ concept IsCancellableSocketOrSerPort = IsSocketOrSerPort<T> && requires(T sockPo
     { sockPort.cancel() } -> std::same_as<void>;    //This check is kind of paranoid
 };
 
+/*!
+ * \brief Check if a Boost %ASIO %TCP or %UDP resolver has a \c cancel() function with \c void return type.
+ *
+ * \tparam T Type to be checked.
+ */
+template<typename T>
+concept IsCancellableResolver = IsResolver<T> && requires(T resolver)
+{
+    { resolver.cancel() } -> std::same_as<void>;    //This check is kind of paranoid
+};
+
 template<typename ReturnT, typename T>
-    requires IsCancellableSocketOrSerPort<T>
-ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& pSocketOrPort, std::chrono::milliseconds pTimeout,
+    requires (IsCancellableSocketOrSerPort<T> || IsCancellableResolver<T>)
+ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& pSockPortResolver, std::chrono::milliseconds pTimeout,
                                               const std::optional<std::reference_wrapper<bool>> pTimedOut = std::nullopt);
-                                                                            ///< \brief Wait for the future, get and return its value;
-                                                                            ///  cancel the socket/port and throw an exception on timeout.
+                                                                            ///< \brief Wait for the future, get and return its value; cancel
+                                                                            ///  the socket/port/resolver and throw an exception on timeout.
 
 template<typename T>
     requires IsCancellableSocketOrSerPort<T>
@@ -102,13 +122,13 @@ void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t p
 
 
 /*!
- * \brief Wait for the future, get and return its value; cancel the socket/port and throw an exception on timeout.
+ * \brief Wait for the future, get and return its value; cancel the socket/port/resolver and throw an exception on timeout.
  *
  * This function should be used to retrieve the result of an asynchronous operation (in terms of the return value of the equivalent
- * synchronous call) on a socket/port \p pSocketOrPort using the built-in \c boost::asio::use_future handler when this very
- * result is not needed anymore if the operation times out. After \p pTimeout with still unfinished operation \p pSocketOrPort
- * will be cancelled. If the operation finishes before the timeout or during the cancelling of the socket/port, the result
- * will be returned. Otherwise an exception is thrown, in which case \p pTimedOut will be set to true (if defined).
+ * synchronous call) on a socket/port/resolver \p pSockPortResolver using the built-in \c boost::asio::use_future handler when this
+ * very result is not needed anymore if the operation times out. After \p pTimeout with still unfinished operation \p pSockPortResolver
+ * will be cancelled. If the operation finishes before the timeout or during the cancelling of the socket/port/resolver,
+ * the result will be returned. Otherwise an exception is thrown, in which case \p pTimedOut will be set to true (if defined).
  *
  * Note that \p pTimedOut is always set to false in the beginning, if defined.
  *
@@ -117,16 +137,16 @@ void readWriteHandler(const boost::system::error_code& pErrorCode, std::size_t p
  * \throws boost::system::system_error If the handler throwed such an exception (other than from cancelling after timeout).
  *
  * \tparam ReturnT Return type of the handled operation (which is wrapped in \p pFuture).
- * \tparam T Type of the socket/port (%TCP or %UDP socket or serial port from the Boost %ASIO library).
+ * \tparam T Type of the socket/port/resolver (%TCP or %UDP socket or resolver or a serial port from the Boost %ASIO library).
  * \param pFuture The future returned from initiating the async operation.
- * \param pSocketOrPort The socket or serial port on which the operation is performed.
+ * \param pSockPortResolver The socket, serial port or resolver on which the operation is performed.
  * \param pTimeout The timeout for the handled operation.
- * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSocketOrPort cancelled and thrown exception was because of the timeout).
+ * \param pTimedOut Whether \p pTimeout was reached (i.e. \p pSockPortResolver cancelled and thrown exception was because of the timeout).
  * \return Result of \p pFuture / the operation.
  */
 template<typename ReturnT, typename T>
-    requires IsCancellableSocketOrSerPort<T>
-ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& pSocketOrPort, std::chrono::milliseconds pTimeout,
+    requires (IsCancellableSocketOrSerPort<T> || IsCancellableResolver<T>)
+ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& pSockPortResolver, std::chrono::milliseconds pTimeout,
                                               const std::optional<std::reference_wrapper<bool>> pTimedOut)
 {
     if (pTimedOut.has_value())
@@ -143,7 +163,7 @@ ReturnT getAsyncBoostFutureWithTimedOutCancel(std::future<ReturnT>& pFuture, T& 
     }
     else if (status == std::future_status::timeout)
     {
-        pSocketOrPort.cancel();
+        pSockPortResolver.cancel();
 
         pFuture.wait();
 

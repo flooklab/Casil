@@ -4,5 +4,9 @@
 #Doxygen output
 doc/casil/doc
 
+#Python cache files
+tests/co-sim/.pytest_cache
+tests/co-sim/**/__pycache__
+
 #Untracked development stuff
 _misc

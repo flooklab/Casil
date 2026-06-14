@@ -85,8 +85,8 @@ I2C::I2C(std::string pName, InterfaceBaseType& pInterface, LayerConfig pConfig) 
         {"READY",     {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{1},  .size{1},  .offs{7}}},
         {"NO_ACK",    {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{1},  .size{1},  .offs{6}}},
         {"ADDR",      {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{2},  .size{8},  .offs{0}}},
-        {"SIZE",      {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{3},  .size{16}, .offs{0}}},
-        {"MEM_BYTES", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{6},  .size{16}, .offs{0}}}}),
+        {"SIZE",      {.type{DT::Value},     .mode{AM::ReadWrite}, .addr{3},  .size{16}, .offs{0}, .order{BO::Little}}},
+        {"MEM_BYTES", {.type{DT::Value},     .mode{AM::ReadOnly},  .addr{6},  .size{16}, .offs{0}, .order{BO::Little}}}}),
     seqMemSize(0)
 {
 }

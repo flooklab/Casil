@@ -139,7 +139,7 @@ std::vector<std::uint8_t> SiSim::read(const std::uint64_t pAddr, const int pSize
 
     try
     {
-        socketWrapperPtr->write(createReadRequest(pAddr, pSize));
+        socketWrapperPtr->write(createReadRequest(pAddr, static_cast<std::uint32_t>(pSize)));
     }
     catch (const std::runtime_error& exc)
     {

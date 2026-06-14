@@ -413,6 +413,12 @@ foreach(fileName ${SCPI_DEVICE_DESCRIPTION_FILE_NAMES})
 endforeach()
 file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/tmp_devdescr_patch")
 
+#Configure entry point in build directory for co-simulation tests
+if(CASIL_BUILD_BINDING)
+    set(CASIL_PRJ_SRC_DIR "${PROJECT_SOURCE_DIR}")
+    configure_file("${PROJECT_SOURCE_DIR}/tests/co-sim/runCoSimTests.py.in" "${PROJECT_BINARY_DIR}/co-sim/runCoSimTests.py" @ONLY)
+endif()
+
 #Installation
 
 install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION "${CASIL_CMAKE_LICENSEDIR}" COMPONENT License)

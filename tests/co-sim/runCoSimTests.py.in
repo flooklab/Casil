@@ -1,0 +1,34 @@
+##################################################################################################
+#
+#  Copyright (C) 2026 M. Frohne
+#
+#  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
+#
+#  Casil is free software: you can redistribute it and/or modify it
+#  under the terms of the GNU Affero General Public License as published
+#  by the Free Software Foundation, either version 3 of the License,
+#  or (at your option) any later version.
+#
+#  Casil is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty
+#  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#  See the GNU Affero General Public License for more details.
+#
+#  You should have received a copy of the GNU Affero General Public License
+#  along with Casil. If not, see <https://www.gnu.org/licenses/>.
+#
+##################################################################################################
+
+import os
+import subprocess
+import sys
+
+casilSrcDir = "@CASIL_PRJ_SRC_DIR@"
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+modEnv = os.environ.copy()
+modEnv["PYTHONPATH"] = os.pathsep.join(sys.path)
+modEnv["BASIL_FIRMWARE_DIR"] = os.path.join(casilSrcDir, "external/basil/basil/firmware")
+
+subprocess.run([sys.executable, os.path.join(casilSrcDir, "tests/co-sim/runTests.py")], env=modEnv)

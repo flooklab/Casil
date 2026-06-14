@@ -74,7 +74,7 @@ def _getBasilFirmwareDir():
     """Get the firmware directory."""
     if "BASIL_FIRMWARE_DIR" in os.environ:
         return os.environ["BASIL_FIRMWARE_DIR"]
-    else:   #TODO configure this path from CMake for running sim from build dir???
+    else:
         return str(pathlib.Path(__file__).parent.parent.parent.parent.parent.joinpath("external/basil/basil/firmware").absolute())
 
 def _generateMakefile(

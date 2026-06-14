@@ -438,7 +438,7 @@ bool I2C::initModule()
 {
     try
     {
-        seqMemSize = static_cast<std::uint16_t>(getValue("MEM_BYTES"));
+        seqMemSize = memSize();
     }
     catch (const std::runtime_error& exc)
     {

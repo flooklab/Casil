@@ -106,10 +106,6 @@ init_cache_variable(CASIL_BUILD_BINDING BOOL ON "Build PyCasil Python binding.")
 init_cache_variable(CASIL_BUILD_EXAMPLE BOOL ON "Build example executable.")
 init_cache_variable(CASIL_BUILD_TESTS BOOL ON "Build Casil unit tests.")
 
-if((NOT CASIL_BUILD_STATIC) AND (NOT CASIL_BUILD_SHARED))
-    message(FATAL_ERROR "Must build at least one version of the library (shared/static).")
-endif()
-
 init_cache_variable(CASIL_INSTALL_STATIC BOOL OFF "Install static Casil library.")
 init_cache_variable(CASIL_INSTALL_SHARED BOOL ON "Install shared Casil library.")
 init_cache_variable(CASIL_INSTALL_BINDING BOOL ON "Install PyCasil Python binding.")

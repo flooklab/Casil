@@ -126,6 +126,7 @@ SiSim::~SiSim() = default;
  *
  * \internal See also CommonImpl::TCPSocketWrapper::write() and CommonImpl::TCPSocketWrapper::read(). \endinternal
  *
+ * \throws std::runtime_error For negative \p pSize.
  * \throws std::runtime_error If the write or the read fail.
  * \throws std::runtime_error If the received response is not a valid \ref casil::TL::SiSim::MessageType::ReadResponse "ReadResponse".
  *
@@ -133,6 +134,9 @@ SiSim::~SiSim() = default;
  */
 std::vector<std::uint8_t> SiSim::read(const std::uint64_t pAddr, const int pSize)
 {
+    if (pSize < 0)
+        throw std::runtime_error("Requested read size is invalid for " + getSelfDescription() + ".");
+
     try
     {
         socketWrapperPtr->write(createReadRequest(pAddr, pSize));

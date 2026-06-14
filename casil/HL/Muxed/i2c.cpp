@@ -352,7 +352,7 @@ void I2C::setSize(const int pSize)
  */
 std::vector<std::uint8_t> I2C::sendRead(const std::uint8_t pAddr, const int pSize)
 {
-    setAddr((pAddr << 1) | 0x01u);
+    setAddr(pAddr | 0x01u);
     setSize(pSize);
     exec();
     while (!isDone())
@@ -379,7 +379,7 @@ std::vector<std::uint8_t> I2C::sendRead(const std::uint8_t pAddr, const int pSiz
  */
 std::vector<std::uint8_t> I2C::sendRead(const std::bitset<7>& pAddr, const int pSize)
 {
-    return sendRead(pAddr.to_ulong(), pSize);
+    return sendRead((pAddr.to_ulong() << 1), pSize);
 }
 
 /*!
@@ -398,7 +398,7 @@ std::vector<std::uint8_t> I2C::sendRead(const std::bitset<7>& pAddr, const int p
  */
 void I2C::sendWrite(const std::uint8_t pAddr, const std::vector<std::uint8_t>& pData)
 {
-    setAddr((pAddr << 1) & 0xFEu);
+    setAddr(pAddr & 0xFEu);
     setSize(pData.size());
     setData(pData);
     exec();
@@ -422,7 +422,7 @@ void I2C::sendWrite(const std::uint8_t pAddr, const std::vector<std::uint8_t>& p
  */
 void I2C::sendWrite(const std::bitset<7>& pAddr, const std::vector<std::uint8_t>& pData)
 {
-    sendWrite(pAddr.to_ulong(), pData);
+    sendWrite((pAddr.to_ulong() << 1), pData);
 }
 
 //Private

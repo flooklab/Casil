@@ -67,6 +67,7 @@
 #include <casil/layerfactorymacros.h>
 
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <deque>

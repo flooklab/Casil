@@ -65,7 +65,6 @@
 
 #include <algorithm>
 #include <bitset>
-#include <chrono>
 #include <iterator>
 #include <span>
 #include <stdexcept>

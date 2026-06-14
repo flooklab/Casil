@@ -10,7 +10,7 @@ but some of the usage aspects might be quite different in detail and some very "
 might not be available at all. The usage of the Python binding ("PyCasil") will be rather similar to basil. If you wanted
 to use PyCasil in place of basil, though, this would possibly require small changes to your YAML configuration and
 certainly require bigger (but not huge) changes to your program code. Note, however, that Casil is currently not
-really usable because it is still nearly incomplete and not even tested with hardware or simulation yet.  
+really usable because it is still nearly incomplete and not even tested with actual hardware yet.  
 Please also see the ["disclaimer"](#user-content-disclaimer) below.  
 
 For license information please see the [License Information](#user-content-license-information) section at the bottom.
@@ -33,8 +33,9 @@ I also currently do not see that anyone would really want or need something like
 But, as this project actually turned out to be relatively solid/functioning already, I thought I would share it anyway.
 Nevertheless, as I wrote above, Casil is still nearly incomplete. For it to become anything serious that could be used
 for an actual project one would need to port a whole lot of individual drivers and other parts from basil to Casil.
-The whole `cocotb` simulation interface and accompanying simulation-driven unit tests would have to be ported too
-at some point. I do not see this happening anytime soon (unless maybe someone would want to help out).
+And even though there is now an adapted `cocotb` co-simulation interface and the few already adapted simulation-driven
+unit tests indeed pass, a lot more simulation tests (corresponding to the then ported register drivers) would
+probably have to be ported before being able to assess whether really everything works as it should.
 
 ## Building
 

@@ -73,7 +73,7 @@ Because Casil is supposed to be(come) a reimplementation of *basil* but currentl
 the primary focus of development should really just be on implementing more basil functionality.
 Most importantly, this comprises the adaption of more basil *driver* components (see below).  
 
-Other things (except bug fixes, maybe general code quality, simulation interface (in the medium term), ...)
+Other things (except bug fixes, maybe general code quality, simulation tests for added register drivers, ...)
 have *no* priority at the moment, especially not new features that are not part of basil.
 
 ### Writing new Driver/Interface/Register Components

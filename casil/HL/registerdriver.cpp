@@ -140,12 +140,12 @@ RegisterDriver::RegisterDriver(std::string pType, std::string pName, InterfaceBa
         }
         if (regDescr.type == DataType::ByteArray && regDescr.offs > 0)
         {
-            throw std::runtime_error("Offset is non-zero for byte array register \"" + regName + "\" "+
+            throw std::runtime_error("Offset is non-zero for byte array register \"" + regName + "\" " +
                                      "of register driver \"" + name + "\".");
         }
         if (regDescr.mode == AccessMode::ReadOnly && !std::holds_alternative<std::monostate>(regDescr.defaultValue))
         {
-            throw std::runtime_error("Default value set for read-only register \"" + regName + "\" of register driver "+
+            throw std::runtime_error("Default value set for read-only register \"" + regName + "\" of register driver " +
                                      "\"" + name + "\".");
         }
         if ((regDescr.type == DataType::Value && std::holds_alternative<std::vector<std::uint8_t>>(regDescr.defaultValue)) ||
@@ -742,7 +742,7 @@ void RegisterDriver::trigger(const std::string_view pRegName)
 
     if (reg.mode != AccessMode::WriteOnly)
     {
-        throw std::invalid_argument("Cannot trigger register \"" + std::string(pRegName) + "\" of register driver \"" + name + "\": "+
+        throw std::invalid_argument("Cannot trigger register \"" + std::string(pRegName) + "\" of register driver \"" + name + "\": " +
                                     "Only available for write-only registers.");
     }
 

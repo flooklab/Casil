@@ -70,6 +70,7 @@ set(HEADER_FILE_NAMES
     TL/Direct/tcp.h
     TL/Direct/udp.h
     TL/Muxed/dummymuxedinterface.h
+    TL/Muxed/sisim.h
     TL/Muxed/sitcp.h
 )
 
@@ -126,6 +127,7 @@ set(SOURCE_FILE_NAMES
     TL/Direct/tcp
     TL/Direct/udp
     TL/Muxed/dummymuxedinterface
+    TL/Muxed/sisim
     TL/Muxed/sitcp
 )
 

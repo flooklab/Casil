@@ -1,7 +1,7 @@
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024–2025 M. Frohne
+//  Copyright (C) 2024–2026 M. Frohne
 //
 //  This file is part of Casil, a reimplementation of the data acquisition framework basil in C++.
 //
@@ -34,6 +34,7 @@ extern void bindTL_TCP(py::module&);
 extern void bindTL_UDP(py::module&);
 
 extern void bindTL_DummyMuxedInterface(py::module&);
+extern void bindTL_SiSim(py::module&);
 extern void bindTL_SiTCP(py::module&);
 
 void bindTL(py::module& pM)
@@ -49,5 +50,6 @@ void bindTL(py::module& pM)
     bindTL_UDP(pM);
 
     bindTL_DummyMuxedInterface(pM);
+    bindTL_SiSim(pM);
     bindTL_SiTCP(pM);
 }
